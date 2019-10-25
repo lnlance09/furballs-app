@@ -1,0 +1,6 @@
+export const ADD_CAT_PIC = "capture:ADD_CAT_PIC"
+export const BASE_URL = "http://localhost:8888/cats/"
+export const FETCH_ACTIVITY = "activity:FETCH_ACTIVITY"
+export const LOGIN = "profile:LOGIN"
+export const REGISTER = "profile:REGISTER"
+export const SEARCH_CATS = "search:SEARCH_CATS"
