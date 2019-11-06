@@ -1,18 +1,27 @@
+import AppHeader from "../components/AppHeader"
+import CatGrid from "../components/CatGrid"
+import Colors from "../constants/Colors"
 import PropTypes from "prop-types"
 import React, { Component } from "react"
 import { connect } from "react-redux"
-import { fetchUser, login, register } from "../actions/profile"
+import { style } from "./styles/ProfileScreen"
+import { fetchUser, getCurrentUser, login, register } from "@redux/actions/profile"
 import {
 	ActivityIndicator,
 	AsyncStorage,
-	ImageBackground,
+	Dimensions,
 	ScrollView,
 	StyleSheet,
+	TextInput,
+	TouchableHighlight,
 	View
 } from "react-native"
-import { Button, Container, Form, Input, Item, Text, Toast } from "native-base"
-import { Image } from "react-native-elements"
-import { CatCard } from "../components/CatCard"
+import { Container, H1, H2, Text, Toast } from "native-base"
+import { Avatar, Button, Icon, Image } from "react-native-elements"
+
+const width = Dimensions.get("window").width - 20
+
+const styles = StyleSheet.create(style)
 
 class ProfileScreen extends Component {
 	constructor(props) {
@@ -21,12 +30,13 @@ class ProfileScreen extends Component {
 		this.state = {
 			email: "",
 			forgotPassword: false,
+			imgIndex: 0,
 			loginForm: true,
+			modalVisible: false,
 			name: "",
 			password: "",
 			registrationForm: false,
 			showToast: false,
-			userId: null,
 			username: ""
 		}
 	}
@@ -35,22 +45,12 @@ class ProfileScreen extends Component {
 		let userId = ""
 		try {
 			userId = (await AsyncStorage.getItem("userId")) || null
-		} catch (e) {
-			console.log(e.message)
+		} catch (error) {
+			console.log(error.message)
 		}
-
-		this.setState({ userId })
 
 		if (userId) {
-			this.props.fetchUser({ id: this.state.id })
-		}
-	}
-
-	async createSession(userId) {
-		try {
-			await AsyncStorage.setItem("userId", userId)
-		} catch (e) {
-			console.log(e.message)
+			this.props.fetchUser({ id: userId })
 		}
 	}
 
@@ -88,60 +88,33 @@ class ProfileScreen extends Component {
 		const {
 			email,
 			forgotPassword,
+			imgIndex,
 			loginForm,
+			modalVisible,
 			name,
 			password,
 			registrationForm,
-			userId,
 			username
 		} = this.state
-
-		const styles = StyleSheet.create({
-			container: {},
-			formSubText: {
-				marginTop: 8,
-				textAlign: "left"
-			},
-			formSubmitBtn: {
-				marginTop: 10
-			},
-			imgContainer: {
-				alignItems: "center",
-				justifyContent: "center"
-			},
-			logo: {
-				height: 150,
-				width: 150
-			}
-		})
+		const { catImages, cats, catCount, user, userId } = this.props
+		console.log("profile screen")
+		console.log(this.props)
+		console.log(imgIndex)
 
 		const SubmitFormButton = ({ callback, text }) => {
-			return (
-				<Button
-					block
-					onPress={() => callback()}
-					primary
-					style={styles.formSubmitBtn}
-					warning
-				>
-					<Text style={{ fontWeight: "bold" }}>{text}</Text>
-				</Button>
-			)
+			return <Button onPress={() => callback()} style={styles.formSubmitBtn} title={text} />
 		}
 
 		const ForgotPassword = (
-			<Container style={{ padding: 10 }}>
-				<Form>
-					<Item regular>
-						<Input
-							onChange={e => {
-								this.setState({ email: e.nativeEvent.text })
-							}}
-							placeholder="Enter your email"
-							value={email}
-						/>
-					</Item>
-				</Form>
+			<Container style={styles.formContainer}>
+				<TextInput
+					onChange={e => {
+						this.setState({ email: e.nativeEvent.text })
+					}}
+					placeholder="Enter your email"
+					style={styles.textInput}
+					value={email}
+				/>
 				<SubmitFormButton
 					callback={() => this.submitLoginForm(email, password)}
 					text="Send"
@@ -162,28 +135,24 @@ class ProfileScreen extends Component {
 		)
 
 		const LoginForm = (
-			<Container style={{ padding: 10 }}>
-				<Form>
-					<Item regular>
-						<Input
-							onChange={e => {
-								this.setState({ email: e.nativeEvent.text })
-							}}
-							placeholder="Email or username"
-							value={email}
-						/>
-					</Item>
-					<Item regular style={{ marginTop: 10 }}>
-						<Input
-							onChange={e => {
-								this.setState({ password: e.nativeEvent.text })
-							}}
-							placeholder="Password"
-							secureTextEntry
-							value={password}
-						/>
-					</Item>
-				</Form>
+			<View style={styles.formContainer}>
+				<TextInput
+					onChange={e => {
+						this.setState({ email: e.nativeEvent.text })
+					}}
+					placeholder="Email or username"
+					style={styles.textInput}
+					value={email}
+				/>
+				<TextInput
+					onChange={e => {
+						this.setState({ password: e.nativeEvent.text })
+					}}
+					placeholder="Password"
+					secureTextEntry
+					style={styles.textInput}
+					value={password}
+				/>
 				<SubmitFormButton
 					callback={() => this.submitLoginForm(email, password)}
 					text="Sign In"
@@ -212,51 +181,44 @@ class ProfileScreen extends Component {
 				>
 					Sign Up
 				</Text>
-				
-			</Container>
+			</View>
 		)
 
 		const RegistrationForm = (
-			<Container style={{ padding: 10 }}>
-				<Form>
-					<Item regular>
-						<Input
-							onChange={e => {
-								this.setState({ name: e.nativeEvent.text })
-							}}
-							placeholder="Name"
-							value={name}
-						/>
-					</Item>
-					<Item regular style={{ marginTop: 10 }}>
-						<Input
-							onChange={e => {
-								this.setState({ username: e.nativeEvent.text })
-							}}
-							placeholder="Username"
-							value={username}
-						/>
-					</Item>
-					<Item regular style={{ marginTop: 10 }}>
-						<Input
-							onChange={e => {
-								this.setState({ email: e.nativeEvent.text })
-							}}
-							placeholder="Email"
-							value={email}
-						/>
-					</Item>
-					<Item regular style={{ marginTop: 10 }}>
-						<Input
-							onChange={e => {
-								this.setState({ password: e.nativeEvent.text })
-							}}
-							placeholder="Password"
-							secureTextEntry
-							value={password}
-						/>
-					</Item>
-				</Form>
+			<Container style={styles.formContainer}>
+				<TextInput
+					onChange={e => {
+						this.setState({ name: e.nativeEvent.text })
+					}}
+					placeholder="Name"
+					style={styles.textInput}
+					value={name}
+				/>
+				<TextInput
+					onChange={e => {
+						this.setState({ username: e.nativeEvent.text })
+					}}
+					placeholder="Username"
+					style={styles.textInput}
+					value={username}
+				/>
+				<TextInput
+					onChange={e => {
+						this.setState({ email: e.nativeEvent.text })
+					}}
+					placeholder="Email"
+					style={styles.textInput}
+					value={email}
+				/>
+				<TextInput
+					onChange={e => {
+						this.setState({ password: e.nativeEvent.text })
+					}}
+					placeholder="Password"
+					secureTextEntry
+					style={styles.textInput}
+					value={password}
+				/>
 				<SubmitFormButton
 					callback={() => this.submitRegistrationForm(email, name, password, username)}
 					text="Sign Up"
@@ -278,36 +240,34 @@ class ProfileScreen extends Component {
 
 		return (
 			<Container>
+				<AppHeader
+					left={() => null}
+					right={() => <Icon color={Colors.white} name="cog" onPress={() => null} type="font-awesome" />}
+					title="Profile"
+				/>
 				{userId === null ? (
 					<Container style={styles.container}>
-						<ImageBackground
-							source={{
-								uri:
-									"https://d17fnq9dkz9hgj.cloudfront.net/uploads/2012/11/152964589-welcome-home-new-cat-632x475.jpg"
-							}}
-							style={{
-								width: "100%",
-								height: 250
-							}}
-						/>
-
 						{forgotPassword && ForgotPassword}
 						{loginForm && LoginForm}
 						{registrationForm && RegistrationForm}
 					</Container>
 				) : (
-					<View style={styles.container}>
-						<ScrollView>
-							<Image
-								containerStyle={styles.imgContainer}
-								PlaceholderContent={<ActivityIndicator />}
-								style={styles.logo}
-								source={{
-									uri: "https://facebook.github.io/react-native/img/tiny_logo.png"
-								}}
-							/>
-						</ScrollView>
-					</View>
+					<ScrollView>
+						{this.props.user.id ? (
+							<View>
+								<View style={styles.imageWrapper}>
+									<Avatar rounded icon={{ name: 'home' }} size="large" />
+								</View>
+								<H1 style={styles.h1}>{user.name}</H1>
+								<Text style={styles.usernameText}>{user.username}</Text>
+
+								<H2 style={styles.myCatsH2}>My Cats</H2>
+								<CatGrid cats={cats} catImages={catImages} user={user} />
+							</View>
+						) : (
+							<ActivityIndicator />
+						)}
+					</ScrollView>
 				)}
 			</Container>
 		)
@@ -315,7 +275,26 @@ class ProfileScreen extends Component {
 }
 
 ProfileScreen.navigationOptions = {
-	title: "Profile",
+	header: null
+}
+
+ProfileScreen.propTypes = {
+	catCount: PropTypes.number,
+	catImages: PropTypes.array,
+	cats: PropTypes.array,
+	fetchUser: PropTypes.func,
+	getCurrentUser: PropTypes.func,
+	login: PropTypes.func,
+	register: PropTypes.func,
+	user: PropTypes.object,
+	userId: PropTypes.oneOfType([PropTypes.string, PropTypes.bool])
+}
+
+ProfileScreen.defaultProps = {
+	fetchUser,
+	getCurrentUser,
+	login,
+	register,
 	user: {
 		dateCreated: null,
 		id: null,
@@ -323,20 +302,8 @@ ProfileScreen.navigationOptions = {
 		name: null,
 		pushNotificationsEnabled: true,
 		verificationCode: null
-	}
-}
-
-ProfileScreen.propTypes = {
-	fetchUser: PropTypes.func,
-	login: PropTypes.func,
-	register: PropTypes.func,
-	user: PropTypes.object
-}
-
-ProfileScreen.defaultProps = {
-	fetchUser,
-	login,
-	register
+	},
+	userId: null
 }
 
 const mapStateToProps = (state, ownProps) => {
@@ -350,6 +317,7 @@ export default connect(
 	mapStateToProps,
 	{
 		fetchUser,
+		getCurrentUser,
 		login,
 		register
 	}

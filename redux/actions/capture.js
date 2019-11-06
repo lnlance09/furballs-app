@@ -1,4 +1,4 @@
-import * as constants from "../constants"
+import * as constants from "@redux/types"
 
 export const addCatPic = ({ img }) => dispatch => {
 	fetch(`${constants.BASE_URL}api/cats/addPic`, {

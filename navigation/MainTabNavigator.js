@@ -1,6 +1,6 @@
 import React from "react"
 import { Platform, View } from "react-native"
-import { createStackNavigator, createBottomTabNavigator } from "react-navigation"
+import { createBottomTabNavigator, createStackNavigator } from "react-navigation"
 import TabBarIcon from "../components/TabBarIcon"
 import CaptureScreen from "../screens/CaptureScreen"
 import HomeScreen from "../screens/HomeScreen"
@@ -26,26 +26,24 @@ const CaptureStack = createStackNavigator(
 
 CaptureStack.navigationOptions = {
 	showLabel: false,
-	tabBarIcon: ({ focused }) => (
-		<View
-			style={{
-				backgroundColor: "#FF7121",
-				borderRadius: 100,
-				paddingTop: 10,
-				height: 80,
-				width: 80
-			}}
-		>
-			<TabBarIcon
-				color="#fff"
-				name={Platform.OS === "ios" ? "ios-camera" : "md-camera"}
-				size={55}
-				style={{
-					marginLeft: 19
-				}}
-			/>
-		</View>
-	)
+	tabBarIcon: ({ focused }) => {
+		if (!focused) {
+			return (
+				<View>
+					<TabBarIcon
+						color={focused ? Colors.red : Colors.tabIconDefault}
+						name={Platform.OS === "ios" ? "ios-camera" : "md-camera"}
+						size={32}
+						style={{
+							marginBottom: -3
+						}}
+					/>
+				</View>
+			)
+		}
+
+		return null
+	}
 }
 
 CaptureStack.path = ""
@@ -135,7 +133,11 @@ SearchStack.navigationOptions = {
 	tabBarIcon: ({ focused }) => (
 		<TabBarIcon
 			color={focused ? Colors.tabIconSelected : Colors.tabIconDefault}
-			name={Platform.OS === "ios" ? "ios-search" : "md-search"}
+			name={
+				Platform.OS === "ios"
+					? "ios-information-circle-outline"
+					: "md-information-circle-outline"
+			}
 			size={26}
 			style={{
 				marginBottom: -3
@@ -156,7 +158,15 @@ const tabNavigator = createBottomTabNavigator(
 		ProfileStack
 	},
 	{
-		tabBarOptions: { showLabel: false }
+		navigationOptions: ({ navigation }) => ({
+			tabBarVisible: false
+		}),
+		tabBarOptions: {
+			style: {
+				borderTopColor: "transparent"
+			},
+			showLabel: false
+		}
 	}
 )
 

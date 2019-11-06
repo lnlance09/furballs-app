@@ -1,86 +1,76 @@
+import AppHeader from "../components/AppHeader"
 import PropTypes from "prop-types"
 import React, { Component } from "react"
 import { connect } from "react-redux"
-import { searchCats } from "../actions/search"
-import {
-	FlatList,
-	ScrollView,
-	StyleSheet,
-	View
-} from "react-native"
-import { SearchBar } from "react-native-elements"
-import { CatCard } from "../components/CatCard"
+import { style } from "./styles/SearchScreen"
+import { searchResources } from "@redux/actions/search"
+import { Card, CardItem, Text } from "native-base"
+import { ActivityIndicator, Image, ScrollView, StyleSheet, View } from "react-native"
+
+const styles = StyleSheet.create(style)
 
 class SearchScreen extends Component {
 	constructor(props) {
 		super(props)
-		
-		this.state = {
-			page: 0,
-			q: ""
-		}
+
+		this.state = {}
 	}
 
 	componentDidMount() {
-		this.props.searchCats({ q: "", page: 0 })
-	}
-
-	updateSearch(q) {
-		this.setState({ q })
-		this.props.searchCats({ q, page: this.state.page })
+		this.props.searchResources({ city: "nyc", state: "new york" })
 	}
 
 	render() {
-		const { q } = this.state
-
-		const styles = StyleSheet.create({
-			container: {
-				backgroundColor: "#fff",
-				flex: 1
-			}
-		})
+		const { resources } = this.props
 
 		return (
 			<View style={styles.container}>
-				<SearchBar
-					lightTheme
-					onChangeText={this.updateSearch}
-					placeholder="Search furballs"
-					value={q}
-				/>
-				<ScrollView>
-					<FlatList
-						data={this.props.cats}
-						keyExtractor={item => item.id}
-						renderItem={({ item }) => (
-							<CatCard
-								description={item.description}
-								img={item.img}
-								lat={item.lat}
-								lon={item.lon}
-								name={item.name}
-							/>
-						)}
-						style={{ width: "100%" }}
-					/>
-				</ScrollView>
+				<AppHeader title="Local Resources" />
+				{resources.length === 0 ? (
+					<ActivityIndicator size="small" color="#00ff00" />
+				) : (
+					<ScrollView style={styles.scrollView}>
+						{resources.map((item, index) => (
+							<Card key={`resource${index}`} style={styles.cardContainer}>
+								<CardItem cardBody>
+									{item.photos && (
+										<Image
+											source={{
+												uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${item.photos[0].photo_reference}&key=AIzaSyD0Hd-I0mmRVa3WxTy-lpNJ-xAyDqWWTxM`
+											}}
+											style={{ width: "100%", height: 120 }}
+										/>
+									)}
+								</CardItem>
+								<CardItem header>
+									<Text>{item.name}</Text>
+								</CardItem>
+								<CardItem>
+									<Text style={styles.catCardDescription}>
+										{item.formatted_address}
+									</Text>
+								</CardItem>
+							</Card>
+						))}
+					</ScrollView>
+				)}
 			</View>
 		)
 	}
 }
 
 SearchScreen.navigationOptions = {
-	title: "Search furballs"
+	header: null
 }
 
 SearchScreen.propTypes = {
-	cats: PropTypes.array,
-	searchCats: PropTypes.func
+	resources: PropTypes.array,
+	searchResources: PropTypes.func
 }
 
 SearchScreen.defaultProps = {
-	cats: [],
-	searchCats
+	resources: [],
+	searchResources
 }
 
 const mapStateToProps = (state, ownProps) => {
@@ -93,6 +83,6 @@ const mapStateToProps = (state, ownProps) => {
 export default connect(
 	mapStateToProps,
 	{
-		searchCats
+		searchResources
 	}
 )(SearchScreen)

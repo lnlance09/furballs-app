@@ -1,4 +1,32 @@
-import * as constants from "../constants"
+import * as constants from "@redux/types"
+import { AsyncStorage } from "react-native"
+
+const deleteUserId = async () => {
+	try {
+		await AsyncStorage.removeItem("userId")
+	} catch (error) {
+		console.log(error.message)
+	}
+}
+
+const getUserId = async () => {
+	let user = ""
+	try {
+		user = (await AsyncStorage.getItem("userId")) || null
+	} catch (error) {
+		console.log(error.message)
+	}
+
+	return user
+}
+
+const saveUserId = async userId => {
+	try {
+		await AsyncStorage.setItem("userId", userId)
+	} catch (error) {
+		console.log(error.message)
+	}
+}
 
 export const fetchUser = ({ id }) => dispatch => {
 	fetch(`${constants.BASE_URL}api/users/getUser?id=${id}`, {
@@ -8,7 +36,18 @@ export const fetchUser = ({ id }) => dispatch => {
 	})
 		.then(response => response.json())
 		.then(json => {
+			console.log("fetch user")
 			console.log(json)
+
+			if (!json.error) {
+				dispatch({
+					type: constants.SET_USER_ID,
+					payload: {
+						userId: json.user.id
+					}
+				})
+			}
+
 			dispatch({
 				type: constants.FETCH_USER,
 				payload: json
@@ -17,6 +56,18 @@ export const fetchUser = ({ id }) => dispatch => {
 		.catch(error => {
 			console.error(error)
 		})
+}
+
+export const getCurrentUser = () => dispatch => {
+	const userId = getUserId()
+	dispatch({
+		type: constants.SET_USER_ID,
+		payload: {
+			userId
+		}
+	})
+
+	return userId
 }
 
 export const login = ({ email, password }) => dispatch => {
@@ -34,6 +85,17 @@ export const login = ({ email, password }) => dispatch => {
 		.then(json => {
 			console.log("login")
 			console.log(json)
+			if (!json.error) {
+				saveUserId(json.user.id)
+
+				dispatch({
+					type: constants.SET_USER_ID,
+					payload: {
+						userId: json.user.id
+					}
+				})
+			}
+
 			dispatch({
 				type: constants.LOGIN,
 				payload: json
@@ -42,6 +104,13 @@ export const login = ({ email, password }) => dispatch => {
 		.catch(error => {
 			console.error(error)
 		})
+}
+
+export const logout = () => dispatch => {
+	deleteUser()
+	dispatch({
+		type: constants.LOGOUT
+	})
 }
 
 export const register = ({ email, name, password, username }) => dispatch => {
@@ -53,10 +122,10 @@ export const register = ({ email, name, password, username }) => dispatch => {
 			username
 		}),
 		headers: {
-			"Accept": "application/json",
+			Accept: "application/json",
 			"Content-Type": "application/json"
 		},
-		method: "POST",
+		method: "POST"
 	})
 		.then(response => {
 			console.log("register body")
@@ -66,6 +135,11 @@ export const register = ({ email, name, password, username }) => dispatch => {
 		.then(json => {
 			console.log("register")
 			console.log(json)
+
+			if (!json.error) {
+				saveUserId(json.user.id)
+			}
+
 			dispatch({
 				type: constants.REGISTER,
 				payload: json

@@ -1,10 +1,11 @@
 import * as Font from "expo-font"
-import React, { Component, useState } from "react"
+import PropTypes from "prop-types"
+import React, { Component } from "react"
 import { AppLoading } from "expo"
 import { Asset } from "expo-asset"
 import { Root } from "native-base"
 import { Provider } from "react-redux"
-import { Platform, StatusBar, StyleSheet, View } from "react-native"
+import { Platform, StatusBar } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import AppNavigator from "./navigation/AppNavigator"
 import MonoFont from "./assets/fonts/SpaceMono-Regular.ttf"
@@ -45,13 +46,6 @@ class App extends Component {
 	render() {
 		const { isLoadingComplete } = this.state
 
-		const styles = StyleSheet.create({
-			container: {
-				backgroundColor: "#fff",
-				flex: 1
-			}
-		})
-
 		if (!isLoadingComplete && !this.props.skipLoadingScreen) {
 			return (
 				<AppLoading
@@ -71,6 +65,14 @@ class App extends Component {
 			</Provider>
 		)
 	}
+}
+
+App.propTypes = {
+	skipLoadingScreen: PropTypes.bool
+}
+
+App.defaultProps = {
+
 }
 
 export default App

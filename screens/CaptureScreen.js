@@ -1,15 +1,19 @@
+import CatPage from "../components/CatPage"
 import PropTypes from "prop-types"
 import React, { Component } from "react"
+import { style } from "./styles/CaptureScreen"
 import { connect } from "react-redux"
-import { addCatPic } from "../actions/capture"
-import { Text, View, TouchableOpacity } from "react-native"
+import { addCatPic } from "@redux/actions/capture"
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import * as Permissions from "expo-permissions"
 import { Camera } from "expo-camera"
+
+const styles = StyleSheet.create(style)
 
 class CaptureScreen extends Component {
 	constructor(props) {
 		super(props)
-		
+
 		this.state = {
 			hasCameraPermission: false,
 			type: Camera.Constants.Type.back
@@ -53,21 +57,15 @@ class CaptureScreen extends Component {
 			return <Text>No access to camera</Text>
 		} else {
 			return (
-				<View style={{ flex: 1 }}>
+				<View style={styles.cameraView}>
 					<Camera
 						ref={ref => {
 							this.camera = ref
 						}}
-						style={{ flex: 1 }}
+						style={styles.cameraView}
 						type={this.state.type}
 					>
-						<View
-							style={{
-								backgroundColor: "transparent",
-								flex: 1,
-								flexDirection: "row"
-							}}
-						>
+						<View style={styles.cameraTouchableOpacity}>
 							<TouchableOpacity
 								onPress={() => {
 									this.setState({
@@ -77,21 +75,13 @@ class CaptureScreen extends Component {
 												: Camera.Constants.Type.back
 									})
 								}}
-								style={{
-									alignItems: "center",
-									alignSelf: "flex-end",
-									flex: 0.1
-								}}
+								style={styles.cameraTouchableOpacity}
 							>
 								<Text
 									onPress={this.takePicture.bind(this)}
-									style={{
-										color: "white",
-										fontSize: 18,
-										marginBottom: 10
-									}}
+									style={styles.takePicText}
 								>
-									Flip
+									Take Pic
 								</Text>
 							</TouchableOpacity>
 						</View>
@@ -100,6 +90,10 @@ class CaptureScreen extends Component {
 			)
 		}
 	}
+}
+
+CaptureScreen.navigationOptions = {
+	header: null
 }
 
 CaptureScreen.propTypes = {

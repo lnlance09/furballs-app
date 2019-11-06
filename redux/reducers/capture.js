@@ -1,13 +1,14 @@
-import * as constants from "../constants"
+import * as constants from "@redux/types"
 
 const initial = () => ({})
 
-const activity = (state = initial(), action) => {
+const capture = (state = initial(), action) => {
 	const payload = action.payload
 
 	switch (action.type) {
-		case constants.FETCH_ACTIVITY:
+		case constants.ADD_CAT_PIC:
 			return {
+				...state,
 				cats: payload.cats
 			}
 
@@ -16,4 +17,4 @@ const activity = (state = initial(), action) => {
 	}
 }
 
-export default activity
+export default capture
