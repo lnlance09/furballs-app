@@ -1,3 +1,4 @@
+import * as Permissions from "expo-permissions"
 import CatPage from "../components/CatPage"
 import PropTypes from "prop-types"
 import React, { Component } from "react"
@@ -5,7 +6,6 @@ import { style } from "./styles/CaptureScreen"
 import { connect } from "react-redux"
 import { addCatPic } from "@redux/actions/capture"
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
-import * as Permissions from "expo-permissions"
 import { Camera } from "expo-camera"
 
 const styles = StyleSheet.create(style)
@@ -28,6 +28,7 @@ class CaptureScreen extends Component {
 	}
 
 	async takePicture() {
+		console.log("take pic")
 		if (this.camera) {
 			this.camera.takePictureAsync().then(async data => {
 				console.log("take pic")

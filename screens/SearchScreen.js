@@ -1,10 +1,11 @@
 import AppHeader from "../components/AppHeader"
+import Colors from "../constants/Colors"
 import PropTypes from "prop-types"
 import React, { Component } from "react"
 import { connect } from "react-redux"
 import { style } from "./styles/SearchScreen"
 import { searchResources } from "@redux/actions/search"
-import { Card, CardItem, Text } from "native-base"
+import { Card, CardItem, Spinner, Text } from "native-base"
 import { ActivityIndicator, Image, ScrollView, StyleSheet, View } from "react-native"
 
 const styles = StyleSheet.create(style)
@@ -27,7 +28,7 @@ class SearchScreen extends Component {
 			<View style={styles.container}>
 				<AppHeader title="Local Resources" />
 				{resources.length === 0 ? (
-					<ActivityIndicator size="small" color="#00ff00" />
+					<Spinner color={Colors.grey} style={styles.spinnerStyle} />
 				) : (
 					<ScrollView style={styles.scrollView}>
 						{resources.map((item, index) => (

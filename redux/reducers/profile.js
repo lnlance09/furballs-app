@@ -18,13 +18,19 @@ const profile = (state = initial(), action) => {
 		case constants.LOGIN:
 			return {
 				...state,
-				user: payload.user
+				user: payload.user,
 			}
 
 		case constants.LOGOUT:
 			return {
 				...state,
-				user: null
+				user: null,
+				userId: null
+			}
+
+		case constants.RESET_PASSWORD:
+			return {
+				...state
 			}
 
 		case constants.SET_USER_ID:

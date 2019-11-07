@@ -22,6 +22,8 @@ const app = (state = initial(), action) => {
 					img: payload.cat.img,
 					lastLocationTime: payload.cat.last_location_time,
 					lat: payload.cat.lat,
+					likeCount: payload.cat.like_count,
+					likedByMe: payload.cat.liked_by_me === 1,
 					lon: payload.cat.lon,
 					mealCount: parseInt(payload.cat.meal_count, 10),
 					meals: payload.cat.meal_count > 0 ? JSON.parse(payload.cat.meals) : null,
@@ -33,6 +35,15 @@ const app = (state = initial(), action) => {
 				error: false,
 				selected: true,
 				selectedId: parseInt(payload.cat.id, 10)
+			}
+
+		case constants.LIKE_CAT:
+			return {
+				...state,
+				cat: {
+					...state.cat,
+					likedByMe: true
+				}
 			}
 
 		case constants.RESET_CAT:
@@ -48,6 +59,15 @@ const app = (state = initial(), action) => {
 			return {
 				...state,
 				editing: !state.editing
+			}
+
+		case constants.UNLIKE_CAT:
+			return {
+				...state,
+				cat: {
+					...state.cat,
+					likedByMe: false
+				}
 			}
 
 		default:

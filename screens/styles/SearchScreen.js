@@ -5,7 +5,7 @@ const { width } = Dimensions.get("window")
 
 export const style = {
 	container: {
-		backgroundColor: "#fff",
+		backgroundColor: Colors.white,
 		flex: 1
 	},
 	cardContainer: {
@@ -26,5 +26,10 @@ export const style = {
 	},
 	scrollView: {
 		marginHorizontal: 6
+	},
+	spinnerStyle: {
+		alignItems: "center",
+		flex: 1,
+		justifyContent: "center"
 	}
 }

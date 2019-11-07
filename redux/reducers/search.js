@@ -1,7 +1,7 @@
 import * as constants from "@redux/types"
 
 const initial = () => ({
-	resources: [{}, {}, {}, {}, {}]
+	resources: []
 })
 
 const search = (state = initial(), action) => {

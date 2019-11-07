@@ -1,5 +1,6 @@
 import * as constants from "@redux/types"
 import { AsyncStorage } from "react-native"
+import { Toast } from "native-base"
 
 const deleteUserId = async () => {
 	try {
@@ -85,9 +86,14 @@ export const login = ({ email, password }) => dispatch => {
 		.then(json => {
 			console.log("login")
 			console.log(json)
-			if (!json.error) {
+			if (json.error) {
+				Toast.show({
+					buttonText: null,
+					text: "Wrong password",
+					type: "danger"
+				})
+			} else {
 				saveUserId(json.user.id)
-
 				dispatch({
 					type: constants.SET_USER_ID,
 					payload: {
@@ -107,7 +113,7 @@ export const login = ({ email, password }) => dispatch => {
 }
 
 export const logout = () => dispatch => {
-	deleteUser()
+	deleteUserId()
 	dispatch({
 		type: constants.LOGOUT
 	})
@@ -136,7 +142,13 @@ export const register = ({ email, name, password, username }) => dispatch => {
 			console.log("register")
 			console.log(json)
 
-			if (!json.error) {
+			if (json.error) {
+				Toast.show({
+					buttonText: null,
+					text: "There was an error",
+					type: "danger"
+				})
+			} else {
 				saveUserId(json.user.id)
 			}
 
@@ -149,3 +161,29 @@ export const register = ({ email, name, password, username }) => dispatch => {
 			console.error(error)
 		})
 }
+
+export const resetPassword = ({ email }) => dispatch => {
+	fetch(`${constants.BASE_URL}api/users/resetPassword`, {
+		body: JSON.stringify({
+			email
+		}),
+		headers: {
+			Accept: "application/json",
+			"Content-Type": "application/json"
+		},
+		method: "POST"
+	})
+		.then(response => {
+			return response.json()
+		})
+		.then(json => {
+			dispatch({
+				type: constants.RESET_PASSWORD,
+				payload: json
+			})
+		})
+		.catch(error => {
+			console.error(error)
+		})
+}
+

@@ -5,11 +5,8 @@ const { width } = Dimensions.get("window")
 
 export const style = {
 	container: {
-		backgroundColor: "#fff",
-		marginVertical: 0,
-		marginTop: 0,
-		paddingTop: 0,
-		paddingVertical: 0
+		backgroundColor: Colors.white,
+		flex: 1,
 	},
 	map: {
 		bottom: 0,
@@ -25,7 +22,7 @@ export const style = {
 	tabBarContainerStyle: {
 		borderBottomWidth: 0
 	},
-	tabHeadingStyle: {
+	tabHeading: {
 		backgroundColor: Colors.white
 	},
 	tabText: {

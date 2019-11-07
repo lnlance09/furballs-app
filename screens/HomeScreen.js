@@ -32,6 +32,8 @@ class HomeScreen extends Component {
 							img={cat.img}
 							lastLocationTime={cat.lastLocationTime}
 							lat={cat.lat}
+							likeCount={cat.likeCount}
+							likedByMe={cat.likedByMe}
 							lon={cat.lon}
 							mealCount={cat.mealCount}
 							meals={cat.meals}
@@ -66,6 +68,8 @@ HomeScreen.propTypes = {
 		img: PropTypes.string,
 		lastLocationTime: PropTypes.string,
 		lat: PropTypes.string,
+		likeCount: PropTypes.number,
+		likedByMe: PropTypes.bool,
 		lon: PropTypes.string,
 		mealCount: PropTypes.number,
 		meals: PropTypes.array,

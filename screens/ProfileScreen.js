@@ -5,7 +5,7 @@ import PropTypes from "prop-types"
 import React, { Component } from "react"
 import { connect } from "react-redux"
 import { style } from "./styles/ProfileScreen"
-import { fetchUser, getCurrentUser, login, register } from "@redux/actions/profile"
+import { fetchUser, getCurrentUser, login, logout, register, resetPassword, setUserId } from "@redux/actions/profile"
 import {
 	ActivityIndicator,
 	AsyncStorage,
@@ -16,8 +16,8 @@ import {
 	TouchableHighlight,
 	View
 } from "react-native"
-import { Container, H1, H2, Text, Toast } from "native-base"
-import { Avatar, Button, Icon, Image } from "react-native-elements"
+import { Container, Text, Toast } from "native-base"
+import { Avatar, Button, Icon, Image, ListItem } from "react-native-elements"
 
 const width = Dimensions.get("window").width - 20
 
@@ -36,6 +36,7 @@ class ProfileScreen extends Component {
 			name: "",
 			password: "",
 			registrationForm: false,
+			settingsVisible: false,
 			showToast: false,
 			username: ""
 		}
@@ -51,6 +52,12 @@ class ProfileScreen extends Component {
 
 		if (userId) {
 			this.props.fetchUser({ id: userId })
+		}
+	}
+
+	resetPassword() {
+		if (email !== "") {
+			this.props.resetPassword({ email, password })
 		}
 	}
 
@@ -84,6 +91,8 @@ class ProfileScreen extends Component {
 		}
 	}
 
+	toggleSettingsVisibility = () => this.setState({ settingsVisible: !this.state.settingsVisible })
+
 	render() {
 		const {
 			email,
@@ -94,8 +103,10 @@ class ProfileScreen extends Component {
 			name,
 			password,
 			registrationForm,
+			settingsVisible,
 			username
 		} = this.state
+
 		const { catImages, cats, catCount, user, userId } = this.props
 		console.log("profile screen")
 		console.log(this.props)
@@ -242,7 +253,19 @@ class ProfileScreen extends Component {
 			<Container>
 				<AppHeader
 					left={() => null}
-					right={() => <Icon color={Colors.white} name="cog" onPress={() => null} type="font-awesome" />}
+					right={() => {
+						if (userId !== null) {
+							return (
+								<Icon
+									color={Colors.white}
+									name="cog"
+									onPress={() => this.toggleSettingsVisibility()}
+									type="font-awesome"
+								/>
+							)
+						}
+						return null
+					}}
 					title="Profile"
 				/>
 				{userId === null ? (
@@ -253,19 +276,61 @@ class ProfileScreen extends Component {
 					</Container>
 				) : (
 					<ScrollView>
-						{this.props.user.id ? (
+						{settingsVisible ? (
 							<View>
-								<View style={styles.imageWrapper}>
-									<Avatar rounded icon={{ name: 'home' }} size="large" />
-								</View>
-								<H1 style={styles.h1}>{user.name}</H1>
-								<Text style={styles.usernameText}>{user.username}</Text>
-
-								<H2 style={styles.myCatsH2}>My Cats</H2>
-								<CatGrid cats={cats} catImages={catImages} user={user} />
+								<ListItem
+									bottomDivider
+									key="pushNotificationsListItem"
+									// onPress={() => this.props.getCat({ id: item.id })}
+									subtitle="Push notifications"
+									title={null}
+								/>
+								<ListItem
+									bottomDivider
+									key="locationListItem"
+									// onPress={() => this.props.getCat({ id: item.id })}
+									subtitle="Location"
+									title={null}
+								/>
+								<ListItem
+									bottomDivider
+									key="cameraListItem"
+									// onPress={() => this.props.getCat({ id: item.id })}
+									subtitle="Camera"
+									title={null}
+								/>
+								<ListItem
+									bottomDivider
+									key="microphoneListItem"
+									// onPress={() => this.props.getCat({ id: item.id })}
+									subtitle="Microphone"
+									title={null}
+								/>
+								{userId !== null && (
+									<ListItem
+										bottomDivider
+										key="logoutListItem"
+										onPress={() => this.props.logout()}
+										subtitle="Logout"
+										title={null}
+									/>
+								)}
 							</View>
 						) : (
-							<ActivityIndicator />
+							user.id ? (
+								<View>
+									<View style={styles.imageWrapper}>
+										<Avatar rounded icon={{ name: 'home' }} size="large" />
+									</View>
+									<Text style={styles.h1}>{user.name}</Text>
+									<Text style={styles.usernameText}>@{user.username}</Text>
+
+									<Text style={styles.myCatsH2}>My Cats</Text>
+									<CatGrid cats={cats} catImages={catImages} user={user} />
+								</View>
+							) : (
+								<ActivityIndicator />
+							)
 						)}
 					</ScrollView>
 				)}
@@ -285,7 +350,10 @@ ProfileScreen.propTypes = {
 	fetchUser: PropTypes.func,
 	getCurrentUser: PropTypes.func,
 	login: PropTypes.func,
+	logout: PropTypes.func,
 	register: PropTypes.func,
+	resetPassword: PropTypes.func,
+	setUserId: PropTypes.func,
 	user: PropTypes.object,
 	userId: PropTypes.oneOfType([PropTypes.string, PropTypes.bool])
 }
@@ -294,7 +362,10 @@ ProfileScreen.defaultProps = {
 	fetchUser,
 	getCurrentUser,
 	login,
+	logout,
 	register,
+	resetPassword,
+	setUserId,
 	user: {
 		dateCreated: null,
 		id: null,
@@ -319,6 +390,9 @@ export default connect(
 		fetchUser,
 		getCurrentUser,
 		login,
-		register
+		logout,
+		register,
+		resetPassword,
+		setUserId
 	}
 )(ProfileScreen)

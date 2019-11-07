@@ -2,8 +2,8 @@ import * as constants from "@redux/types"
 
 const initial = () => ({
 	activityCats: [],
-	page: 0,
-	refreshing: false
+	activityPage: 0,
+	activityRefreshing: false
 })
 
 const activity = (state = initial(), action) => {

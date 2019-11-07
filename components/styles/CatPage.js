@@ -2,7 +2,6 @@ import Colors from "../../constants/Colors"
 
 export const style = {
 	cardPageContainer: {
-		marginTop: 10,
 		marginVertical: 0,
 		width: "100%"
 	},
@@ -49,17 +48,17 @@ export const style = {
 	tabBarUnderlineStyle: {
 		backgroundColor: Colors.blue
 	},
-	tabContainerStyle: {
+	tabBarContainerStyle: {
 		borderBottomWidth: 0
 	},
-	tabHeadingStyle: {
-		backgroundColor: "#fff"
+	tabHeading: {
+		backgroundColor: Colors.white
 	},
-	tabHeadingTextStyle: {
+	tabText: {
 		color: Colors.black
 	},
 	spottedAtText: {
-		color: "#000",
+		color: Colors.black,
 		fontSize: 13,
 		marginTop: 7
 	}

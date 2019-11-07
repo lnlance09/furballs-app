@@ -5,7 +5,7 @@ const { width } = Dimensions.get("window")
 
 export const style = {
 	closeModalIcon: {
-		color: "#fff",
+		color: Colors.white,
 		marginHorizontal: 20,
 		marginTop: 50
 	},
@@ -20,15 +20,13 @@ export const style = {
 		textAlign: "left"
 	},
 	formSubmitBtn: {
-		backgroundColor: "#3897f1",
-		borderRadius: 5,
-		height: 45,
 		marginTop: 10
 	},
 	formSubmitBtnText: {
 		fontWeight: "bold"
 	},
 	h1: {
+		fontSize: 24,
 		marginTop: 0,
 		textAlign: "center",
 		width: "100%"
@@ -47,6 +45,7 @@ export const style = {
 		width: 120
 	},
 	myCatsH2: {
+		fontSize: 18,
 		marginBottom: 0,
 		marginHorizontal: 10,
 		marginTop: 8,
@@ -65,6 +64,7 @@ export const style = {
 		marginBottom: 5
 	},
 	usernameText: {
+		fontSize: 13,
 		marginTop: 4,
 		textAlign: "center",
 		width: "100%"

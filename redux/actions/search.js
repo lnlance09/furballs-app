@@ -8,10 +8,13 @@ export const searchResources = ({ city, state }) => dispatch => {
 			"Content-Type": "application/json"
 		}
 	})
-		.then(response => response.json())
+		.then(response => {
+			console.log(response)
+			return response.json()
+		})
 		.then(json => {
-			// console.log("resources")
-			// console.log(json)
+			console.log("resources")
+			console.log(json)
 			dispatch({
 				type: constants.SEARCH_RESOURCES,
 				payload: json

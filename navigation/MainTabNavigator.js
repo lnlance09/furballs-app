@@ -27,22 +27,18 @@ const CaptureStack = createStackNavigator(
 CaptureStack.navigationOptions = {
 	showLabel: false,
 	tabBarIcon: ({ focused }) => {
-		if (!focused) {
-			return (
-				<View>
-					<TabBarIcon
-						color={focused ? Colors.red : Colors.tabIconDefault}
-						name={Platform.OS === "ios" ? "ios-camera" : "md-camera"}
-						size={32}
-						style={{
-							marginBottom: -3
-						}}
-					/>
-				</View>
-			)
-		}
-
-		return null
+		return (
+			<View>
+				<TabBarIcon
+					color={focused ? Colors.red : Colors.tabIconDefault}
+					name={Platform.OS === "ios" ? "ios-add" : "md-add"}
+					size={32}
+					style={{
+						marginBottom: -3
+					}}
+				/>
+			</View>
+		)
 	}
 }
 

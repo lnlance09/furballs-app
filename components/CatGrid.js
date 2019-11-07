@@ -79,7 +79,7 @@ class CatGrid extends Component {
 					</View>
 				) : (
 					<Text style={styles.emptyMsg}>
-						{user.name} does not have any pics yet
+						{user.name} has not liked any cats
 					</Text>
 				)}
 			</ScrollView>

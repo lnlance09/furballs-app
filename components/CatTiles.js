@@ -34,7 +34,7 @@ class CatTiles extends Component {
 
 	nextPage() {
 		this.props.toggleCatTilesRefeshing()
-		this.props.fetchActivity({ page: this.props.page })
+		this.props.fetchActivity({ page: this.props.activityPage })
 	}
 
 	render() {
@@ -50,7 +50,11 @@ class CatTiles extends Component {
 							keyExtractor={item => item.id}
 							onEndReached={() => {
 								console.log("end reached")
+								console.log(activityPage)
+								console.log(activityPages)
+								console.log(activityHasMore)
 								if (activityPage < activityPages && activityHasMore && !activityRefreshing) {
+									console.log("fetching new page")
 									this.nextPage()
 								}
 							}}

@@ -8,7 +8,7 @@ import moment from "moment"
 import { style } from "./styles/CatPage"
 import { connect } from "react-redux"
 import { RenderMeal } from "../tools/textFunctions"
-import { getCat, resetCat, toggleCatPageEditing } from "@redux/actions/app"
+import { getCat, likeCat, resetCat, toggleCatPageEditing, unlikeCat } from "@redux/actions/app"
 import { Container, Tab, Tabs, TabHeading, Text } from "native-base"
 import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native"
 import { Button, Icon, Image, ListItem } from "react-native-elements"
@@ -21,21 +21,32 @@ class CatPage extends Component {
 		super(props)
 
 		this.state = {
-			fetching: false,
-			page: 0,
-			q: ""
+			reportLayoutVisible: false
 		}
 
 		this.feedCat = this.feedCat.bind(this)
 		this.likeCat = this.likeCat.bind(this)
+		this.reportAbuse = this.reportAbuse.bind(this)
+		this.unlikeCat = this.unlikeCat.bind(this)
 	}
 
 	feedCat() {
+		console.log("feed cat")
+		this.setState({ reportLayoutVisible: true})
+	}
+
+	likeCat(id) {
+		console.log("like cat")
+		this.props.likeCat({ id })
+	}
+
+	reportAbuse() {
 
 	}
 
-	likeCat() {
-
+	unlikeCat(id) {
+		console.log("like cat")
+		this.props.unlikeCat({ id })
 	}
 
 	render() {
@@ -46,12 +57,15 @@ class CatPage extends Component {
 			img,
 			lastLocationTime,
 			lat,
+			likedByMe,
 			lon,
 			mealCount,
 			name,
 			picCount,
 			region
 		} = this.props
+
+		const { reportLayoutVisible } = this.state
 
 		const canEdit = true
 
@@ -90,19 +104,25 @@ class CatPage extends Component {
 						/>
 					)}
 					right={() => {
-						if (canEdit) {
+						if (likedByMe) {
 							return (
-								<Icon
-									color={Colors.pink}
-									name="heart"
-									onPress={() => {
-										
-									}}
-									type="font-awesome"
-								/>
+								<Text
+									onPress={() => this.unlikeCat(this.props.id)}
+									style={{ color: Colors.white }}
+								>
+									Liked
+								</Text>
 							)
 						}
-						return null
+
+						return (
+							<Icon
+								color={Colors.pink}
+								name="heart"
+								onPress={() => this.likeCat(this.props.id)}
+								type="font-awesome"
+							/>
+						)
 					}}
 					title={name}
 				/>
@@ -139,32 +159,28 @@ class CatPage extends Component {
 							🐾 Spotted {moment(lastLocationTime).fromNow()}
 						</Text>
 						<Text style={styles.spottedAtText}>
-							🐾 Report animal abuse
+							🚩 Report animal abuse
 						</Text>
 
 						<View
-							style={{
-								// flexDirection: "row",
-								// flexWrap: "wrap",
-								marginTop: 10
-							}}
+							style={{ marginTop: 10 }}
 						>
 							<Button
 								buttonStyle={styles.feedBtn}
-								onPress={() => callback()}
+								onPress={() => this.feedCat()}
 								title="Feed this cat"
 							/>
 						</View>
 
 						<Container style={styles.cardPageContainer}>
 							<Tabs
-								tabContainerStyle={styles.tabContainerStyle}
+								tabContainerStyle={styles.tabBarContainerStyle}
 								tabBarUnderlineStyle={styles.tabBarUnderlineStyle}
 							>
 								<Tab
 									heading={
-										<TabHeading style={styles.tabHeadingStyle}>
-											<Text style={styles.tabHeadingTextStyle}>Sightings</Text>
+										<TabHeading style={styles.tabHeading}>
+											<Text style={styles.tabText}>Sightings</Text>
 										</TabHeading>
 									}
 								>
@@ -178,8 +194,8 @@ class CatPage extends Component {
 								</Tab>
 								<Tab
 									heading={
-										<TabHeading style={styles.tabHeadingStyle}>
-											<Text style={styles.tabHeadingTextStyle}>Meals</Text>
+										<TabHeading style={styles.tabHeading}>
+											<Text style={styles.tabText}>Meals</Text>
 										</TabHeading>
 									}
 								>
@@ -208,6 +224,9 @@ CatPage.propTypes = {
 	img: PropTypes.string,
 	lastLocationTime: PropTypes.string,
 	lat: PropTypes.string,
+	likeCat: PropTypes.func,
+	likeCount: PropTypes.number,
+	likedByMe: PropTypes.bool,
 	lon: PropTypes.string,
 	mealCount: PropTypes.number,
 	meals: PropTypes.array,
@@ -217,13 +236,16 @@ CatPage.propTypes = {
 	picCount: PropTypes.number,
 	region: PropTypes.object,
 	resetCat: PropTypes.func,
-	toggleCatPageEditing: PropTypes.func
+	toggleCatPageEditing: PropTypes.func,
+	unlikeCat: PropTypes.func,
 }
 
 CatPage.defaultProps = {
 	editing: false,
 	id: null,
 	getCat,
+	likeCat,
+	likedByMe: false,
 	region: {
 		latitude: 40.7644,
 		latitudeDelta: 0.0922,
@@ -231,12 +253,13 @@ CatPage.defaultProps = {
 		longitudeDelta: 0.0421
 	},
 	resetCat,
-	toggleCatPageEditing
+	toggleCatPageEditing,
+	unlikeCat
 }
 const mapStateToProps = (state, ownProps) => {
 	return { ...state.app, ...ownProps }
 }
 export default connect(
 	mapStateToProps,
-	{ getCat, resetCat, toggleCatPageEditing }
+	{ getCat, likeCat, resetCat, toggleCatPageEditing, unlikeCat }
 )(CatPage)

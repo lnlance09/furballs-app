@@ -8,12 +8,10 @@ export const fetchActivity = ({ page }) => dispatch => {
 	})
 		.then(response => response.json())
 		.then(json => {
-			console.log("fetchActivity")
-			console.log(json)
 			dispatch({
-				type: constants.FETCH_ACTIVITY,
 				page,
-				payload: json
+				payload: json,
+				type: constants.FETCH_ACTIVITY
 			})
 		})
 		.catch(error => {

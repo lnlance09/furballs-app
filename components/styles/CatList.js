@@ -16,9 +16,15 @@ export const style = {
 		width: "100%"
 	},
 	searchBarContainer: {
-		backgroundColor: "#fff"
+		backgroundColor: Colors.white,
+		borderTopWidth: 0
 	},
 	searchBarInputContainer: {
 		backgroundColor: "#efefef"
+	},
+	spinnerStyle: {
+		alignItems: "center",
+		flex: 1,
+		justifyContent: "center"
 	}
 }

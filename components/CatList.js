@@ -1,4 +1,5 @@
 import PropTypes from "prop-types"
+import Colors from "../constants/Colors"
 import React, { Component } from "react"
 import moment from "moment"
 import { style } from "./styles/CatList"
@@ -12,6 +13,7 @@ import {
 import { getCat, resetCat } from "@redux/actions/app"
 import { searchCats, toggleCatListRefeshing } from "@redux/actions/map"
 import { ListItem, SearchBar } from "react-native-elements"
+import { Spinner } from "native-base"
 
 const styles = StyleSheet.create(style)
 
@@ -58,35 +60,39 @@ class CatList extends Component {
 					value={q}
 				/>
 				<View style={styles.listContainer}>
-					<FlatList
-						contentContainerStyle={styles.flatListContainer}
-						data={listCats}
-						keyExtractor={item => item.id}
-						onEndReached={() => {
-							console.log("end reached")
-							if (listPage < listPages && listHasMore && !listRefreshing) {
-								this.nextPage()
-							}
-						}}
-						onEndReachedThreshold={0.5}
-						onRefresh={() => {
-							this.props.toggleCatListRefeshing()
-							this.props.searchCats({ q, page: 0 })
-						}}
-						refreshing={listRefreshing}
-						renderItem={({ item, index }) => (
-							<ListItem
-								bottomDivider
-								chevron
-								key={`ListItem${index}`}
-								leftAvatar={{ source: { uri: item.img } }}
-								onPress={() => this.props.getCat({ id: item.id })}
-								subtitle={item.food_type === null ? "" : `${RenderMeal([item.food_type])} fed ${moment(item.food_date).fromNow()}`}
-								title={item.name}
-							/>
-						)}
-						style={styles.flatList}
-					/>
+					{listCats.length === 0 ? (
+						<Spinner color={Colors.grey} style={styles.spinnerStyle} />
+					) : (
+						<FlatList
+							contentContainerStyle={styles.flatListContainer}
+							data={listCats}
+							keyExtractor={item => item.id}
+							onEndReached={() => {
+								console.log("end reached")
+								if (listPage < listPages && listHasMore && !listRefreshing) {
+									this.nextPage()
+								}
+							}}
+							onEndReachedThreshold={0.5}
+							onRefresh={() => {
+								this.props.toggleCatListRefeshing()
+								this.props.searchCats({ q, page: 0 })
+							}}
+							refreshing={listRefreshing}
+							renderItem={({ item, index }) => (
+								<ListItem
+									bottomDivider
+									chevron
+									key={`ListItem${index}`}
+									leftAvatar={{ source: { uri: item.img } }}
+									onPress={() => this.props.getCat({ id: item.id })}
+									subtitle={item.food_type === null ? "" : `${RenderMeal([item.food_type])} fed ${moment(item.food_date).fromNow()}`}
+									title={item.name}
+								/>
+							)}
+							style={styles.flatList}
+						/>
+					)}
 				</View>
 			</View>
 		)

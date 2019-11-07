@@ -7,14 +7,14 @@ export const style = {
 	cameraTouchableOpacity: {
 		alignItems: "center",
 		alignSelf: "flex-end",
-		flex: 0.1
+		// flex: 0.1
 	},
 	cameraView: {
 		flex: 1
 	},
 	takePicText: {
-		color: "white",
+		color: Colors.white,
 		fontSize: 18,
-		marginBottom: 10
+		marginTop: 50
 	}
 }

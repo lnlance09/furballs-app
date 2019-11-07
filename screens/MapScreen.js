@@ -28,8 +28,6 @@ class MapScreen extends Component {
 	}
 
 	componentDidMount() {
-		console.log("ssssss")
-		console.log(this.props)
 		this.props.searchCatsByLocation({
 			lat: this.props.region.latitude,
 			lon: this.props.region.longitude
@@ -49,8 +47,8 @@ class MapScreen extends Component {
 			region,
 			selected
 		} = this.props
-		console.log("map screen")
-		console.log(this.props)
+		// console.log("map screen")
+		// console.log(this.props)
 
 		const MapView = () => (
 			<View>
@@ -81,11 +79,7 @@ class MapScreen extends Component {
 			</View>
 		)
 
-		const SearchView = () => (
-			<View>
-				<CatList />
-			</View>
-		)
+		const SearchView = () => <CatList />
 
 		return (
 			<Container style={styles.container}>
