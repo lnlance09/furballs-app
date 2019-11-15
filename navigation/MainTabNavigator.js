@@ -1,30 +1,89 @@
 import React from "react"
 import { Platform, View } from "react-native"
 import { createBottomTabNavigator, createStackNavigator } from "react-navigation"
+import { fromLeft } from "react-navigation-transitions"
 import TabBarIcon from "../components/TabBarIcon"
 import CaptureScreen from "../screens/CaptureScreen"
+import CatScreen from "../screens/CatScreen"
+import ChangePasswordScreen from "../screens/ChangePasswordScreen"
+import EditPhotoScreen from "../screens/EditPhotoScreen"
 import HomeScreen from "../screens/HomeScreen"
+import LoginScreen from "../screens/LoginScreen"
 import MapScreen from "../screens/MapScreen"
 import ProfileScreen from "../screens/ProfileScreen"
 import SearchScreen from "../screens/SearchScreen"
+import VerificationCodeScreen from "../screens/VerificationCodeScreen"
 import Colors from "../constants/Colors"
 
+
 const config = Platform.select({
+	default: {},
+	transitionConfig: () => fromLeft(),
 	web: {
 		headerMode: "screen"
-	},
-	default: {}
+	}
 })
+
+
 
 // Capture stack
 const CaptureStack = createStackNavigator(
 	{
-		Capture: CaptureScreen
+		Capture: {
+			screen: CaptureScreen
+		},
+		EditPhoto: {
+			screen: EditPhotoScreen
+		}
 	},
 	config
 )
 
-CaptureStack.navigationOptions = {
+CaptureStack.navigationOptions = ({ navigation }) => {
+	let tabBarVisible = true
+	navigation.state.routes.map(route => {
+		tabBarVisible = route.routeName !== "Capture"
+	})
+
+	return {
+		tabBarVisible,
+		showLabel: false,
+		tabBarIcon: ({ focused }) => {
+			return (
+				<View>
+					<TabBarIcon
+						color={focused ? Colors.red : Colors.tabIconDefault}
+						name={Platform.OS === "ios" ? "ios-add" : "md-add"}
+						size={32}
+						style={{
+							marginBottom: -3
+						}}
+					/>
+				</View>
+			)
+		},
+		transitionConfig: () => fromLeft()
+	}
+}
+
+CaptureStack.path = ""
+
+
+
+// Cat stack
+const CatStack = createStackNavigator(
+	{
+		Cat: {
+			screen: CatScreen
+		},
+		Capture: {
+			screen: CaptureScreen
+		}
+	},
+	config
+)
+
+CatStack.navigationOptions = {
 	showLabel: false,
 	tabBarIcon: ({ focused }) => {
 		return (
@@ -42,12 +101,19 @@ CaptureStack.navigationOptions = {
 	}
 }
 
-CaptureStack.path = ""
+CatStack.path = "cat/:id"
+
+
 
 // Home stack
 const HomeStack = createStackNavigator(
 	{
-		Home: HomeScreen
+		Home: {
+			screen: HomeScreen
+		},
+		Cat: {
+			screen: CatScreen
+		}
 	},
 	config
 )
@@ -66,12 +132,19 @@ HomeStack.navigationOptions = {
 	)
 }
 
-HomeStack.path = ""
+HomeStack.path = "home"
+
+
 
 // Map stack
 const MapStack = createStackNavigator(
 	{
-		Links: MapScreen
+		Map: {
+			screen: MapScreen
+		},
+		Cat: {
+			screen: CatScreen
+		}
 	},
 	config
 )
@@ -92,10 +165,26 @@ MapStack.navigationOptions = {
 
 MapStack.path = ""
 
+
+
 // Profile stack
 const ProfileStack = createStackNavigator(
 	{
-		Profile: ProfileScreen
+		Profile: {
+			screen: ProfileScreen
+		},
+		Login: {
+			screen: LoginScreen
+		},
+		VerificationCode: {
+			screen: VerificationCodeScreen
+		},
+		ChangePassword: {
+			screen: ChangePasswordScreen
+		},
+		Cat: {
+			screen: CatScreen
+		}
 	},
 	config
 )
@@ -115,6 +204,8 @@ ProfileStack.navigationOptions = {
 }
 
 ProfileStack.path = ""
+
+
 
 // Search stack
 const SearchStack = createStackNavigator(
@@ -144,6 +235,8 @@ SearchStack.navigationOptions = {
 
 SearchStack.path = ""
 
+
+
 // Tab navigator
 const tabNavigator = createBottomTabNavigator(
 	{
@@ -159,10 +252,11 @@ const tabNavigator = createBottomTabNavigator(
 		}),
 		tabBarOptions: {
 			style: {
-				borderTopColor: "transparent"
+				// borderTopColor: "transparent"
 			},
 			showLabel: false
-		}
+		},
+		transitionConfig: () => fromLeft()
 	}
 )
 

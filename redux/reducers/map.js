@@ -23,6 +23,7 @@ const map = (state = initial(), action) => {
 			}
 
 		case constants.SEARCH_CATS_BY_LOCATION:
+			console.log(payload.cats)
 			return {
 				...state,
 				mapCats: payload.cats
@@ -31,7 +32,10 @@ const map = (state = initial(), action) => {
 		case constants.SET_REGION:
 			return {
 				...state,
-				region: payload
+				region: {
+					latitude: payload.latitude,
+					longitude: payload.longitude
+				}
 			}
 
 		case constants.TOGGLE_CAT_LIST_REFRESHING:

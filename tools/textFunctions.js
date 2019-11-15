@@ -1,4 +1,3 @@
-
 export const RenderMeal = type => {
 	const meals = {
 		"1": "🍗",
@@ -7,6 +6,5 @@ export const RenderMeal = type => {
 		"4": "🦃",
 		"5": "🍣"
 	}
-
 	return meals[type]
 }

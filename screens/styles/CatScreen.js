@@ -6,9 +6,10 @@ export const style = {
 		width: "100%"
 	},
 	cardPageDescriptionText: {
+		fontSize: 16,
 		marginBottom: 10,
-		marginTop: 6,
-		fontSize: 14
+		marginHorizontal: 7,
+		marginTop: 6
 	},
 	cardPageNameText: {
 		fontSize: 24
@@ -16,10 +17,6 @@ export const style = {
 	cardPageImg: {
 		height: 200,
 		width: "100%"
-	},
-	cardPageSubView: {
-		marginHorizontal: 10,
-		marginVertical: 10
 	},
 	emptyMsg: {
 		alignItems: "center",
@@ -29,8 +26,10 @@ export const style = {
 		textAlign: "center"
 	},
 	feedBtn: {
-		backgroundColor: Colors.orange,
-		marginTop: 10
+		backgroundColor: Colors.blue,
+		borderRadius: 3,
+		marginHorizontal: 7,
+		marginTop: 14
 	},
 	gridView: {
 		flex: 1,
@@ -38,18 +37,29 @@ export const style = {
 	},
 	map: {
 		bottom: 0,
-		height: 200,
+		height: 140,
 		left: 0,
+		marginHorizontal: 7,
 		marginTop: 10,
 		position: "relative",
 		right: 0,
 		top: 0
 	},
+	nameText: {
+		alignItems: "center",
+		bottom: 7,
+		color: Colors.white,
+		fontSize: 28,
+		justifyContent: "center",
+		marginLeft: 7,
+		position: "absolute"
+	},
 	tabBarUnderlineStyle: {
-		backgroundColor: Colors.blue
+		backgroundColor: Colors.black
 	},
 	tabBarContainerStyle: {
-		borderBottomWidth: 0
+		borderBottomWidth: 0,
+		marginTop: 5
 	},
 	tabHeading: {
 		backgroundColor: Colors.white
@@ -60,6 +70,7 @@ export const style = {
 	spottedAtText: {
 		color: Colors.black,
 		fontSize: 13,
+		marginHorizontal: 7,
 		marginTop: 7
 	}
 }

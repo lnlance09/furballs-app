@@ -6,14 +6,7 @@ class TabBarIcon extends Component {
 	render() {
 		const { color, name, size, style } = this.props
 
-		return (
-			<Ionicons
-				color={color}
-				name={name}
-				size={size}
-				style={style}
-			/>
-		)
+		return <Ionicons color={color} name={name} size={size} style={style} />
 	}
 }
 

@@ -11,13 +11,15 @@ const activity = (state = initial(), action) => {
 
 	switch (action.type) {
 		case constants.FETCH_ACTIVITY:
-
-			const activityCats = action.page === 0 ? payload.cats : state.activityCats.concat(payload.cats)
+			const activityCats =
+				action.page === 0 ? payload.cats : state.activityCats.concat(payload.cats)
 			return {
 				...state,
 				activityCats,
 				activityHasMore: payload.hasMore,
-				activityPage: payload.hasMore ? parseInt(state.activityPage, 10) + 1 : state.activityPage,
+				activityPage: payload.hasMore
+					? parseInt(state.activityPage, 10) + 1
+					: state.activityPage,
 				activityPages: payload.pages,
 				activityRefreshing: false
 			}

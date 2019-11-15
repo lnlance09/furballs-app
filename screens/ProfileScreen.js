@@ -1,25 +1,30 @@
+import * as Permissions from "expo-permissions"
 import AppHeader from "../components/AppHeader"
 import CatGrid from "../components/CatGrid"
 import Colors from "../constants/Colors"
 import PropTypes from "prop-types"
+import ToggleSwitch from "toggle-switch-react-native"
+import store from "../store/"
 import React, { Component } from "react"
 import { connect } from "react-redux"
 import { style } from "./styles/ProfileScreen"
-import { fetchUser, getCurrentUser, login, logout, register, resetPassword, setUserId } from "@redux/actions/profile"
+import {
+	fetchUser,
+	getCurrentUser,
+	logout
+} from "@redux/actions/profile"
 import {
 	ActivityIndicator,
 	AsyncStorage,
-	Dimensions,
+	CameraRoll,
+	Image,
 	ScrollView,
 	StyleSheet,
-	TextInput,
-	TouchableHighlight,
+	Switch,
 	View
 } from "react-native"
-import { Container, Text, Toast } from "native-base"
-import { Avatar, Button, Icon, Image, ListItem } from "react-native-elements"
-
-const width = Dimensions.get("window").width - 20
+import { Container, Tab, TabHeading, Tabs, Text } from "native-base"
+import { Avatar, Icon, ListItem } from "react-native-elements"
 
 const styles = StyleSheet.create(style)
 
@@ -28,312 +33,263 @@ class ProfileScreen extends Component {
 		super(props)
 
 		this.state = {
-			email: "",
-			forgotPassword: false,
-			imgIndex: 0,
-			loginForm: true,
-			modalVisible: false,
-			name: "",
-			password: "",
-			registrationForm: false,
+			auth: false,
+			hasCameraPermission: false,
+			hasCameraRollPermission: false,
+			hasLocationPermission: false,
+			hasMicrophonePermission: false,
+			hasPushNotifications: false,
+			photos: [],
 			settingsVisible: false,
-			showToast: false,
-			username: ""
 		}
 	}
 
 	async componentDidMount() {
-		let userId = ""
-		try {
-			userId = (await AsyncStorage.getItem("userId")) || null
-		} catch (error) {
-			console.log(error.message)
-		}
+		let user = await AsyncStorage.getItem("user") || null
+		if (user) {
+			user = JSON.parse(user)
+			this.setState({ auth: true })
+			this.props.fetchUser({ id: user.id })
 
-		if (userId) {
-			this.props.fetchUser({ id: userId })
-		}
-	}
-
-	resetPassword() {
-		if (email !== "") {
-			this.props.resetPassword({ email, password })
+			this.toggleCameraPermission(true)
+			this.toggleCameraRollPermission(true)
+			this.toggleLocationPermission(true)
+			this.toggleMicrophonePermission(true)
+		} else {
+			const { navigate } = this.props.navigation
+			navigate("Login")
 		}
 	}
 
-	submitLoginForm(email, password) {
-		if (email !== "" && password !== "") {
-			this.props.login({ email, password })
-		}
-	}
-
-	submitRegistrationForm(email, name, password, username) {
-		if (email === "") {
-			Toast.show({
-				buttonText: "Okay",
-				duration: 3000,
-				text: "Please enter a valid email address",
-				type: "danger"
+	async toggleCameraPermission(on) {
+		if (on) {
+			const { status } = await Permissions.askAsync(Permissions.CAMERA)
+			this.setState({
+				hasCameraPermission: status === "granted"
 			})
-		}
-
-		if (password.length < 7) {
-			Toast.show({
-				buttonText: "Okay",
-				duration: 3000,
-				text: "You must enter your password",
-				type: "danger"
-			})
-		}
-
-		if (email !== "" && password.length > 6 && name.length > 1 && username.length > 1) {
-			this.props.register({ email, name, password, username })
+		} else {
+			this.setState({ hasCameraPermission: false })
 		}
 	}
 
-	toggleSettingsVisibility = () => this.setState({ settingsVisible: !this.state.settingsVisible })
+	async toggleCameraRollPermission(on) {
+		if (on) {
+			const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL)
+			this.setState({
+				hasCameraRollPermission: status === "granted"
+			})
+		} else {
+			this.setState({ hasCameraRollPermission: false })
+		}
+	}
+
+	async toggleLocationPermission(on) {
+		if (on) {
+			const { status } = await Permissions.askAsync(Permissions.LOCATION)
+			this.setState({
+				hasLocationPermission: status === "granted"
+			})
+		} else {
+			this.setState({ hasLocationPermission: false })
+		}
+	}
+
+	async toggleMicrophonePermission(on) {
+		if (on) {
+			const { status } = await Permissions.askAsync(Permissions.AUDIO_RECORDING)
+			this.setState({
+				hasMicrophonePermission: status === "granted"
+			})
+		} else {
+			this.setState({ hasMicrophonePermission: false })
+		}
+	}
+
+	async togglePushNotifications(on) {
+		console.log('togglePushNotifications')
+		console.log(on)
+		if (on) {
+			const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS)
+			console.log("status")
+			console.log(status)
+			this.setState({
+				hasPushNotifications: status === "granted"
+			})
+		} else {
+			this.setState({ hasPushNotifications: false })
+		}
+	}
+
+	toggleSettingsVisibility() {
+		this.setState({ settingsVisible: !this.state.settingsVisible })
+	}
 
 	render() {
 		const {
-			email,
-			forgotPassword,
-			imgIndex,
-			loginForm,
-			modalVisible,
-			name,
-			password,
-			registrationForm,
-			settingsVisible,
-			username
+			auth,
+			hasCameraPermission,
+			hasCameraRollPermission,
+			hasLocationPermission,
+			hasMicrophonePermission,
+			hasPushNotifications,
+			photos,
+			settingsVisible
 		} = this.state
+		const { user } = this.props
+		const { navigate } = this.props.navigation
 
-		const { catImages, cats, catCount, user, userId } = this.props
-		console.log("profile screen")
-		console.log(this.props)
-		console.log(imgIndex)
+		console.log("photos")
+		console.log(photos)
 
-		const SubmitFormButton = ({ callback, text }) => {
-			return <Button onPress={() => callback()} style={styles.formSubmitBtn} title={text} />
-		}
-
-		const ForgotPassword = (
-			<Container style={styles.formContainer}>
-				<TextInput
-					onChange={e => {
-						this.setState({ email: e.nativeEvent.text })
+		const RenderCameraRoll = (
+			photos.map((p, i) => (
+				<Image
+					key={i}
+					source={{ uri: p.node.image.uri }}
+					style={{
+						width: 300,
+						height: 100
 					}}
-					placeholder="Enter your email"
-					style={styles.textInput}
-					value={email}
 				/>
-				<SubmitFormButton
-					callback={() => this.submitLoginForm(email, password)}
-					text="Send"
-				/>
-				<Text
-					onPress={() => {
-						this.setState({
-							forgotPassword: false,
-							loginForm: true,
-							registrationForm: false
-						})
-					}}
-					style={styles.formSubText}
-				>
-					Cancel
-				</Text>
-			</Container>
+			))
 		)
 
-		const LoginForm = (
-			<View style={styles.formContainer}>
-				<TextInput
-					onChange={e => {
-						this.setState({ email: e.nativeEvent.text })
-					}}
-					placeholder="Email or username"
-					style={styles.textInput}
-					value={email}
+		const SettingsSection = (
+			<View>
+				<ListItem
+					bottomDivider
+					key="pushNotificationsListItem"
+					rightTitle={(
+						<ToggleSwitch
+							isOn={hasPushNotifications}
+							onColor={Colors.green}
+							onToggle={isOn => this.togglePushNotifications(isOn)}
+						/>
+					)}
+					subtitle={null}
+					title="Push notifications"
 				/>
-				<TextInput
-					onChange={e => {
-						this.setState({ password: e.nativeEvent.text })
-					}}
-					placeholder="Password"
-					secureTextEntry
-					style={styles.textInput}
-					value={password}
+				<ListItem
+					bottomDivider
+					key="locationListItem"
+					rightTitle={(
+						<ToggleSwitch
+							isOn={hasLocationPermission}
+							onColor={Colors.green}
+							onToggle={isOn => this.toggleLocationPermission(isOn)}
+						/>
+					)}
+					subtitle={null}
+					title="Location"
 				/>
-				<SubmitFormButton
-					callback={() => this.submitLoginForm(email, password)}
-					text="Sign In"
+				<ListItem
+					bottomDivider
+					key="cameraListItem"
+					rightTitle={(
+						<ToggleSwitch
+							isOn={hasCameraPermission}
+							onColor={Colors.green}
+							onToggle={isOn => this.toggleCameraPermission(isOn)}
+						/>
+					)}
+					subtitle={null}
+					title="Camera"
 				/>
-				<Text
-					onPress={() => {
-						this.setState({
-							forgotPassword: true,
-							loginForm: false,
-							registrationForm: false
-						})
-					}}
-					style={styles.formSubText}
-				>
-					Forgot password?
-				</Text>
-				<Text
-					onPress={() => {
-						this.setState({
-							forgotPassword: false,
-							loginForm: false,
-							registrationForm: true
-						})
-					}}
-					style={styles.formSubText}
-				>
-					Sign Up
-				</Text>
+				<ListItem
+					bottomDivider
+					key="cameraRollListItem"
+					rightTitle={(
+						<ToggleSwitch
+							isOn={hasCameraRollPermission}
+							onColor={Colors.green}
+							onToggle={isOn => this.toggleCameraRollPermission(isOn)}
+						/>
+					)}
+					subtitle={null}
+					title="Camera roll"
+				/>
+				<ListItem
+					bottomDivider
+					key="microphoneListItem"
+					rightTitle={(
+						<ToggleSwitch
+							isOn={hasMicrophonePermission}
+							onColor={Colors.green}
+							onToggle={isOn => this.toggleMicrophonePermission(isOn)}
+						/>
+					)}
+					subtitle={null}
+					title="Microphone"
+				/>
+				{auth !== null && (
+					<ListItem
+						bottomDivider
+						key="logoutListItem"
+						onPress={() => {
+							this.props.logout()
+							navigate("Login")
+						}}
+						subtitle={null}
+						title="Logout"
+					/>
+				)}
 			</View>
-		)
-
-		const RegistrationForm = (
-			<Container style={styles.formContainer}>
-				<TextInput
-					onChange={e => {
-						this.setState({ name: e.nativeEvent.text })
-					}}
-					placeholder="Name"
-					style={styles.textInput}
-					value={name}
-				/>
-				<TextInput
-					onChange={e => {
-						this.setState({ username: e.nativeEvent.text })
-					}}
-					placeholder="Username"
-					style={styles.textInput}
-					value={username}
-				/>
-				<TextInput
-					onChange={e => {
-						this.setState({ email: e.nativeEvent.text })
-					}}
-					placeholder="Email"
-					style={styles.textInput}
-					value={email}
-				/>
-				<TextInput
-					onChange={e => {
-						this.setState({ password: e.nativeEvent.text })
-					}}
-					placeholder="Password"
-					secureTextEntry
-					style={styles.textInput}
-					value={password}
-				/>
-				<SubmitFormButton
-					callback={() => this.submitRegistrationForm(email, name, password, username)}
-					text="Sign Up"
-				/>
-				<Text
-					onPress={() => {
-						this.setState({
-							forgotPassword: false,
-							loginForm: true,
-							registrationForm: false
-						})
-					}}
-					style={styles.formSubText}
-				>
-					Sign In
-				</Text>
-			</Container>
 		)
 
 		return (
 			<Container>
 				<AppHeader
 					left={() => null}
-					right={() => {
-						if (userId !== null) {
-							return (
-								<Icon
-									color={Colors.white}
-									name="cog"
-									onPress={() => this.toggleSettingsVisibility()}
-									type="font-awesome"
-								/>
-							)
-						}
-						return null
-					}}
+					right={() => (
+						<Icon
+							color={Colors.black}
+							name="cog"
+							onPress={() => this.toggleSettingsVisibility()}
+							type="font-awesome"
+						/>
+					)}
 					title="Profile"
 				/>
-				{userId === null ? (
-					<Container style={styles.container}>
-						{forgotPassword && ForgotPassword}
-						{loginForm && LoginForm}
-						{registrationForm && RegistrationForm}
-					</Container>
-				) : (
-					<ScrollView>
-						{settingsVisible ? (
-							<View>
-								<ListItem
-									bottomDivider
-									key="pushNotificationsListItem"
-									// onPress={() => this.props.getCat({ id: item.id })}
-									subtitle="Push notifications"
-									title={null}
+				<ScrollView>
+					{settingsVisible ? (
+						SettingsSection
+					) : user.id ? (
+						<View>
+							<View style={styles.imageWrapper}>
+								<Avatar
+									icon={{ name: "home" }}
+									onEditPress={() => {
+										CameraRoll.getPhotos({
+											assetType: "Photos",
+											first: 20
+										})
+										.then(r => {
+											console.log("edges")
+											console.log(r)
+											this.setState({ photos: r.edges });
+										})
+										.catch((err) => {
+											// Error Loading Images
+										})
+									}}
+									rounded
+									showEditButton
+									size="large"
 								/>
-								<ListItem
-									bottomDivider
-									key="locationListItem"
-									// onPress={() => this.props.getCat({ id: item.id })}
-									subtitle="Location"
-									title={null}
-								/>
-								<ListItem
-									bottomDivider
-									key="cameraListItem"
-									// onPress={() => this.props.getCat({ id: item.id })}
-									subtitle="Camera"
-									title={null}
-								/>
-								<ListItem
-									bottomDivider
-									key="microphoneListItem"
-									// onPress={() => this.props.getCat({ id: item.id })}
-									subtitle="Microphone"
-									title={null}
-								/>
-								{userId !== null && (
-									<ListItem
-										bottomDivider
-										key="logoutListItem"
-										onPress={() => this.props.logout()}
-										subtitle="Logout"
-										title={null}
-									/>
-								)}
+								{RenderCameraRoll}
 							</View>
-						) : (
-							user.id ? (
-								<View>
-									<View style={styles.imageWrapper}>
-										<Avatar rounded icon={{ name: 'home' }} size="large" />
-									</View>
-									<Text style={styles.h1}>{user.name}</Text>
-									<Text style={styles.usernameText}>@{user.username}</Text>
+							<Text style={styles.h1}>{user.name}</Text>
+							<Text style={styles.usernameText}>@{user.username}</Text>
 
-									<Text style={styles.myCatsH2}>My Cats</Text>
-									<CatGrid cats={cats} catImages={catImages} user={user} />
-								</View>
-							) : (
-								<ActivityIndicator />
-							)
-						)}
-					</ScrollView>
-				)}
+							<Container style={{ marginLeft: 4, marginRight: 7 }}>
+								<Text style={{ fontSize: 24, marginLeft: 7, marginTop: 8 }}>My cats</Text>
+								<CatGrid navigate={navigate} user={user} />
+							</Container>
+						</View>
+					) : (
+						<ActivityIndicator />
+					)}
+				</ScrollView>
 			</Container>
 		)
 	}
@@ -344,28 +300,28 @@ ProfileScreen.navigationOptions = {
 }
 
 ProfileScreen.propTypes = {
+	authenticated: PropTypes.bool,
 	catCount: PropTypes.number,
 	catImages: PropTypes.array,
 	cats: PropTypes.array,
 	fetchUser: PropTypes.func,
 	getCurrentUser: PropTypes.func,
-	login: PropTypes.func,
 	logout: PropTypes.func,
-	register: PropTypes.func,
-	resetPassword: PropTypes.func,
-	setUserId: PropTypes.func,
-	user: PropTypes.object,
-	userId: PropTypes.oneOfType([PropTypes.string, PropTypes.bool])
+	navigation: PropTypes.object,
+	user: PropTypes.shape({
+		dateCreated: PropTypes.string,
+		id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+		img: PropTypes.string,
+		name: PropTypes.string,
+		pushNotificationsEnabled: PropTypes.bool,
+		verificationCode: PropTypes.string
+	}),
 }
 
 ProfileScreen.defaultProps = {
 	fetchUser,
 	getCurrentUser,
-	login,
 	logout,
-	register,
-	resetPassword,
-	setUserId,
 	user: {
 		dateCreated: null,
 		id: null,
@@ -373,8 +329,7 @@ ProfileScreen.defaultProps = {
 		name: null,
 		pushNotificationsEnabled: true,
 		verificationCode: null
-	},
-	userId: null
+	}
 }
 
 const mapStateToProps = (state, ownProps) => {
@@ -389,10 +344,6 @@ export default connect(
 	{
 		fetchUser,
 		getCurrentUser,
-		login,
-		logout,
-		register,
-		resetPassword,
-		setUserId
+		logout
 	}
 )(ProfileScreen)

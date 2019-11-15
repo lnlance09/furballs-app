@@ -8,7 +8,8 @@ export const searchCats = ({ page, q }) => dispatch => {
 	})
 		.then(response => response.json())
 		.then(json => {
-			// console.log(json)
+			console.log("search cats action")
+			console.log(json)
 			dispatch({
 				type: constants.SEARCH_CATS,
 				page,
@@ -31,8 +32,8 @@ export const searchCatsByLocation = ({ lat, lon }) => dispatch => {
 			console.log("location")
 			console.log(json)
 			dispatch({
-				type: constants.SEARCH_CATS_BY_LOCATION,
-				payload: json
+				payload: json,
+				type: constants.SEARCH_CATS_BY_LOCATION
 			})
 		})
 		.catch(error => {
@@ -41,9 +42,11 @@ export const searchCatsByLocation = ({ lat, lon }) => dispatch => {
 }
 
 export const setRegion = region => dispatch => {
+	const lat = region.latitude
+	const lon = region.longitude
 	dispatch({
-		type: constants.SET_REGION,
-		payload: region
+		payload: region,
+		type: constants.SET_REGION
 	})
 }
 

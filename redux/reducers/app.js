@@ -1,6 +1,8 @@
 import * as constants from "@redux/types"
 
-const initial = () => ({})
+const initial = () => ({
+	loading: true
+})
 
 const app = (state = initial(), action) => {
 	const payload = action.payload
@@ -19,12 +21,13 @@ const app = (state = initial(), action) => {
 				cat: {
 					description: payload.cat.description,
 					homeless: payload.cat.homeless === "1",
+					id: payload.cat.id,
 					img: payload.cat.img,
 					lastLocationTime: payload.cat.last_location_time,
-					lat: payload.cat.lat,
+					lat: parseFloat(payload.cat.lat),
 					likeCount: payload.cat.like_count,
 					likedByMe: payload.cat.liked_by_me === 1,
-					lon: payload.cat.lon,
+					lon: parseFloat(payload.cat.lon),
 					mealCount: parseInt(payload.cat.meal_count, 10),
 					meals: payload.cat.meal_count > 0 ? JSON.parse(payload.cat.meals) : null,
 					name: payload.cat.name,
@@ -33,11 +36,16 @@ const app = (state = initial(), action) => {
 					picCount: parseInt(payload.cat.pic_count, 10)
 				},
 				error: false,
-				selected: true,
-				selectedId: parseInt(payload.cat.id, 10)
+				loading: false
 			}
 
 		case constants.LIKE_CAT:
+			if (payload.error) {
+				return {
+					...state
+				}
+			}
+
 			return {
 				...state,
 				cat: {
@@ -49,10 +57,12 @@ const app = (state = initial(), action) => {
 		case constants.RESET_CAT:
 			return {
 				...state,
-				cat: null,
+				cat: {
+					id: null,
+					likedByMe: false
+				},
 				error: false,
-				selected: false,
-				selectedId: null
+				loading: true
 			}
 
 		case constants.TOGGLE_CAT_EDITING_PAGE:
@@ -62,6 +72,12 @@ const app = (state = initial(), action) => {
 			}
 
 		case constants.UNLIKE_CAT:
+			if (payload.error) {
+				return {
+					...state
+				}
+			}
+
 			return {
 				...state,
 				cat: {

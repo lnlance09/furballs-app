@@ -1,6 +1,10 @@
 import * as constants from "@redux/types"
 
-const initial = () => ({})
+const initial = () => ({
+	user: {
+		id: null
+	}
+})
 
 const profile = (state = initial(), action) => {
 	const payload = action.payload
@@ -9,34 +13,45 @@ const profile = (state = initial(), action) => {
 		case constants.FETCH_USER:
 			return {
 				...state,
-				userCatCount: parseInt(payload.catCount, 10),
-				userCatImages: payload.catImages,
-				cats: payload.cats,
 				user: payload.user
+			}
+
+		case constants.GET_LIKED_CATS:
+			return {
+				...state,
+				gridCats: payload.cats,
 			}
 
 		case constants.LOGIN:
 			return {
 				...state,
-				user: payload.user,
+				token: payload.token,
+				user: payload.user
 			}
 
 		case constants.LOGOUT:
 			return {
 				...state,
-				user: null,
-				userId: null
+				token: null,
+				user: {}
+			}
+
+		case constants.REGISTER:
+
+			return {
+				...state,
+				token: payload.token,
+				user: payload.user
 			}
 
 		case constants.RESET_PASSWORD:
 			return {
-				...state
+				...state,
 			}
 
-		case constants.SET_USER_ID:
+		case constants.SUBMIT_VERIFICATION_CODE:
 			return {
 				...state,
-				userId: payload.userId
 			}
 
 		default:

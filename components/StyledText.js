@@ -4,12 +4,7 @@ import { Text } from "react-native"
 
 class MonoText extends Component {
 	render() {
-		return (
-			<Text
-				style={[this.props.style, { fontFamily: "space-mono" }]}
-				{...this.props}
-			/>
-		)
+		return <Text style={[this.props.style, { fontFamily: "space-mono" }]} {...this.props} />
 	}
 }
 

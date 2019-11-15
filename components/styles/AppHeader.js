@@ -3,10 +3,10 @@ import Colors from "../../constants/Colors"
 export const style = {
 	header: {
 		alignSelf: "stretch",
-		backgroundColor: Colors.blue,
+		backgroundColor: Colors.white,
 		textAlign: "left"
 	},
 	title: {
-		color: Colors.white
+		color: Colors.black
 	}
 }

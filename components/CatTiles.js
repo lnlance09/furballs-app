@@ -3,17 +3,14 @@ import React, { Component } from "react"
 import { connect } from "react-redux"
 import { style } from "./styles/CatTiles"
 import {
-	Dimensions,
 	FlatList,
-	ScrollView,
+	ImageBackground,
 	StyleSheet,
-	View
+	Text,
+	TouchableWithoutFeedback,
 } from "react-native"
 import { getCat, resetCat } from "@redux/actions/app"
 import { fetchActivity, toggleCatTilesRefeshing } from "@redux/actions/activity"
-import { Tile } from "react-native-elements"
-
-const { width } = Dimensions.get("window")
 
 const styles = StyleSheet.create(style)
 
@@ -21,9 +18,9 @@ class CatTiles extends Component {
 	constructor(props) {
 		super(props)
 
-		this.state = {
-			page: 0
-		}
+		this.state = {}
+
+		this.onEndReachedCalledDuringMomentum = true
 
 		this.nextPage = this.nextPage.bind(this)
 	}
@@ -38,53 +35,59 @@ class CatTiles extends Component {
 	}
 
 	render() {
-		const { activityCats, activityHasMore, activityPage, activityPages, activityRefreshing } = this.props
+		const {
+			activityCats,
+			activityHasMore,
+			activityPage,
+			activityPages,
+			activityRefreshing
+		} = this.props
 
 		return (
-			<ScrollView contentContainerStyle={styles.contentContainer} style={styles.container}>
-				<View style={styles.listContainer}>
-					{activityCats.length > 0 && (
-						<FlatList
-							contentContainerStyle={styles.flatListContainer}
-							data={activityCats}
-							keyExtractor={item => item.id}
-							onEndReached={() => {
-								console.log("end reached")
-								console.log(activityPage)
-								console.log(activityPages)
-								console.log(activityHasMore)
-								if (activityPage < activityPages && activityHasMore && !activityRefreshing) {
-									console.log("fetching new page")
-									this.nextPage()
-								}
+			activityCats.length > 0 && (
+				<FlatList
+					contentContainerStyle={styles.flatListContainer}
+					data={activityCats}
+					keyExtractor={item => item.id}
+					onEndReached={() => {
+						console.log("end reached")
+						console.log(activityPage)
+						console.log(activityPages)
+						console.log(activityHasMore)
+						if (
+							activityPage < activityPages &&
+							activityHasMore &&
+							!activityRefreshing
+						) {
+							// console.log("fetching new page")
+							this.nextPage()
+						}
+					}}
+					onEndReachedThreshold={0.5}
+					onRefresh={() => {
+						this.props.toggleCatTilesRefeshing()
+						this.props.fetchActivity({ page: 0 })
+					}}
+					refreshing={activityRefreshing}
+					renderItem={({ item, index }) => (
+						<TouchableWithoutFeedback
+							onPress={() => {
+								this.props.navigate("Cat", {
+									id: item.id
+								})
 							}}
-							onEndReachedThreshold={0.5}
-							onRefresh={() => {
-								this.props.toggleCatTilesRefeshing()
-								this.props.fetchActivity({ page: 0 })
-							}}
-							refreshing={activityRefreshing}
-							renderItem={({ item, index }) => (
-								<Tile
-									caption={item.description}
-									containerStyle={{
-										marginTop: 6
-									}}
-									featured
-									imageSrc={{ uri: item.img }}
-									key={`catTile${index}`}
-									onPress={() => {
-										this.props.getCat({ id: item.id })
-									}}
-									title={item.name}
-									width={width}
-							/>
-							)}
-							style={styles.flatList}
-						/>
+						>
+							<ImageBackground
+								source={{ uri: item.img }}
+								key={`catTile${index}`}
+								style={{ height: 200, width: "100%" }}
+							>
+								<Text style={styles.nameText}>{item.name}</Text>
+							</ImageBackground>
+						</TouchableWithoutFeedback>
 					)}
-				</View>
-			</ScrollView>
+				/>
+			)
 		)
 	}
 }
@@ -97,6 +100,7 @@ CatTiles.propTypes = {
 	activityRefreshing: PropTypes.bool,
 	fetchActivity: PropTypes.func,
 	getCat: PropTypes.func,
+	navigate: PropTypes.func,
 	resetCat: PropTypes.func,
 	toggleCatTilesRefeshing: PropTypes.func
 }

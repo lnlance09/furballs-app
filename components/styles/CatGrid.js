@@ -5,9 +5,9 @@ const { width } = Dimensions.get("window")
 
 export const style = {
 	container: {
-		backgroundColor: "#fff",
-		marginVertical: 0,
+		backgroundColor: Colors.white,
 		marginTop: 0,
+		marginVertical: 0,
 		paddingTop: 0,
 		paddingVertical: 0
 	},
@@ -21,11 +21,11 @@ export const style = {
 		textAlign: "center"
 	},
 	gridImg: {
-		borderRadius: 4,
-		height: (width / 3) - 12,
-		justifyContent: 'flex-end',
+		borderRadius: 0,
+		height: width / 3 - 12,
+		justifyContent: "flex-end",
 		marginTop: 7,
-		width: (width / 3) - 12,
+		width: width / 3 - 12
 	},
 	listContainer: {
 		flex: 1,

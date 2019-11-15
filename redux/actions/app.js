@@ -1,15 +1,19 @@
 import * as constants from "@redux/types"
 
-export const getCat = ({ id }) => dispatch => {
+export const getCat = ({ bearer, id }) => dispatch => {
+	let headers = {
+		"Content-Type": "application/json"
+	}
+
+	if (bearer) {
+		headers.Authorization = bearer
+	}
+
 	fetch(`${constants.BASE_URL}api/cats/getCat?id=${id}`, {
-		headers: {
-			"Content-Type": "application/json"
-		}
+		headers
 	})
 		.then(response => response.json())
 		.then(json => {
-			console.log("get cat")
-			console.log(json)
 			dispatch({
 				type: constants.GET_CAT,
 				payload: json
@@ -21,21 +25,24 @@ export const getCat = ({ id }) => dispatch => {
 }
 
 export const likeCat = ({ bearer, id }) => dispatch => {
+	let headers = {
+		Accept: "application/json",
+		"Content-Type": "application/json"
+	}
+
+	if (bearer) {
+		headers.Authorization = bearer
+	}
+
 	fetch(`${constants.BASE_URL}api/cats/likeCat`, {
 		body: JSON.stringify({
-			// email,
 			cat_id: id
 		}),
-		headers: {
-			Accept: "application/json",
-			"Content-Type": "application/json"
-		},
+		headers,
 		method: "POST"
 	})
 		.then(response => response.json())
 		.then(json => {
-			console.log("like cat")
-			console.log(json)
 			dispatch({
 				type: constants.LIKE_CAT,
 				payload: json
@@ -59,20 +66,29 @@ export const toggleCatPageEditing = () => dispatch => {
 }
 
 export const unlikeCat = ({ bearer, id }) => dispatch => {
+	let headers = {
+		Accept: "application/json",
+		"Content-Type": "application/json"
+	}
+
+	if (bearer) {
+		headers.Authorization = bearer
+	}
+
 	fetch(`${constants.BASE_URL}api/cats/unlikeCat`, {
-		method: "POST",
-		headers: {
-			Accept: "application/json",
-			"Content-Type": "application/json"
-		}
+		body: JSON.stringify({
+			cat_id: id
+		}),
+		headers,
+		method: "POST"
 	})
 		.then(response => response.json())
 		.then(json => {
-			console.log("like cat")
+			console.log("unlike cat")
 			console.log(json)
 			dispatch({
-				type: constants.UNLIKE_CAT,
-				payload: json
+				payload: json,
+				type: constants.UNLIKE_CAT
 			})
 		})
 		.catch(error => {

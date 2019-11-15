@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Furballs",
+    "name": "Felinus",
     "slug": "my-app",
     "privacy": "public",
     "sdkVersion": "35.0.0",
@@ -24,6 +24,7 @@
       "**/*"
     ],
     "ios": {
+      "bundleIdentifier": "com.felinus.felinus",
       "supportsTablet": true
     }
   }

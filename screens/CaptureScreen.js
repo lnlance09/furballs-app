@@ -1,11 +1,14 @@
 import * as Permissions from "expo-permissions"
-import CatPage from "../components/CatPage"
+import AppHeader from "../components/AppHeader"
+import Colors from "../constants/Colors"
 import PropTypes from "prop-types"
+import Confetti from "react-native-confetti"
 import React, { Component } from "react"
 import { style } from "./styles/CaptureScreen"
 import { connect } from "react-redux"
 import { addCatPic } from "@redux/actions/capture"
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { ImageBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { Icon } from "react-native-elements"
 import { Camera } from "expo-camera"
 
 const styles = StyleSheet.create(style)
@@ -16,6 +19,7 @@ class CaptureScreen extends Component {
 
 		this.state = {
 			hasCameraPermission: false,
+			img: null,
 			type: Camera.Constants.Type.back
 		}
 	}
@@ -43,48 +47,70 @@ class CaptureScreen extends Component {
 						width: 100
 					}
 				}
+				console.log(cropdata)
 
-				this.props.addCatPic({ img: data })
+				this.setState({ img: data.uri }, () => {
+					const { navigate } = this.props.navigation
+					this.props.addCatPic({ img: data })
+					navigate("EditPhoto")
+					if (this._confettiView) {
+						this._confettiView.startConfetti()
+					}
+				})
 			})
 		}
 	}
 
 	render() {
-		const { hasCameraPermission, type } = this.state
+		const { hasCameraPermission, img, type } = this.state
+		const { navigate } = this.props.navigation
 
 		if (hasCameraPermission === null) {
-			return <View />
+			return (
+				<View>
+					
+				</View>
+			)
 		} else if (hasCameraPermission === false) {
-			return <Text>No access to camera</Text>
+			return <Text></Text>
 		} else {
 			return (
 				<View style={styles.cameraView}>
+					<AppHeader
+						left={() => (
+							<Icon
+								color={Colors.black}
+								name="arrow-back"
+								onPress={() => {
+									navigate("Home")
+								}}
+							/>
+						)}
+						right={() => null}
+						title=""
+					/>
 					<Camera
 						ref={ref => {
 							this.camera = ref
 						}}
 						style={styles.cameraView}
-						type={this.state.type}
+						type={type}
 					>
 						<View style={styles.cameraTouchableOpacity}>
 							<TouchableOpacity
-								onPress={() => {
-									this.setState({
-										type:
-											type === Camera.Constants.Type.back
-												? Camera.Constants.Type.front
-												: Camera.Constants.Type.back
-									})
-								}}
 								style={styles.cameraTouchableOpacity}
-							>
-								<Text
-									onPress={this.takePicture.bind(this)}
-									style={styles.takePicText}
-								>
-									Take Pic
-								</Text>
-							</TouchableOpacity>
+							></TouchableOpacity>
+						</View>
+						<View style={styles.cameraOptions}>
+							<Icon
+								color={Colors.red}
+								name="camera"
+								onPress={this.takePicture.bind(this)}
+								raised
+								reverse
+								size={40}
+								type="font-awesome"
+							/>
 						</View>
 					</Camera>
 				</View>
@@ -98,7 +124,8 @@ CaptureScreen.navigationOptions = {
 }
 
 CaptureScreen.propTypes = {
-	addCatPic: PropTypes.func
+	addCatPic: PropTypes.func,
+	navigation: PropTypes.object
 }
 
 CaptureScreen.defaultProps = {

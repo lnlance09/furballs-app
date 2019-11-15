@@ -1,33 +1,10 @@
 import * as constants from "@redux/types"
-import { AsyncStorage } from "react-native"
+import {
+	deleteItemFromStorage,
+	getItemFromStorage,
+	saveItemToStorage
+} from "../../tools/storageFunctions"
 import { Toast } from "native-base"
-
-const deleteUserId = async () => {
-	try {
-		await AsyncStorage.removeItem("userId")
-	} catch (error) {
-		console.log(error.message)
-	}
-}
-
-const getUserId = async () => {
-	let user = ""
-	try {
-		user = (await AsyncStorage.getItem("userId")) || null
-	} catch (error) {
-		console.log(error.message)
-	}
-
-	return user
-}
-
-const saveUserId = async userId => {
-	try {
-		await AsyncStorage.setItem("userId", userId)
-	} catch (error) {
-		console.log(error.message)
-	}
-}
 
 export const fetchUser = ({ id }) => dispatch => {
 	fetch(`${constants.BASE_URL}api/users/getUser?id=${id}`, {
@@ -39,16 +16,6 @@ export const fetchUser = ({ id }) => dispatch => {
 		.then(json => {
 			console.log("fetch user")
 			console.log(json)
-
-			if (!json.error) {
-				dispatch({
-					type: constants.SET_USER_ID,
-					payload: {
-						userId: json.user.id
-					}
-				})
-			}
-
 			dispatch({
 				type: constants.FETCH_USER,
 				payload: json
@@ -59,19 +26,25 @@ export const fetchUser = ({ id }) => dispatch => {
 		})
 }
 
-export const getCurrentUser = () => dispatch => {
-	const userId = getUserId()
-	dispatch({
-		type: constants.SET_USER_ID,
-		payload: {
-			userId
+export const getLikedCats = ({ id }) => dispatch => {
+	fetch(`${constants.BASE_URL}api/users/getLikedCats?id=${id}`, {
+		headers: {
+			"Content-Type": "application/json"
 		}
 	})
-
-	return userId
+		.then(response => response.json())
+		.then(json => {
+			dispatch({
+				type: constants.GET_LIKED_CATS,
+				payload: json
+			})
+		})
+		.catch(error => {
+			console.error(error)
+		})
 }
 
-export const login = ({ email, password }) => dispatch => {
+export const login = ({ email, navigate, password }) => dispatch => {
 	fetch(`${constants.BASE_URL}api/users/login`, {
 		body: JSON.stringify({
 			email,
@@ -93,18 +66,13 @@ export const login = ({ email, password }) => dispatch => {
 					type: "danger"
 				})
 			} else {
-				saveUserId(json.user.id)
-				dispatch({
-					type: constants.SET_USER_ID,
-					payload: {
-						userId: json.user.id
-					}
-				})
+				navigate("Profile")
+				saveItemToStorage("user", JSON.stringify(json.user))
 			}
 
 			dispatch({
-				type: constants.LOGIN,
-				payload: json
+				payload: json,
+				type: constants.LOGIN
 			})
 		})
 		.catch(error => {
@@ -113,13 +81,13 @@ export const login = ({ email, password }) => dispatch => {
 }
 
 export const logout = () => dispatch => {
-	deleteUserId()
+	deleteItemFromStorage("user")
 	dispatch({
 		type: constants.LOGOUT
 	})
 }
 
-export const register = ({ email, name, password, username }) => dispatch => {
+export const register = ({ email, name, navigate, password, username }) => dispatch => {
 	fetch(`${constants.BASE_URL}api/users/register`, {
 		body: JSON.stringify({
 			email,
@@ -149,20 +117,21 @@ export const register = ({ email, name, password, username }) => dispatch => {
 					type: "danger"
 				})
 			} else {
-				saveUserId(json.user.id)
-			}
+				navigate("VerificationCode")
+				saveItemToStorage("user", JSON.stringify(json.user))
 
-			dispatch({
-				type: constants.REGISTER,
-				payload: json
-			})
+				dispatch({
+					payload: json,
+					type: constants.REGISTER
+				})
+			}
 		})
 		.catch(error => {
 			console.error(error)
 		})
 }
 
-export const resetPassword = ({ email }) => dispatch => {
+export const resetPassword = ({ email, navigate }) => dispatch => {
 	fetch(`${constants.BASE_URL}api/users/resetPassword`, {
 		body: JSON.stringify({
 			email
@@ -173,17 +142,67 @@ export const resetPassword = ({ email }) => dispatch => {
 		},
 		method: "POST"
 	})
-		.then(response => {
-			return response.json()
-		})
+		.then(response => response.json())
 		.then(json => {
+			if (json.error) {
+				Toast.show({
+					buttonText: null,
+					text: "A user with that email or username does not exist",
+					type: "danger"
+				})
+			} else {
+				saveItemToStorage("email", email)
+				navigate("VerificationCode")
+			}
+
 			dispatch({
-				type: constants.RESET_PASSWORD,
-				payload: json
+				payload: json,
+				type: constants.RESET_PASSWORD
 			})
 		})
 		.catch(error => {
 			console.error(error)
 		})
+}
+
+export const submitVerificationCode = ({ code, email, navigate }) => dispatch => {
+	fetch(`${constants.BASE_URL}api/users/submitVerificationCode`, {
+		body: JSON.stringify({
+			code,
+			email
+		}),
+		headers: {
+			Accept: "application/json",
+			"Content-Type": "application/json"
+		},
+		method: "POST"
+	})
+		.then(response => response.json())
+		.then(json => {
+			console.log(json)
+			if (json.error) {
+				Toast.show({
+					buttonText: null,
+					text: json.error,
+					type: "danger"
+				})
+			} else {
+				navigate("ChangePassword")
+			}
+
+			dispatch({
+				payload: json,
+				type: constants.SUBMIT_VERIFICATION_CODE
+			})
+		})
+		.catch(error => {
+			console.error(error)
+		})
+}
+
+export const toggleCatGridRefeshing = () => dispatch => {
+	dispatch({
+		type: constants.TOGGLE_CAT_GRID_REFRESHING
+	})
 }
 

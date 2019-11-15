@@ -9,22 +9,6 @@ export const style = {
 		marginHorizontal: 20,
 		marginTop: 50
 	},
-	formContainer: {
-		flex: 1,
-		paddingHorizontal: 8,
-		paddingVertical: 5
-	},
-	formSubText: {
-		fontSize: 12,
-		marginTop: 8,
-		textAlign: "left"
-	},
-	formSubmitBtn: {
-		marginTop: 10
-	},
-	formSubmitBtnText: {
-		fontWeight: "bold"
-	},
 	h1: {
 		fontSize: 24,
 		marginTop: 0,
@@ -36,7 +20,7 @@ export const style = {
 		flex: 1,
 		justifyContent: "center",
 		paddingHorizontal: 5,
-		paddingVertical: 10
+		paddingVertical: 7
 	},
 	logo: {
 		borderRadius: 120 / 2,
@@ -44,24 +28,17 @@ export const style = {
 		overflow: "hidden",
 		width: 120
 	},
-	myCatsH2: {
-		fontSize: 18,
-		marginBottom: 0,
-		marginHorizontal: 10,
-		marginTop: 8,
-		textAlign: "left",
-		width: "100%"
+	tabBarUnderlineStyle: {
+		backgroundColor: Colors.black
 	},
-	textInput: {
-		height: 43,
-		fontSize: 14,
-		borderRadius: 5,
-		borderWidth: 1,
-		borderColor: "#eaeaea",
-		backgroundColor: "#fafafa",
-		paddingLeft: 10,
-		marginTop: 5,
-		marginBottom: 5
+	tabBarContainerStyle: {
+		borderBottomWidth: 0
+	},
+	tabHeading: {
+		backgroundColor: Colors.white
+	},
+	tabText: {
+		color: Colors.black
 	},
 	usernameText: {
 		fontSize: 13,

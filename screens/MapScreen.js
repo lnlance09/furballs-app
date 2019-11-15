@@ -1,6 +1,5 @@
 import Animated, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
 import CatList from "../components/CatList"
-import CatPage from "../components/CatPage"
 import Colors from "../constants/Colors"
 import PropTypes from "prop-types"
 import mapStyle from "../mapStyle.json"
@@ -9,9 +8,15 @@ import { connect } from "react-redux"
 import { style } from "./styles/MapScreen"
 import { fetchActivity } from "@redux/actions/activity"
 import { getCat, resetCat } from "@redux/actions/app"
-import { searchCats, searchCatsByLocation, setRegion, toggleCatListRefeshing } from "@redux/actions/map"
-import { Container, Tab, TabHeading, Tabs, Text } from "native-base"
-import { ActivityIndicator, SafeAreaView, StyleSheet, View } from "react-native"
+import {
+	searchCats,
+	searchCatsByLocation,
+	setRegion,
+	toggleCatListRefeshing
+} from "@redux/actions/map"
+import _ from "lodash"
+import { Tab, TabHeading, Tabs, Text } from "native-base"
+import { SafeAreaView, StyleSheet, View } from "react-native"
 
 const styles = StyleSheet.create(style)
 
@@ -29,34 +34,36 @@ class MapScreen extends Component {
 
 	componentDidMount() {
 		this.props.searchCatsByLocation({
-			lat: this.props.region.latitude,
-			lon: this.props.region.longitude
+			lat: this.props.initialRegion.latitude,
+			lon: this.props.initialRegion.longitude
 		})
 	}
 
 	onRegionChange(region) {
 		console.log("change region")
 		console.log(region)
-		this.props.setRegion(region)
+		// _.debounce(region => {
+			this.props.setRegion(region)
+			this.props.searchCatsByLocation({
+				lat: region.latitude,
+				lon: region.longitude
+			})
+		// }, 2000)
 	}
 
 	render() {
-		const {
-			cat,
-			mapCats,
-			region,
-			selected
-		} = this.props
-		// console.log("map screen")
-		// console.log(this.props)
+		const { initialRegion, mapCats } = this.props
+		const { navigate } = this.props.navigation
+		console.log("map screen")
+		console.log(this.props.region)
 
 		const MapView = () => (
 			<View>
 				<Animated
 					customMapStyle={mapStyle}
-					// onRegionChange={this.onRegionChange}
+					onRegionChangeComplete={this.onRegionChange}
 					provider={PROVIDER_GOOGLE}
-					region={region}
+					initialRegion={initialRegion}
 					style={styles.map}
 				>
 					{mapCats.map(c => {
@@ -69,7 +76,9 @@ class MapScreen extends Component {
 								description={c.description}
 								key={`MapMarker${c.id}`}
 								onPress={() => {
-									this.props.getCat({ id: c.id })
+									navigate("Cat", {
+										id: c.id
+									})
 								}}
 								title={c.name}
 							/>
@@ -79,58 +88,34 @@ class MapScreen extends Component {
 			</View>
 		)
 
-		const SearchView = () => <CatList />
+		const SearchView = () => <CatList navigate={navigate} />
 
 		return (
-			<Container style={styles.container}>
-				{selected ? (
-					cat ? (
-						<CatPage
-							description={cat.description}
-							homeless={cat.homeless}
-							img={cat.img}
-							lat={cat.lat}
-							lon={cat.lon}
-							mealCount={cat.mealCount}
-							meals={cat.meals}
-							name={cat.name}
-							pattern={cat.pattern}
-							pics={cat.pics}
-							picCount={cat.picCount}
-						/>
-					) : (
-						<ActivityIndicator />
-					)
-				) : (
-					<SafeAreaView style={{ flex: 1 }}>
-						<Container>
-							<Tabs
-								tabContainerStyle={styles.tabBarContainerStyle}
-								tabBarUnderlineStyle={styles.tabBarUnderlineStyle}
-							>
-								<Tab
-									heading={
-										<TabHeading style={styles.tabHeading}>
-											<Text style={styles.tabText}>List</Text>
-										</TabHeading>
-									}
-								>
-									{SearchView(this.props)}
-								</Tab>
-								<Tab
-									heading={
-										<TabHeading style={styles.tabHeading}>
-											<Text style={styles.tabText}>Map</Text>
-										</TabHeading>
-									}
-								>
-									{MapView(this.props)}
-								</Tab>
-							</Tabs>
-						</Container>
-					</SafeAreaView>
-				)}
-			</Container>
+			<SafeAreaView style={styles.container}>
+				<Tabs
+					tabContainerStyle={styles.tabBarContainerStyle}
+					tabBarUnderlineStyle={styles.tabBarUnderlineStyle}
+				>
+					<Tab
+						heading={
+							<TabHeading style={styles.tabHeading}>
+								<Text style={styles.tabText}>List</Text>
+							</TabHeading>
+						}
+					>
+						{SearchView(this.props)}
+					</Tab>
+					<Tab
+						heading={
+							<TabHeading style={styles.tabHeading}>
+								<Text style={styles.tabText}>Map</Text>
+							</TabHeading>
+						}
+					>
+						{MapView(this.props)}
+					</Tab>
+				</Tabs>
+			</SafeAreaView>
 		)
 	}
 }
@@ -144,12 +129,21 @@ MapScreen.propTypes = {
 	refreshing: PropTypes.bool,
 	fetchActivity: PropTypes.func,
 	getCat: PropTypes.func,
+	initialRegion: PropTypes.shape({
+		latitude: PropTypes.number,
+		latitudeDelta: PropTypes.number,
+		longitude: PropTypes.number,
+		longitudeDelta: PropTypes.number
+	}),
 	mapCats: PropTypes.array,
-	region: PropTypes.object,
+	navigation: PropTypes.object,
+	region: PropTypes.shape({
+		latitude: PropTypes.number,
+		longitude: PropTypes.number
+	}),
 	resetCat: PropTypes.func,
 	searchCats: PropTypes.func,
 	searchCatsByLocation: PropTypes.func,
-	selected: PropTypes.bool,
 	setRegion: PropTypes.func,
 	toggleCatListRefeshing: PropTypes.func
 }
@@ -158,18 +152,17 @@ MapScreen.defaultProps = {
 	cat: null,
 	fetchActivity,
 	getCat,
-	mapCats: [],
-	refreshing: false,
-	region: {
+	initialRegion: {
 		latitude: 40.7644,
 		latitudeDelta: 0.0922,
 		longitude: -73.9235,
 		longitudeDelta: 0.0421
 	},
+	mapCats: [],
+	refreshing: false,
 	resetCat,
 	searchCats,
 	searchCatsByLocation,
-	selected: false,
 	setRegion,
 	toggleCatListRefeshing
 }
