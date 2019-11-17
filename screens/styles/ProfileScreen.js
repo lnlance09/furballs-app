@@ -4,11 +4,6 @@ import { Dimensions } from "react-native"
 const { width } = Dimensions.get("window")
 
 export const style = {
-	closeModalIcon: {
-		color: Colors.white,
-		marginHorizontal: 20,
-		marginTop: 50
-	},
 	h1: {
 		fontSize: 24,
 		marginTop: 0,
@@ -22,23 +17,14 @@ export const style = {
 		paddingHorizontal: 5,
 		paddingVertical: 7
 	},
-	logo: {
-		borderRadius: 120 / 2,
-		height: 120,
-		overflow: "hidden",
-		width: 120
+	myCatContainer: {
+		marginLeft: 4,
+		marginRight: 7
 	},
-	tabBarUnderlineStyle: {
-		backgroundColor: Colors.black
-	},
-	tabBarContainerStyle: {
-		borderBottomWidth: 0
-	},
-	tabHeading: {
-		backgroundColor: Colors.white
-	},
-	tabText: {
-		color: Colors.black
+	myCatsHeader: {
+		fontSize: 24,
+		marginLeft: 7,
+		marginTop: 8
 	},
 	usernameText: {
 		fontSize: 13,

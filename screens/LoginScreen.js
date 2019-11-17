@@ -1,20 +1,16 @@
 import AppHeader from "../components/AppHeader"
+import ButtonComponent from "../components/ButtonComponent"
 import PropTypes from "prop-types"
+import RegisterPic from "../assets/images/register.svg"
 import React, { Component } from "react"
 import { connect } from "react-redux"
 import { style } from "./styles/LoginScreen"
 import { getCurrentUser, login, register, resetPassword } from "@redux/actions/profile"
-import {
-	StyleSheet,
-	TextInput,
-	View
-} from "react-native"
-import {
-	TextField,
-	FilledTextField,
-	OutlinedTextField,
-} from "react-native-material-textfield"
-import { Button, Container, Text, Toast } from "native-base"
+import { Dimensions, StyleSheet, View } from "react-native"
+import { TextField } from "react-native-material-textfield"
+import { Container, Text, Toast } from "native-base"
+
+const { width } = Dimensions.get("window")
 
 const styles = StyleSheet.create(style)
 
@@ -127,9 +123,12 @@ class LoginScreen extends Component {
 
 		const SubmitFormButton = ({ callback, text }) => {
 			return (
-				<Button block onPress={() => callback()} style={styles.formSubmitBtn}>
-					<Text style={{ fontWeight: "bold" }}>{text}</Text>
-				</Button>
+				<ButtonComponent
+					buttonStyle={styles.formSubmitBtn}
+					onPress={() => callback()}
+					text={text}
+					textStyle={styles.formSubmitBtnText}
+				/>
 			)
 		}
 
@@ -143,10 +142,7 @@ class LoginScreen extends Component {
 					}}
 					value={resetEmail}
 				/>
-				<SubmitFormButton
-					callback={() => this.resetPassword(resetEmail)}
-					text="Send"
-				/>
+				<SubmitFormButton callback={() => this.resetPassword(resetEmail)} text="Send" />
 				<Text
 					onPress={() => {
 						this.setState({
@@ -258,7 +254,9 @@ class LoginScreen extends Component {
 					value={registerPassword}
 				/>
 				<SubmitFormButton
-					callback={() => this.submitRegistrationForm(registerEmail, name, registerPassword, username)}
+					callback={() =>
+						this.submitRegistrationForm(registerEmail, name, registerPassword, username)
+					}
 					text="Sign Up"
 				/>
 				<Text
@@ -279,12 +277,9 @@ class LoginScreen extends Component {
 
 		return (
 			<Container>
-				<AppHeader
-					left={() => null}
-					right={() => null}
-					title={screenTitle}
-				/>
+				<AppHeader left={() => null} right={() => null} title={screenTitle} />
 				<Container style={styles.container}>
+					<RegisterPic width={width} height={170} />
 					{forgotPassword && ForgotPassword}
 					{loginForm && LoginForm}
 					{registrationForm && RegistrationForm}
@@ -336,6 +331,6 @@ export default connect(
 		getCurrentUser,
 		login,
 		register,
-		resetPassword,
+		resetPassword
 	}
 )(LoginScreen)

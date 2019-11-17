@@ -11,10 +11,9 @@ export const style = {
 	},
 	formSubmitBtn: {
 		backgroundColor: Colors.blue,
-		borderRadius: 0,
 		marginTop: 10
 	},
 	formSubmitBtnText: {
-		fontWeight: "bold"
+		color: Colors.white
 	}
 }

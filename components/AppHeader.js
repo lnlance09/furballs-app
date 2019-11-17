@@ -1,4 +1,3 @@
-import Colors from "../constants/Colors"
 import { style } from "./styles/AppHeader"
 import PropTypes from "prop-types"
 import React, { Component } from "react"

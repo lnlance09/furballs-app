@@ -33,7 +33,8 @@ const app = (state = initial(), action) => {
 					name: payload.cat.name,
 					pattern: payload.cat.pattern,
 					pics: payload.cat.pic_count > 0 ? JSON.parse(payload.cat.pics) : null,
-					picCount: parseInt(payload.cat.pic_count, 10)
+					picCount: parseInt(payload.cat.pic_count, 10),
+					userId: payload.cat.user_id
 				},
 				error: false,
 				loading: false

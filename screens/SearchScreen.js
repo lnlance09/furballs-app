@@ -6,7 +6,7 @@ import React, { Component } from "react"
 import { connect } from "react-redux"
 import { style } from "./styles/SearchScreen"
 import { searchResources } from "@redux/actions/search"
-import { Body, Card, CardItem, Spinner, Text } from "native-base"
+import { Card, CardItem, Spinner, Text } from "native-base"
 import { Image, ScrollView, StyleSheet, View } from "react-native"
 
 const styles = StyleSheet.create(style)
@@ -58,7 +58,8 @@ class SearchScreen extends Component {
 										</CardItem>
 										<CardItem>
 											<Text style={styles.catCardDescription}>
-												{address}{"\n"}
+												{address}
+												{"\n"}
 												{`${parsed.city}, ${parsed.state}`}
 											</Text>
 										</CardItem>

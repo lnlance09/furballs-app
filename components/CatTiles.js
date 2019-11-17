@@ -1,16 +1,8 @@
+import * as constants from "@redux/types"
 import PropTypes from "prop-types"
 import React, { Component } from "react"
-import { connect } from "react-redux"
 import { style } from "./styles/CatTiles"
-import {
-	FlatList,
-	ImageBackground,
-	StyleSheet,
-	Text,
-	TouchableWithoutFeedback,
-} from "react-native"
-import { getCat, resetCat } from "@redux/actions/app"
-import { fetchActivity, toggleCatTilesRefeshing } from "@redux/actions/activity"
+import { FlatList, ImageBackground, StyleSheet, Text, TouchableWithoutFeedback } from "react-native"
 
 const styles = StyleSheet.create(style)
 
@@ -18,69 +10,99 @@ class CatTiles extends Component {
 	constructor(props) {
 		super(props)
 
-		this.state = {}
+		this.state = {
+			cats: [],
+			hasMore: false,
+			isLoading: false,
+			isRefreshing: false,
+			page: 0,
+			seed: 0
+		}
 
-		this.onEndReachedCalledDuringMomentum = true
-
-		this.nextPage = this.nextPage.bind(this)
+		this.getActivity = this.getActivity.bind(this)
+		this.handleLoadMore = this.handleLoadMore.bind(this)
+		this.handleRefresh = this.handleRefresh.bind(this)
 	}
 
 	componentDidMount() {
-		this.props.fetchActivity({ page: 0 })
+		this.getActivity()
 	}
 
-	nextPage() {
-		this.props.toggleCatTilesRefeshing()
-		this.props.fetchActivity({ page: this.props.activityPage })
+	handleLoadMore() {
+		if (this.state.hasMore) {
+			this.setState(
+				{
+					page: this.state.page + 1
+				},
+				() => {
+					this.getActivity()
+				}
+			)
+		}
+	}
+
+	handleRefresh() {
+		this.setState(
+			{
+				isRefreshing: true,
+				page: 0,
+				seed: this.state.seed + 1
+			},
+			() => {
+				this.getActivity()
+			}
+		)
+	}
+
+	getActivity() {
+		const { cats, page } = this.state
+		this.setState({ isLoading: true })
+
+		fetch(`${constants.BASE_URL}api/cats/browse?page=${page}`, {
+			headers: {
+				"Content-Type": "application/json"
+			}
+		})
+			.then(response => response.json())
+			.then(json => {
+				this.setState({
+					cats: page === 0 ? json.cats : [...cats, ...json.cats],
+					hasMore: json.hasMore,
+					isRefreshing: false
+				})
+			})
+			.catch(error => {
+				console.error(error)
+			})
 	}
 
 	render() {
-		const {
-			activityCats,
-			activityHasMore,
-			activityPage,
-			activityPages,
-			activityRefreshing
-		} = this.props
+		const { cats, isRefreshing } = this.state
 
 		return (
-			activityCats.length > 0 && (
+			cats.length > 0 && (
 				<FlatList
 					contentContainerStyle={styles.flatListContainer}
-					data={activityCats}
+					data={cats}
 					keyExtractor={item => item.id}
-					onEndReached={() => {
-						console.log("end reached")
-						console.log(activityPage)
-						console.log(activityPages)
-						console.log(activityHasMore)
-						if (
-							activityPage < activityPages &&
-							activityHasMore &&
-							!activityRefreshing
-						) {
-							// console.log("fetching new page")
-							this.nextPage()
-						}
-					}}
-					onEndReachedThreshold={0.5}
-					onRefresh={() => {
-						this.props.toggleCatTilesRefeshing()
-						this.props.fetchActivity({ page: 0 })
-					}}
-					refreshing={activityRefreshing}
+					onEndReached={this.handleLoadMore}
+					onEndThreshold={0}
+					onRefresh={this.handleRefresh}
+					refreshing={isRefreshing}
 					renderItem={({ item, index }) => (
 						<TouchableWithoutFeedback
+							key={`catTile${index}`}
 							onPress={() => {
 								this.props.navigate("Cat", {
 									id: item.id
 								})
 							}}
+							style={{ height: 200, width: "100%" }}
 						>
 							<ImageBackground
+								imageStyle={styles.imgBackgroundImage}
 								source={{ uri: item.img }}
-								key={`catTile${index}`}
-								style={{ height: 200, width: "100%" }}
+								style={styles.imgBackground}
 							>
 								<Text style={styles.nameText}>{item.name}</Text>
 							</ImageBackground>
@@ -93,43 +115,9 @@ class CatTiles extends Component {
 }
 
 CatTiles.propTypes = {
-	activityCats: PropTypes.array,
-	activityHasMore: PropTypes.bool,
-	activityPage: PropTypes.number,
-	activityPages: PropTypes.number,
-	activityRefreshing: PropTypes.bool,
-	fetchActivity: PropTypes.func,
-	getCat: PropTypes.func,
-	navigate: PropTypes.func,
-	resetCat: PropTypes.func,
-	toggleCatTilesRefeshing: PropTypes.func
+	navigate: PropTypes.func
 }
 
-CatTiles.defaultProps = {
-	activityCats: [],
-	activityHasMore: false,
-	activityPage: 0,
-	activityRefreshing: false,
-	fetchActivity,
-	getCat,
-	resetCat,
-	toggleCatTilesRefeshing
-}
+CatTiles.defaultProps = {}
 
-const mapStateToProps = (state, ownProps) => {
-	return {
-		...state.app,
-		...state.activity,
-		...ownProps
-	}
-}
-
-export default connect(
-	mapStateToProps,
-	{
-		fetchActivity,
-		getCat,
-		resetCat,
-		toggleCatTilesRefeshing
-	}
-)(CatTiles)
+export default CatTiles

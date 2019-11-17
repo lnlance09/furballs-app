@@ -1,4 +1,3 @@
-import * as Permissions from "expo-permissions"
 import AppHeader from "../components/AppHeader"
 import Colors from "../constants/Colors"
 import PropTypes from "prop-types"
@@ -7,12 +6,8 @@ import React, { Component } from "react"
 import { style } from "./styles/EditPhotoScreen"
 import { connect } from "react-redux"
 import { addCatPic } from "@redux/actions/capture"
-import { ImageBackground, StyleSheet, Text, View } from "react-native"
-import {
-	TextField,
-	FilledTextField,
-	OutlinedTextField,
-} from "react-native-material-textfield"
+import { ImageBackground, StyleSheet, View } from "react-native"
+import { TextField } from "react-native-material-textfield"
 import { Icon } from "react-native-elements"
 
 const styles = StyleSheet.create(style)
@@ -27,9 +22,7 @@ class EditPhotoScreen extends Component {
 		}
 	}
 
-	async componentDidMount() {
-		
-	}
+	async componentDidMount() {}
 
 	render() {
 		const { description, name } = this.state
@@ -55,7 +48,7 @@ class EditPhotoScreen extends Component {
 						uri:
 							"https://pbs.twimg.com/profile_images/436232540299350016/SUO4-MhH_400x400.jpeg"
 					}}
-					style={{ height: 240, width: "100%" }}
+					style={styles.imgBackground}
 				/>
 				<View style={{ marginHorizontal: 7 }}>
 					<TextField
@@ -75,14 +68,18 @@ class EditPhotoScreen extends Component {
 						onChangeText={description => {
 							this.setState({ description })
 						}}
-						style={{
-							// height: 150,
-							// justifyContent: "flex-start"
-						}}
-						inputContainerStyle={{
-							// height: 130,
-							// justifyContent: "flex-start"
-						}}
+						style={
+							{
+								// height: 150,
+								// justifyContent: "flex-start"
+							}
+						}
+						inputContainerStyle={
+							{
+								// height: 130,
+								// justifyContent: "flex-start"
+							}
+						}
 						value={description}
 					/>
 				</View>

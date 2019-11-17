@@ -3,6 +3,7 @@ import { Platform, View } from "react-native"
 import { createBottomTabNavigator, createStackNavigator } from "react-navigation"
 import { fromLeft } from "react-navigation-transitions"
 import TabBarIcon from "../components/TabBarIcon"
+import CameraRollScreen from "../screens/CameraRollScreen"
 import CaptureScreen from "../screens/CaptureScreen"
 import CatScreen from "../screens/CatScreen"
 import ChangePasswordScreen from "../screens/ChangePasswordScreen"
@@ -15,7 +16,6 @@ import SearchScreen from "../screens/SearchScreen"
 import VerificationCodeScreen from "../screens/VerificationCodeScreen"
 import Colors from "../constants/Colors"
 
-
 const config = Platform.select({
 	default: {},
 	transitionConfig: () => fromLeft(),
@@ -23,8 +23,6 @@ const config = Platform.select({
 		headerMode: "screen"
 	}
 })
-
-
 
 // Capture stack
 const CaptureStack = createStackNavigator(
@@ -34,6 +32,9 @@ const CaptureStack = createStackNavigator(
 		},
 		EditPhoto: {
 			screen: EditPhotoScreen
+		},
+		CameraRoll: {
+			screen: CameraRollScreen
 		}
 	},
 	config
@@ -46,7 +47,6 @@ CaptureStack.navigationOptions = ({ navigation }) => {
 	})
 
 	return {
-		tabBarVisible,
 		showLabel: false,
 		tabBarIcon: ({ focused }) => {
 			return (
@@ -62,13 +62,12 @@ CaptureStack.navigationOptions = ({ navigation }) => {
 				</View>
 			)
 		},
+		tabBarVisible,
 		transitionConfig: () => fromLeft()
 	}
 }
 
 CaptureStack.path = ""
-
-
 
 // Cat stack
 const CatStack = createStackNavigator(
@@ -103,8 +102,6 @@ CatStack.navigationOptions = {
 
 CatStack.path = "cat/:id"
 
-
-
 // Home stack
 const HomeStack = createStackNavigator(
 	{
@@ -133,8 +130,6 @@ HomeStack.navigationOptions = {
 }
 
 HomeStack.path = "home"
-
-
 
 // Map stack
 const MapStack = createStackNavigator(
@@ -165,8 +160,6 @@ MapStack.navigationOptions = {
 
 MapStack.path = ""
 
-
-
 // Profile stack
 const ProfileStack = createStackNavigator(
 	{
@@ -184,6 +177,9 @@ const ProfileStack = createStackNavigator(
 		},
 		Cat: {
 			screen: CatScreen
+		},
+		CameraRoll: {
+			screen: CameraRollScreen
 		}
 	},
 	config
@@ -204,8 +200,6 @@ ProfileStack.navigationOptions = {
 }
 
 ProfileStack.path = ""
-
-
 
 // Search stack
 const SearchStack = createStackNavigator(
@@ -235,8 +229,6 @@ SearchStack.navigationOptions = {
 
 SearchStack.path = ""
 
-
-
 // Tab navigator
 const tabNavigator = createBottomTabNavigator(
 	{
@@ -247,7 +239,7 @@ const tabNavigator = createBottomTabNavigator(
 		ProfileStack
 	},
 	{
-		navigationOptions: ({ navigation }) => ({
+		navigationOptions: () => ({
 			tabBarVisible: false
 		}),
 		tabBarOptions: {

@@ -21,9 +21,4 @@ export const style = {
 	cameraView: {
 		flex: 1
 	},
-	takePicText: {
-		color: Colors.white,
-		fontSize: 18,
-		marginTop: 50
-	}
 }

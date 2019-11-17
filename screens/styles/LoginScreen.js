@@ -15,26 +15,14 @@ export const style = {
 		textAlign: "left"
 	},
 	formSubmitBtn: {
-		backgroundColor: Colors.blue,
-		borderRadius: 0,
+		backgroundColor: Colors.yellow,
+		borderColor: Colors.yellow,
 		marginTop: 10
 	},
 	formSubmitBtnText: {
-		fontWeight: "bold"
-	},
-	logo: {
-		borderRadius: 120 / 2,
-		height: 120,
-		overflow: "hidden",
-		width: 120
+		color: Colors.white
 	},
 	textInput: {
 		// paddingTop: 2
 	},
-	usernameText: {
-		fontSize: 13,
-		marginTop: 4,
-		textAlign: "center",
-		width: "100%"
-	}
 }

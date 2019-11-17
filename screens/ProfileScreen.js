@@ -3,27 +3,20 @@ import AppHeader from "../components/AppHeader"
 import CatGrid from "../components/CatGrid"
 import Colors from "../constants/Colors"
 import PropTypes from "prop-types"
-import ToggleSwitch from "toggle-switch-react-native"
 import store from "../store/"
+import ToggleSwitch from "toggle-switch-react-native"
 import React, { Component } from "react"
 import { connect } from "react-redux"
 import { style } from "./styles/ProfileScreen"
-import {
-	fetchUser,
-	getCurrentUser,
-	logout
-} from "@redux/actions/profile"
+import { fetchUser, getCurrentUser, logout } from "@redux/actions/profile"
 import {
 	ActivityIndicator,
-	AsyncStorage,
-	CameraRoll,
 	Image,
 	ScrollView,
 	StyleSheet,
-	Switch,
 	View
 } from "react-native"
-import { Container, Tab, TabHeading, Tabs, Text } from "native-base"
+import { Container, Text } from "native-base"
 import { Avatar, Icon, ListItem } from "react-native-elements"
 
 const styles = StyleSheet.create(style)
@@ -34,23 +27,26 @@ class ProfileScreen extends Component {
 
 		this.state = {
 			auth: false,
+			bearer: null,
 			hasCameraPermission: false,
 			hasCameraRollPermission: false,
 			hasLocationPermission: false,
 			hasMicrophonePermission: false,
 			hasPushNotifications: false,
 			photos: [],
-			settingsVisible: false,
+			settingsVisible: false
 		}
 	}
 
 	async componentDidMount() {
-		let user = await AsyncStorage.getItem("user") || null
-		if (user) {
-			user = JSON.parse(user)
-			this.setState({ auth: true })
-			this.props.fetchUser({ id: user.id })
+		const _state = store.getState()
+		const user = _state.profile.user
+		const auth = user === null ? false : true
+		const bearer = auth ? user.token : null
+		this.setState({ auth, bearer, user })
 
+		if (auth) {
+			this.props.fetchUser({ id: user.id })
 			this.toggleCameraPermission(true)
 			this.toggleCameraRollPermission(true)
 			this.toggleLocationPermission(true)
@@ -106,7 +102,7 @@ class ProfileScreen extends Component {
 	}
 
 	async togglePushNotifications(on) {
-		console.log('togglePushNotifications')
+		console.log("togglePushNotifications")
 		console.log(on)
 		if (on) {
 			const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS)
@@ -141,83 +137,70 @@ class ProfileScreen extends Component {
 		console.log("photos")
 		console.log(photos)
 
-		const RenderCameraRoll = (
-			photos.map((p, i) => (
-				<Image
-					key={i}
-					source={{ uri: p.node.image.uri }}
-					style={{
-						width: 300,
-						height: 100
-					}}
-				/>
-			))
-		)
-
 		const SettingsSection = (
 			<View>
 				<ListItem
 					bottomDivider
 					key="pushNotificationsListItem"
-					rightTitle={(
+					rightTitle={
 						<ToggleSwitch
 							isOn={hasPushNotifications}
 							onColor={Colors.green}
 							onToggle={isOn => this.togglePushNotifications(isOn)}
 						/>
-					)}
+					}
 					subtitle={null}
 					title="Push notifications"
 				/>
 				<ListItem
 					bottomDivider
 					key="locationListItem"
-					rightTitle={(
+					rightTitle={
 						<ToggleSwitch
 							isOn={hasLocationPermission}
 							onColor={Colors.green}
 							onToggle={isOn => this.toggleLocationPermission(isOn)}
 						/>
-					)}
+					}
 					subtitle={null}
 					title="Location"
 				/>
 				<ListItem
 					bottomDivider
 					key="cameraListItem"
-					rightTitle={(
+					rightTitle={
 						<ToggleSwitch
 							isOn={hasCameraPermission}
 							onColor={Colors.green}
 							onToggle={isOn => this.toggleCameraPermission(isOn)}
 						/>
-					)}
+					}
 					subtitle={null}
 					title="Camera"
 				/>
 				<ListItem
 					bottomDivider
 					key="cameraRollListItem"
-					rightTitle={(
+					rightTitle={
 						<ToggleSwitch
 							isOn={hasCameraRollPermission}
 							onColor={Colors.green}
 							onToggle={isOn => this.toggleCameraRollPermission(isOn)}
 						/>
-					)}
+					}
 					subtitle={null}
 					title="Camera roll"
 				/>
 				<ListItem
 					bottomDivider
 					key="microphoneListItem"
-					rightTitle={(
+					rightTitle={
 						<ToggleSwitch
 							isOn={hasMicrophonePermission}
 							onColor={Colors.green}
 							onToggle={isOn => this.toggleMicrophonePermission(isOn)}
 						/>
-					)}
+					}
 					subtitle={null}
 					title="Microphone"
 				/>
@@ -253,36 +236,26 @@ class ProfileScreen extends Component {
 				<ScrollView>
 					{settingsVisible ? (
 						SettingsSection
-					) : user.id ? (
+					) : auth ? (
 						<View>
 							<View style={styles.imageWrapper}>
 								<Avatar
 									icon={{ name: "home" }}
 									onEditPress={() => {
-										CameraRoll.getPhotos({
-											assetType: "Photos",
-											first: 20
-										})
-										.then(r => {
-											console.log("edges")
-											console.log(r)
-											this.setState({ photos: r.edges });
-										})
-										.catch((err) => {
-											// Error Loading Images
-										})
+										navigate("CameraRoll")
 									}}
 									rounded
 									showEditButton
 									size="large"
 								/>
-								{RenderCameraRoll}
 							</View>
 							<Text style={styles.h1}>{user.name}</Text>
 							<Text style={styles.usernameText}>@{user.username}</Text>
 
-							<Container style={{ marginLeft: 4, marginRight: 7 }}>
-								<Text style={{ fontSize: 24, marginLeft: 7, marginTop: 8 }}>My cats</Text>
+							<Container style={styles.myCatContainer}>
+								<Text style={styles.myCatsHeader}>
+									My cats
+								</Text>
 								<CatGrid navigate={navigate} user={user} />
 							</Container>
 						</View>
@@ -314,8 +287,9 @@ ProfileScreen.propTypes = {
 		img: PropTypes.string,
 		name: PropTypes.string,
 		pushNotificationsEnabled: PropTypes.bool,
-		verificationCode: PropTypes.string
-	}),
+		username: PropTypes.string,
+		verificationCode: PropTypes.string,
+	})
 }
 
 ProfileScreen.defaultProps = {

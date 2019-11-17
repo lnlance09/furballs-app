@@ -1,21 +1,30 @@
+import * as constants from "@redux/types"
 import Animated, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
 import mapStyle from "../mapStyle.json"
 import AppHeader from "../components/AppHeader"
+import ButtonComponent from "../components/ButtonComponent"
 import Colors from "../constants/Colors"
 import PropTypes from "prop-types"
-import React, { Component } from "react"
 import moment from "moment"
+import store from "../store"
+import React, { Component } from "react"
 import { style } from "./styles/CatScreen"
 import { connect } from "react-redux"
 import { RenderMeal } from "../tools/textFunctions"
 // import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome"
 // import { faDrumstickBite } from "@fortawesome/free-solid-svg-icons"
-import { getItemFromStorage } from "../tools/storageFunctions"
+import { TextField } from "react-native-material-textfield"
 import { getCat, likeCat, resetCat, toggleCatScreenEditing, unlikeCat } from "@redux/actions/app"
-import { Button, Container, Tab, Tabs, TabHeading, Text } from "native-base"
-import { AsyncStorage, ImageBackground, ScrollView, StyleSheet, View } from "react-native"
-import { Icon, Image, ListItem } from "react-native-elements"
+import { Container, Tab, Tabs, TabHeading, Text, Toast } from "native-base"
+import {
+	ImageBackground,
+	ScrollView,
+	StyleSheet,
+	View
+} from "react-native"
+import { Icon, Image, ListItem, Overlay } from "react-native-elements"
 import { FlatGrid } from "react-native-super-grid"
+import { LinearGradient } from "expo-linear-gradient"
 
 const styles = StyleSheet.create(style)
 
@@ -23,57 +32,87 @@ class CatScreen extends Component {
 	constructor(props) {
 		super(props)
 
+		console.log("cat screen mounted")
+
 		this.state = {
 			auth: false,
 			bearer: null,
+			explanation: "",
 			reportLayoutVisible: false,
 			user: null
 		}
 
-		this.feedCat = this.feedCat.bind(this)
 		this.likeCat = this.likeCat.bind(this)
 		this.reportAbuse = this.reportAbuse.bind(this)
 		this.unlikeCat = this.unlikeCat.bind(this)
 	}
 
 	async componentDidMount() {
-		let user = await AsyncStorage.getItem("user") || null
-		let auth = false
-		let bearer = null
-		if (user) {
-			user = JSON.parse(user)
-			auth = true
-			bearer = user.token
-		}
+		console.log("componentDidMount")
+		const _state = store.getState()
+		const user = _state.profile.user
+		const auth = user === null ? false : true
+		const bearer = auth ? user.token : null
 
-		console.log("user")
-		console.log(user)
 		this.setState({ auth, bearer, user })
 
 		const id = this.props.navigation.getParam("id", null)
 		this.props.getCat({ bearer, id })
 	}
 
-	feedCat(bearer) {
-		// console.log("feed cat")
-		this.setState({ reportLayoutVisible: true })
-	}
-
 	likeCat(bearer, id) {
 		this.props.likeCat({ bearer, id })
 	}
 
-	reportAbuse() {}
+	reportAbuse() {
+		const id = this.props.cat.id
+		const { bearer, explanation } = this.state
+
+		if (explanation.trim() !== "") {
+			let headers = {
+				Accept: "application/json",
+				"Content-Type": "application/json"
+			}
+
+			if (bearer) {
+				headers.Authorization = bearer
+			}
+
+			fetch(`${constants.BASE_URL}api/cats/reportAbuse`, {
+				body: JSON.stringify({
+					cat_id: id,
+					explanation
+				}),
+				headers,
+				method: "POST"
+			})
+				.then(response => response.json())
+				.then(json => {
+					if (!json.error) {
+						Toast.show({
+							buttonText: null,
+							text: "Your report has been submitted!",
+							type: "success"
+						})
+						this.setState({ reportLayoutVisible: false })
+					}
+				})
+				.catch(error => {
+					console.error(error)
+				})
+		}
+	}
 
 	unlikeCat(bearer, id) {
 		this.props.unlikeCat({ bearer, id })
 	}
 
 	render() {
-		const { auth, reportLayoutVisible, user } = this.state
+		const { auth, explanation, reportLayoutVisible, user } = this.state
 		const { cat, loading } = this.props
 		const {
 			description,
+			homeless,
 			id,
 			img,
 			lastLocationTime,
@@ -83,14 +122,11 @@ class CatScreen extends Component {
 			meals,
 			mealCount,
 			name,
-			picCount
+			picCount,
+			userId
 		} = cat
 		const { navigate } = this.props.navigation
-
-		console.log("Cat screen")
-		console.log(cat)
-
-		const canEdit = true
+		const canEdit = auth && userId === user.id
 
 		const MapSection = () => (
 			<View>
@@ -115,19 +151,21 @@ class CatScreen extends Component {
 				<Text style={styles.spottedAtText}>
 					🐾 Spotted {moment(lastLocationTime).fromNow()}
 				</Text>
-				<Text style={styles.spottedAtText}>🚩 Report animal abuse</Text>
-				<Button
-					block
-					color={Colors.red}
+
+				<ButtonComponent
+					buttonStyle={styles.feedBtn}
 					onPress={() => navigate("Capture")}
-					style={styles.feedBtn}
-				>
-					<Icon color={Colors.white} name="photo" />
-					<Text style={{ fontWeight: "bold" }}>Feed me</Text>
-				</Button>
+					text="Add pics"
+					textStyle={styles.feedBtnText}
+				/>
+				<ButtonComponent
+					buttonStyle={styles.flagBtn}
+					onPress={() =>  this.setState({ reportLayoutVisible: true })}
+					text="Report cat abuse"
+					textStyle={styles.flagBtnText}
+				/>
 			</View>
 		)
-
 		const RenderMeals = () => {
 			return meals.map((m, i) => (
 				<ListItem
@@ -138,7 +176,6 @@ class CatScreen extends Component {
 				/>
 			))
 		}
-
 		const RenderPhotos = props => {
 			return (
 				<FlatGrid
@@ -149,7 +186,6 @@ class CatScreen extends Component {
 				/>
 			)
 		}
-
 		return (
 			<Container style={styles.cardPageContainer}>
 				{loading ? (
@@ -162,7 +198,7 @@ class CatScreen extends Component {
 									color={Colors.black}
 									name="arrow-back"
 									onPress={() => {
-										this.props.resetCat()
+										// this.props.resetCat()
 										this.props.navigation.goBack()
 									}}
 								/>
@@ -186,14 +222,21 @@ class CatScreen extends Component {
 
 						<ScrollView>
 							<ImageBackground source={{ uri: img }} style={styles.cardPageImg}>
+								<LinearGradient
+									colors={["transparent", "rgba(0,0,0,0.5)"]}
+									style={styles.linearGradient}
+								/>
 								<Text style={styles.nameText}>{name}</Text>
+								<Text style={styles.homelessText}>
+									{homeless ? "Homeless cat" : "Bodega cat"}
+								</Text>
 							</ImageBackground>
 
 							<Text style={styles.cardPageDescriptionText}>{description}</Text>
 
 							{MapSection()}
 
-							<Container style={{ marginHorizontal: 7 }}>
+							<Container style={styles.tabContainer}>
 								<Tabs
 									tabContainerStyle={styles.tabBarContainerStyle}
 									tabBarUnderlineStyle={styles.tabBarUnderlineStyle}
@@ -230,6 +273,49 @@ class CatScreen extends Component {
 									</Tab>
 								</Tabs>
 							</Container>
+
+							<Overlay
+								fullscreen
+								isVisible={reportLayoutVisible}
+								onBackdropPress={() =>
+									this.setState({ reportLayoutVisible: false })
+								}
+							>
+								<View>
+									<Text style={styles.modalHeader}>
+										Is this cat okay?
+									</Text>
+									<TextField
+										characterRestriction={500}
+										label="Suspect abuse or neglect?"
+										multiline={true}
+										numberOfLines={4}
+										onChangeText={explanation => {
+											this.setState({ explanation })
+										}}
+										sufffix="Let us know"
+										style={
+											{
+												// height: 150,
+												// justifyContent: "flex-start"
+											}
+										}
+										inputContainerStyle={
+											{
+												// height: 130,
+												// justifyContent: "flex-start"
+											}
+										}
+										value={explanation}
+									/>
+
+									<ButtonComponent
+										buttonStyle={styles.explanationBtn}
+										onPress={() => this.reportAbuse()}
+										text="Submit"
+									/>
+								</View>
+							</Overlay>
 						</ScrollView>
 					</View>
 				)}
@@ -237,9 +323,7 @@ class CatScreen extends Component {
 		)
 	}
 }
-
 CatScreen.navigationOptions = { header: null }
-
 CatScreen.propTypes = {
 	cat: PropTypes.shape({
 		description: PropTypes.string,
@@ -256,7 +340,8 @@ CatScreen.propTypes = {
 		name: PropTypes.string,
 		pattern: PropTypes.string,
 		pics: PropTypes.array,
-		picCount: PropTypes.number
+		picCount: PropTypes.number,
+		userId: PropTypes.number
 	}),
 	editing: PropTypes.bool,
 	getCat: PropTypes.func,
@@ -273,7 +358,6 @@ CatScreen.propTypes = {
 	toggleCatScreenEditing: PropTypes.func,
 	unlikeCat: PropTypes.func
 }
-
 CatScreen.defaultProps = {
 	cat: {
 		id: null,
@@ -293,15 +377,12 @@ CatScreen.defaultProps = {
 	toggleCatScreenEditing,
 	unlikeCat
 }
-
 const mapStateToProps = (state, ownProps) => {
 	return {
 		...state.app,
-		...state.profile,
 		...ownProps
 	}
 }
-
 export default connect(
 	mapStateToProps,
 	{

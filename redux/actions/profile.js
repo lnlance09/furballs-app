@@ -26,24 +26,6 @@ export const fetchUser = ({ id }) => dispatch => {
 		})
 }
 
-export const getLikedCats = ({ id }) => dispatch => {
-	fetch(`${constants.BASE_URL}api/users/getLikedCats?id=${id}`, {
-		headers: {
-			"Content-Type": "application/json"
-		}
-	})
-		.then(response => response.json())
-		.then(json => {
-			dispatch({
-				type: constants.GET_LIKED_CATS,
-				payload: json
-			})
-		})
-		.catch(error => {
-			console.error(error)
-		})
-}
-
 export const login = ({ email, navigate, password }) => dispatch => {
 	fetch(`${constants.BASE_URL}api/users/login`, {
 		body: JSON.stringify({
@@ -199,10 +181,3 @@ export const submitVerificationCode = ({ code, email, navigate }) => dispatch =>
 			console.error(error)
 		})
 }
-
-export const toggleCatGridRefeshing = () => dispatch => {
-	dispatch({
-		type: constants.TOGGLE_CAT_GRID_REFRESHING
-	})
-}
-

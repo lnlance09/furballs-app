@@ -2,12 +2,11 @@ import * as Permissions from "expo-permissions"
 import AppHeader from "../components/AppHeader"
 import Colors from "../constants/Colors"
 import PropTypes from "prop-types"
-import Confetti from "react-native-confetti"
 import React, { Component } from "react"
 import { style } from "./styles/CaptureScreen"
 import { connect } from "react-redux"
 import { addCatPic } from "@redux/actions/capture"
-import { ImageBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { Icon } from "react-native-elements"
 import { Camera } from "expo-camera"
 
@@ -50,9 +49,11 @@ class CaptureScreen extends Component {
 				console.log(cropdata)
 
 				this.setState({ img: data.uri }, () => {
-					const { navigate } = this.props.navigation
 					this.props.addCatPic({ img: data })
+
+					const { navigate } = this.props.navigation
 					navigate("EditPhoto")
+
 					if (this._confettiView) {
 						this._confettiView.startConfetti()
 					}
@@ -62,15 +63,11 @@ class CaptureScreen extends Component {
 	}
 
 	render() {
-		const { hasCameraPermission, img, type } = this.state
+		const { hasCameraPermission, type } = this.state
 		const { navigate } = this.props.navigation
 
 		if (hasCameraPermission === null) {
-			return (
-				<View>
-					
-				</View>
-			)
+			return <View></View>
 		} else if (hasCameraPermission === false) {
 			return <Text></Text>
 		} else {

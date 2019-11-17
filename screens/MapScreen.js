@@ -1,20 +1,14 @@
-import Animated, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
 import CatList from "../components/CatList"
-import Colors from "../constants/Colors"
 import PropTypes from "prop-types"
 import mapStyle from "../mapStyle.json"
+import Animated, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
 import React, { Component } from "react"
 import { connect } from "react-redux"
 import { style } from "./styles/MapScreen"
-import { fetchActivity } from "@redux/actions/activity"
-import { getCat, resetCat } from "@redux/actions/app"
 import {
-	searchCats,
 	searchCatsByLocation,
-	setRegion,
-	toggleCatListRefeshing
+	setRegion
 } from "@redux/actions/map"
-import _ from "lodash"
 import { Tab, TabHeading, Tabs, Text } from "native-base"
 import { SafeAreaView, StyleSheet, View } from "react-native"
 
@@ -40,24 +34,20 @@ class MapScreen extends Component {
 	}
 
 	onRegionChange(region) {
-		console.log("change region")
-		console.log(region)
-		// _.debounce(region => {
-			this.props.setRegion(region)
-			this.props.searchCatsByLocation({
-				lat: region.latitude,
-				lon: region.longitude
-			})
-		// }, 2000)
+		this.props.setRegion(region)
+		this.props.searchCatsByLocation({
+			lat: region.latitude,
+			lon: region.longitude
+		})
 	}
 
 	render() {
 		const { initialRegion, mapCats } = this.props
 		const { navigate } = this.props.navigation
-		console.log("map screen")
-		console.log(this.props.region)
+		// console.log("map screen")
+		// console.log(this.props.region)
 
-		const MapView = () => (
+		const MapView = ({ }) => (
 			<View>
 				<Animated
 					customMapStyle={mapStyle}
@@ -88,7 +78,7 @@ class MapScreen extends Component {
 			</View>
 		)
 
-		const SearchView = () => <CatList navigate={navigate} />
+		const SearchView = ({ }) => <CatList navigate={navigate} />
 
 		return (
 			<SafeAreaView style={styles.container}>
@@ -126,9 +116,6 @@ MapScreen.navigationOptions = {
 
 MapScreen.propTypes = {
 	cat: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
-	refreshing: PropTypes.bool,
-	fetchActivity: PropTypes.func,
-	getCat: PropTypes.func,
 	initialRegion: PropTypes.shape({
 		latitude: PropTypes.number,
 		latitudeDelta: PropTypes.number,
@@ -141,17 +128,12 @@ MapScreen.propTypes = {
 		latitude: PropTypes.number,
 		longitude: PropTypes.number
 	}),
-	resetCat: PropTypes.func,
-	searchCats: PropTypes.func,
 	searchCatsByLocation: PropTypes.func,
-	setRegion: PropTypes.func,
-	toggleCatListRefeshing: PropTypes.func
+	setRegion: PropTypes.func
 }
 
 MapScreen.defaultProps = {
 	cat: null,
-	fetchActivity,
-	getCat,
 	initialRegion: {
 		latitude: 40.7644,
 		latitudeDelta: 0.0922,
@@ -159,17 +141,12 @@ MapScreen.defaultProps = {
 		longitudeDelta: 0.0421
 	},
 	mapCats: [],
-	refreshing: false,
-	resetCat,
-	searchCats,
 	searchCatsByLocation,
-	setRegion,
-	toggleCatListRefeshing
+	setRegion
 }
 
 const mapStateToProps = (state, ownProps) => {
 	return {
-		...state.app,
 		...state.map,
 		...ownProps
 	}
@@ -178,12 +155,7 @@ const mapStateToProps = (state, ownProps) => {
 export default connect(
 	mapStateToProps,
 	{
-		fetchActivity,
-		getCat,
-		resetCat,
-		searchCats,
 		searchCatsByLocation,
-		setRegion,
-		toggleCatListRefeshing
+		setRegion
 	}
 )(MapScreen)

@@ -4,16 +4,6 @@ import { Dimensions } from "react-native"
 const { width } = Dimensions.get("window")
 
 export const style = {
-	container: {
-		backgroundColor: Colors.white,
-		marginTop: 0,
-		marginVertical: 0,
-		paddingTop: 0,
-		paddingVertical: 0
-	},
-	contentContainer: {
-		paddingTop: 0
-	},
 	emptyMsg: {
 		alignItems: "center",
 		flex: 1,

@@ -1,6 +1,6 @@
 import { AsyncStorage } from "react-native"
 
-export const deleteItemFromStorage = async (item) => {
+export const deleteItemFromStorage = async item => {
 	try {
 		await AsyncStorage.removeItem(`${item}`)
 	} catch (error) {
@@ -8,8 +8,7 @@ export const deleteItemFromStorage = async (item) => {
 	}
 }
 
-export const getItemFromStorage = async (item) => {
-	let value = ""
+export const getItemFromStorage = async () => {
 	try {
 		return await AsyncStorage.getItem("user")
 	} catch (error) {

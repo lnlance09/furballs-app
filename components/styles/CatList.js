@@ -10,12 +10,10 @@ export const style = {
 		backgroundColor: Colors.white,
 		borderTopWidth: 0
 	},
+	searchBarInput: {
+		color: Colors.black
+	},
 	searchBarInputContainer: {
 		backgroundColor: "#efefef"
 	},
-	spinnerStyle: {
-		alignItems: "center",
-		flex: 1,
-		justifyContent: "center"
-	}
 }

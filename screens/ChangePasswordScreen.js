@@ -1,20 +1,13 @@
 import AppHeader from "../components/AppHeader"
+import ButtonComponent from "../components/ButtonComponent"
 import PropTypes from "prop-types"
 import React, { Component } from "react"
 import { connect } from "react-redux"
 import { style } from "./styles/ChangePasswordScreen"
 import { changePassword } from "@redux/actions/profile"
-import {
-	StyleSheet,
-	TextInput,
-	View
-} from "react-native"
-import {
-	TextField,
-	FilledTextField,
-	OutlinedTextField,
-} from "react-native-material-textfield"
-import { Button, Container, Text, Toast } from "native-base"
+import { StyleSheet } from "react-native"
+import { TextField } from "react-native-material-textfield"
+import { Container, Text, Toast } from "native-base"
 
 const styles = StyleSheet.create(style)
 
@@ -63,19 +56,18 @@ class ChangePasswordScreen extends Component {
 
 		const SubmitFormButton = ({ callback, text }) => {
 			return (
-				<Button block onPress={() => callback()} style={styles.formSubmitBtn}>
-					<Text style={{ fontWeight: "bold" }}>{text}</Text>
-				</Button>
+				<ButtonComponent
+					buttonStyle={styles.formSubmitBtn}
+					onPress={() => callback()}
+					text={text}
+					textStyle={styles.formSubmitBtnText}
+				/>
 			)
 		}
 
 		return (
 			<Container>
-				<AppHeader
-					left={() => null}
-					right={() => null}
-					title="Change password"
-				/>
+				<AppHeader left={() => null} right={() => null} title="Change password" />
 				<Container style={styles.container}>
 					<TextField
 						autoCapitalize="none"
@@ -111,6 +103,7 @@ ChangePasswordScreen.navigationOptions = {
 
 ChangePasswordScreen.propTypes = {
 	changePassword: PropTypes.func,
+	navigation: PropTypes.object
 }
 
 ChangePasswordScreen.defaultProps = {

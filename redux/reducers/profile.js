@@ -16,12 +16,6 @@ const profile = (state = initial(), action) => {
 				user: payload.user
 			}
 
-		case constants.GET_LIKED_CATS:
-			return {
-				...state,
-				gridCats: payload.cats,
-			}
-
 		case constants.LOGIN:
 			return {
 				...state,
@@ -37,7 +31,6 @@ const profile = (state = initial(), action) => {
 			}
 
 		case constants.REGISTER:
-
 			return {
 				...state,
 				token: payload.token,
@@ -46,12 +39,18 @@ const profile = (state = initial(), action) => {
 
 		case constants.RESET_PASSWORD:
 			return {
+				...state
+			}
+
+		case constants.SET_INITIAL_USER_DATA:
+			return {
 				...state,
+				user: action.user
 			}
 
 		case constants.SUBMIT_VERIFICATION_CODE:
 			return {
-				...state,
+				...state
 			}
 
 		default:

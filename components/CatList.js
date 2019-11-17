@@ -1,153 +1,144 @@
+import * as constants from "@redux/types"
 import PropTypes from "prop-types"
-import Colors from "../constants/Colors"
-import React, { PureComponent } from "react"
+import React, { Component } from "react"
 import moment from "moment"
 import { style } from "./styles/CatList"
-import { connect } from "react-redux"
 import { RenderMeal } from "../tools/textFunctions"
 import { FlatList, StyleSheet, View } from "react-native"
-import { getCat, resetCat } from "@redux/actions/app"
-import { searchCats, toggleCatListRefeshing } from "@redux/actions/map"
 import { ListItem, SearchBar } from "react-native-elements"
 
 const styles = StyleSheet.create(style)
 
-class CatList extends PureComponent {
+class CatList extends Component {
 	constructor(props) {
 		super(props)
 
 		this.state = {
-			fetching: false,
-			q: ""
+			cats: [],
+			hasMore: false,
+			isLoading: false,
+			isRefreshing: false,
+			page: 0,
+			q: "",
+			seed: 0
 		}
 
-		this.onEndReachedCalledDuringMomentum = true
-
-		this.nextPage = this.nextPage.bind(this)
+		this.handleLoadMore = this.handleLoadMore.bind(this)
+		this.handleRefresh = this.handleRefresh.bind(this)
 		this.updateSearch = this.updateSearch.bind(this)
 	}
 
 	componentDidMount() {
-		this.props.searchCats({ q: this.state.q, page: 0 })
+		this.searchCats()
 	}
 
-	nextPage() {
-		this.props.toggleCatListRefeshing()
-		this.props.searchCats({ q: this.state.q, page: this.props.listPage })
+	handleLoadMore() {
+		if (this.state.hasMore) {
+			this.setState(
+				{
+					page: this.state.page + 1
+				},
+				() => {
+					this.searchCats()
+				}
+			)
+		}
+	}
+
+	handleRefresh() {
+		this.setState(
+			{
+				isRefreshing: true,
+				page: 0,
+				seed: this.state.seed + 1
+			},
+			() => {
+				this.searchCats()
+			}
+		)
+	}
+
+	searchCats() {
+		const { cats, page, q } = this.state
+		this.setState({ isLoading: true })
+
+		fetch(`${constants.BASE_URL}api/cats/browse?q=${q}&page=${page}`, {
+			headers: {
+				"Content-Type": "application/json"
+			}
+		})
+			.then(response => response.json())
+			.then(json => {
+				this.setState({
+					cats: page === 0 ? json.cats : [...cats, ...json.cats],
+					hasMore: json.hasMore,
+					isRefreshing: false
+				})
+			})
+			.catch(error => {
+				console.error(error)
+			})
 	}
 
 	updateSearch(q) {
-		this.setState({ q })
-		this.props.searchCats({ q, page: 0 })
+		this.setState({ page: 0, q }, () => this.searchCats())
 	}
 
 	render() {
-		const { q } = this.state
-		const { listCats, listHasMore, listPage, listPages, listRefreshing } = this.props
+		const { cats, isRefreshing, q } = this.state
 
 		return (
 			<View>
 				<SearchBar
 					containerStyle={styles.searchBarContainer}
 					inputContainerStyle={styles.searchBarInputContainer}
-					inputStyle={{ color: Colors.black }}
+					inputStyle={styles.searchBarInput}
 					lightTheme
 					onChangeText={this.updateSearch}
 					placeholder="Search furballs"
 					value={q}
 				/>
-				<FlatList
-					contentContainerStyle={styles.flatListContainer}
-					data={listCats}
-					keyExtractor={item => item.id}
-					onEndReached={() => {
-						console.log("end reached")
-						console.log(listPage)
-						console.log(listPages)
-						console.log(listHasMore)
-						if (listPage < listPages && listHasMore && !listRefreshing) {
-							this.nextPage()
-						}
-					}}
-					onEndReachedThreshold={0.5}
-					onMomentumScrollBegin={() => {
-						this.props.toggleCatListRefeshing()
-					}}
-					onRefresh={() => {
-						this.props.toggleCatListRefeshing()
-						this.props.searchCats({ q, page: 0 })
-					}}
-					refreshing={listRefreshing}
-					renderItem={({ item, index }) => (
-						<ListItem
-							bottomDivider
-							chevron
-							key={`ListItem${index}`}
-							leftAvatar={{ source: { uri: item.img } }}
-							onPress={() => {
-								this.props.navigate("Cat", {
-									id: item.id
-								})
-							}}
-							subtitle={
-								item.food_type === null
-									? ""
-									: `${RenderMeal([item.food_type])} fed ${moment(
-										item.food_date
-									).fromNow()}`
-							}
-							title={item.name}
-						/>
-					)}
-				/>
+				{cats.length > 0 && (
+					<FlatList
+						contentContainerStyle={styles.flatListContainer}
+						data={cats}
+						keyExtractor={item => item.id}
+						onEndReached={this.handleLoadMore}
+						onEndThreshold={0}
+						onRefresh={this.handleRefresh}
+						refreshing={isRefreshing}
+						renderItem={({ item, index }) => (
+							<ListItem
+								bottomDivider
+								chevron
+								key={`ListItem${index}`}
+								leftAvatar={{ source: { uri: item.img } }}
+								onPress={() => {
+									this.props.navigate("Cat", {
+										id: item.id
+									})
+								}}
+								subtitle={
+									item.food_type === null
+										? ""
+										: `${RenderMeal([item.food_type])} fed ${moment(
+											item.food_date
+										).fromNow()}`
+								}
+								title={item.name}
+							/>
+						)}
+					/>
+				)}
 			</View>
 		)
 	}
 }
 
 CatList.propTypes = {
-	getCat: PropTypes.func,
-	listCats: PropTypes.array,
-	listHasMore: PropTypes.bool,
-	listPage: PropTypes.number,
-	listPages: PropTypes.number,
-	listRefreshing: PropTypes.bool,
-	nextPage: PropTypes.func,
-	navigate: PropTypes.func,
-	q: PropTypes.string,
-	searchCats: PropTypes.func,
-	toggleCatListRefeshing: PropTypes.func,
-	useFooter: PropTypes.bool,
-	useImg: PropTypes.bool
+	navigate: PropTypes.func
 }
 
-CatList.defaultProps = {
-	getCat,
-	listCats: [],
-	listHasMore: false,
-	listPage: 0,
-	listRefreshing: false,
-	q: "",
-	searchCats,
-	toggleCatListRefeshing,
-	useFooter: true,
-	useImg: true
-}
+CatList.defaultProps = {}
 
-const mapStateToProps = (state, ownProps) => {
-	return {
-		...state.app,
-		...state.map,
-		...ownProps
-	}
-}
-
-export default connect(
-	mapStateToProps,
-	{
-		getCat,
-		resetCat,
-		searchCats,
-		toggleCatListRefeshing
-	}
-)(CatList)
+export default CatList
