@@ -1,12 +1,16 @@
+import * as Location from "expo-location"
 import AppHeader from "../components/AppHeader"
 import Colors from "../constants/Colors"
 import PropTypes from "prop-types"
 import Confetti from "react-native-confetti"
+import store from "../store"
+import Video from "expo-av"
 import React, { Component } from "react"
 import { style } from "./styles/EditPhotoScreen"
 import { connect } from "react-redux"
-import { addCatPic } from "@redux/actions/capture"
-import { ImageBackground, StyleSheet, View } from "react-native"
+import { addCatPic } from "@redux/actions/app"
+import { ImageBackground, ScrollView, StyleSheet, Text, View } from "react-native"
+import { Dropdown } from "react-native-material-dropdown"
 import { TextField } from "react-native-material-textfield"
 import { Icon } from "react-native-elements"
 
@@ -16,17 +20,40 @@ class EditPhotoScreen extends Component {
 	constructor(props) {
 		super(props)
 
+		const { navigate } = this.props.navigation
+		this.navigate = navigate
+
 		this.state = {
+			catType: "Stray cat",
 			description: "",
-			name: ""
+			img: {},
+			name: "",
+			type: ""
 		}
 	}
 
-	async componentDidMount() {}
+	async componentDidMount() {
+		const img = this.props.navigation.getParam("img", {})
+		console.log("EditPhotoScreen componentDidMount")
+		this.setState({ img })
+	}
+
+	async submitCat() {
+		const location = await Location.getCurrentPositionAsync({})
+		const lat = location.coords.latitude
+		const lon = location.coords.longitude
+		const img = this.state.img
+
+		const _state = store.getState()
+		const bearer = _state.app.token
+
+		console.log("submitCat")
+		console.log(location)
+		this.props.addCatPic({ bearer, img, lat, lon })
+	}
 
 	render() {
-		const { description, name } = this.state
-		const { navigate } = this.props.navigation
+		const { description, img, name } = this.state
 
 		return (
 			<View style={styles.cameraView}>
@@ -40,17 +67,42 @@ class EditPhotoScreen extends Component {
 							}}
 						/>
 					)}
-					right={() => null}
+					right={() => (
+						<Text
+							onPress={() => {
+								if (description.trim() === "") {
+									return
+								}
+
+								if (img === "") {
+									return
+								}
+
+								if (name.trim() === "") {
+									return
+								}
+
+								this.navigate("CatTypeSelection", {
+									description,
+									img,
+									name
+								})
+							}}
+						>
+							Next
+						</Text>
+					)}
 					title="Deets"
 				/>
-				<ImageBackground
-					source={{
-						uri:
-							"https://pbs.twimg.com/profile_images/436232540299350016/SUO4-MhH_400x400.jpeg"
-					}}
-					style={styles.imgBackground}
-				/>
-				<View style={{ marginHorizontal: 7 }}>
+				{img.uri && (
+					<ImageBackground
+						source={{
+							uri: img.uri
+						}}
+						style={styles.imgBackground}
+					/>
+				)}
+				<ScrollView style={{ marginHorizontal: 7 }}>
 					<TextField
 						autoCompleteType="name"
 						label="Give this furball a name"
@@ -68,21 +120,9 @@ class EditPhotoScreen extends Component {
 						onChangeText={description => {
 							this.setState({ description })
 						}}
-						style={
-							{
-								// height: 150,
-								// justifyContent: "flex-start"
-							}
-						}
-						inputContainerStyle={
-							{
-								// height: 130,
-								// justifyContent: "flex-start"
-							}
-						}
 						value={description}
 					/>
-				</View>
+				</ScrollView>
 				<Confetti ref={node => (this._confettiView = node)} />
 			</View>
 		)
@@ -104,7 +144,7 @@ EditPhotoScreen.defaultProps = {
 
 const mapStateToProps = (state, ownProps) => {
 	return {
-		...state.capture,
+		...state.app,
 		...ownProps
 	}
 }

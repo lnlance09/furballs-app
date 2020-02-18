@@ -10,8 +10,8 @@ export const style = {
 		paddingVertical: 5
 	},
 	formSubmitBtn: {
-		backgroundColor: Colors.blue,
-		borderRadius: 0,
+		backgroundColor: Colors.yellow,
+		borderColor: Colors.yellow,
 		marginTop: 10
 	},
 	formSubmitBtnText: {

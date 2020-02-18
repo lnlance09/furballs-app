@@ -1,45 +1,42 @@
 import * as constants from "@redux/types"
 import Animated, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
+import CatPic from "../assets/images/family-cat-illustration-band.png"
 import mapStyle from "../mapStyle.json"
 import AppHeader from "../components/AppHeader"
 import ButtonComponent from "../components/ButtonComponent"
+import Carousel from "../components/Carousel"
 import Colors from "../constants/Colors"
 import PropTypes from "prop-types"
 import moment from "moment"
 import store from "../store"
+import SlidingUpPanel from "rn-sliding-up-panel"
 import React, { Component } from "react"
+import { playSound } from "../tools/soundFunctions"
 import { style } from "./styles/CatScreen"
 import { connect } from "react-redux"
 import { RenderMeal } from "../tools/textFunctions"
-// import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome"
-// import { faDrumstickBite } from "@fortawesome/free-solid-svg-icons"
 import { TextField } from "react-native-material-textfield"
 import { getCat, likeCat, resetCat, toggleCatScreenEditing, unlikeCat } from "@redux/actions/app"
-import { Container, Tab, Tabs, TabHeading, Text, Toast } from "native-base"
-import {
-	ImageBackground,
-	ScrollView,
-	StyleSheet,
-	View
-} from "react-native"
-import { Icon, Image, ListItem, Overlay } from "react-native-elements"
-import { FlatGrid } from "react-native-super-grid"
-import { LinearGradient } from "expo-linear-gradient"
+import { Container, Spinner, Text, Toast } from "native-base"
+import { Clipboard, Dimensions, Image, ScrollView, StyleSheet, View } from "react-native"
+import { Icon, ListItem, Overlay } from "react-native-elements"
+import CatMeow from "../assets/sounds/cat-meow.mp3"
 
 const styles = StyleSheet.create(style)
+
+const { height, width } = Dimensions.get("window")
+const sliderHeight = 240
 
 class CatScreen extends Component {
 	constructor(props) {
 		super(props)
-
-		console.log("cat screen mounted")
 
 		this.state = {
 			auth: false,
 			bearer: null,
 			explanation: "",
 			reportLayoutVisible: false,
-			user: null
+			user: {}
 		}
 
 		this.likeCat = this.likeCat.bind(this)
@@ -49,18 +46,30 @@ class CatScreen extends Component {
 
 	async componentDidMount() {
 		console.log("componentDidMount")
-		const _state = store.getState()
-		const user = _state.profile.user
-		const auth = user === null ? false : true
-		const bearer = auth ? user.token : null
 
-		this.setState({ auth, bearer, user })
+		this.willFocusCatPage = this.props.navigation.addListener(
+			"willFocus",
+			() => {
+				const _state = store.getState()
+				const user = _state.app.user
+				const auth = user === null ? false : true
+				const bearer = auth ? _state.app.token : null
+				this.setState({ auth, bearer, user })
+				console.log(user)
 
-		const id = this.props.navigation.getParam("id", null)
-		this.props.getCat({ bearer, id })
+				const id = this.props.navigation.getParam("id", null)
+				this.props.getCat({ bearer, id })
+				this._panel.hide()
+			}
+		)
 	}
 
-	likeCat(bearer, id) {
+	componentWillUnmount() {
+		this.willFocusCatPage.remove()
+	}
+
+	async likeCat(bearer, id) {
+		playSound(CatMeow)
 		this.props.likeCat({ bearer, id })
 	}
 
@@ -91,7 +100,15 @@ class CatScreen extends Component {
 					if (!json.error) {
 						Toast.show({
 							buttonText: null,
+							style: {
+								backgroundColor: "#f0f0f0",
+								bottom: 64
+							},
 							text: "Your report has been submitted!",
+							textStyle: {
+								color: Colors.black,
+								textAlign: "center"
+							},
 							type: "success"
 						})
 						this.setState({ reportLayoutVisible: false })
@@ -103,30 +120,48 @@ class CatScreen extends Component {
 		}
 	}
 
+	setContent(id) {
+		Clipboard.setString(`https://felinus.io/cats/${id}`)
+		Toast.show({
+			buttonText: null,
+			style: {
+				backgroundColor: "#f0f0f0",
+				bottom: 64
+			},
+			text: "Link copied!",
+			textStyle: {
+				color: Colors.black,
+				textAlign: "center"
+			},
+			type: "success"
+		})
+	}
+
 	unlikeCat(bearer, id) {
 		this.props.unlikeCat({ bearer, id })
 	}
 
 	render() {
-		const { auth, explanation, reportLayoutVisible, user } = this.state
+		const { auth, bearer, explanation, reportLayoutVisible, user } = this.state
 		const { cat, loading } = this.props
 		const {
 			description,
-			homeless,
 			id,
-			img,
+			imgColor,
 			lastLocationTime,
 			lat,
 			likedByMe,
+			livingSituation,
+			livingSituationLabel,
 			lon,
 			meals,
 			mealCount,
 			name,
-			picCount,
 			userId
 		} = cat
 		const { navigate } = this.props.navigation
 		const canEdit = auth && userId === user.id
+		console.log("props cat screen")
 
 		const MapSection = () => (
 			<View>
@@ -151,46 +186,89 @@ class CatScreen extends Component {
 				<Text style={styles.spottedAtText}>
 					🐾 Spotted {moment(lastLocationTime).fromNow()}
 				</Text>
-
-				<ButtonComponent
-					buttonStyle={styles.feedBtn}
-					onPress={() => navigate("Capture")}
-					text="Add pics"
-					textStyle={styles.feedBtnText}
-				/>
-				<ButtonComponent
-					buttonStyle={styles.flagBtn}
-					onPress={() =>  this.setState({ reportLayoutVisible: true })}
-					text="Report cat abuse"
-					textStyle={styles.flagBtnText}
-				/>
 			</View>
 		)
+
 		const RenderMeals = () => {
 			return meals.map((m, i) => (
 				<ListItem
 					bottomDivider
+					containerStyle={{
+						paddingLeft: 0
+					}}
 					key={`mealListItem${i}`}
 					subtitle={`${RenderMeal([m.meal_type])}  ${moment(lastLocationTime).fromNow()}`}
 					title={null}
 				/>
 			))
 		}
-		const RenderPhotos = props => {
-			return (
-				<FlatGrid
-					itemDimension={130}
-					items={props.pics}
-					renderItem={({ item }) => <Image source={{ uri: item.pic_path }} />}
-					style={styles.gridView}
-				/>
-			)
-		}
+
+		const SlidePanel = (
+			<SlidingUpPanel
+				height={height}
+				ref={c => this._panel = c}
+			>
+				<View style={styles.slideUpPanel}>
+					<Image resizeMode="cover" source={CatPic} style={{ width, height: 400 }} />
+					<ListItem
+						bottomDivider
+						containerStyle={{ width }}
+						key="camera-action"
+						leftIcon={{ color: Colors.yellow, name: "camera", type: "font-awesome" }}
+						onPress={() => navigate("Capture", {
+							showHeader: true
+						})}
+						title="Capture"
+					/>
+					<ListItem
+						bottomDivider
+						containerStyle={{ width }}
+						key="like-action"
+						leftIcon={{ color: Colors.pink, name: "heart", type: "font-awesome" }}
+						onPress={() => {
+							if (likedByMe) {
+								this.unlikeCat(bearer, id)
+							} else {
+								this.likeCat(bearer, id)
+							}
+
+							this._panel.hide()
+						}}
+						title={likedByMe ? "Loved!" : "Love"}
+					/>
+					<ListItem
+						bottomDivider
+						containerStyle={{ width }}
+						key="report-action"
+						leftIcon={{ color: Colors.red, name: "flag" }}
+						onPress={() => this.setState({ reportLayoutVisible: true })}
+						title="Report animal abuse"
+					/>
+					<ListItem
+						bottomDivider
+						containerStyle={{ width }}
+						key="link-action"
+						leftIcon={{ color: Colors.blue, name: "link" }}
+						onPress={() => this.setContent(id)}
+						title="Copy URL"
+					/>
+					<ListItem
+						bottomDivider
+						containerStyle={{ width }}
+						key="close-action"
+						leftIcon={{ color: Colors.black, name: "close" }}
+						onPress={() => {
+							this._panel.hide()
+						}}
+						title="Close"
+					/>
+				</View>
+			</SlidingUpPanel>
+		)
+
 		return (
 			<Container style={styles.cardPageContainer}>
-				{loading ? (
-					<View></View>
-				) : (
+				{loading ? null : (
 					<View>
 						<AppHeader
 							left={() => (
@@ -198,81 +276,54 @@ class CatScreen extends Component {
 									color={Colors.black}
 									name="arrow-back"
 									onPress={() => {
-										// this.props.resetCat()
 										this.props.navigation.goBack()
+										this.props.resetCat()
 									}}
 								/>
 							)}
 							right={() => (
 								<Icon
-									color={likedByMe ? Colors.pink : Colors.blue}
-									name="heart"
+									color={Colors.black}
+									name="kebab-horizontal"
 									onPress={() => {
-										if (likedByMe) {
-											this.unlikeCat(user.token, id)
-										} else {
-											this.likeCat(user.token, id)
-										}
+										this._panel.show()
 									}}
-									type="font-awesome"
+									type="octicon"
 								/>
 							)}
 							title={name}
 						/>
 
-						<ScrollView>
-							<ImageBackground source={{ uri: img }} style={styles.cardPageImg}>
-								<LinearGradient
-									colors={["transparent", "rgba(0,0,0,0.5)"]}
-									style={styles.linearGradient}
-								/>
-								<Text style={styles.nameText}>{name}</Text>
-								<Text style={styles.homelessText}>
-									{homeless ? "Homeless cat" : "Bodega cat"}
-								</Text>
-							</ImageBackground>
+						<Carousel
+							imgColor={{
+								borderColor: imgColor
+							}}
+							navigation={this.props.navigation}
+							photos={this.props.cat.pics}
+							width={width}
+						/>
 
-							<Text style={styles.cardPageDescriptionText}>{description}</Text>
+						<ScrollView style={{ marginHorizontal: 7, marginVertical: 7 }}>
+							<Text style={styles.nameText}>
+								{name}
+							</Text>
+							<Text style={styles.homelessText}>
+								{livingSituationLabel}
+							</Text>
+							<Text style={styles.cardPageDescriptionText}>
+								{description}
+							</Text>
 
 							{MapSection()}
 
-							<Container style={styles.tabContainer}>
-								<Tabs
-									tabContainerStyle={styles.tabBarContainerStyle}
-									tabBarUnderlineStyle={styles.tabBarUnderlineStyle}
-								>
-									<Tab
-										heading={
-											<TabHeading style={styles.tabHeading}>
-												<Text style={styles.tabText}>Pics</Text>
-											</TabHeading>
-										}
-									>
-										{picCount > 0 ? (
-											RenderPhotos(this.props)
-										) : (
-											<Text style={styles.emptyMsg}>
-												This cat does not have any pics yet
-											</Text>
-										)}
-									</Tab>
-									<Tab
-										heading={
-											<TabHeading style={styles.tabHeading}>
-												<Text style={styles.tabText}>Meals</Text>
-											</TabHeading>
-										}
-									>
-										{mealCount > 0 ? (
-											RenderMeals()
-										) : (
-											<Text style={styles.emptyMsg}>
-												This cat has not been fed yet
-											</Text>
-										)}
-									</Tab>
-								</Tabs>
-							</Container>
+							<Text style={{ fontSize: 24, marginBottom: 5, marginTop: 18 }}>Cativity</Text>
+							{mealCount > 0 ? (
+								RenderMeals()
+							) : (
+								<Text style={styles.emptyMsg}>
+									This cat has not been fed yet
+								</Text>
+							)}
 
 							<Overlay
 								fullscreen
@@ -283,7 +334,7 @@ class CatScreen extends Component {
 							>
 								<View>
 									<Text style={styles.modalHeader}>
-										Is this cat okay?
+										Report animal abuse
 									</Text>
 									<TextField
 										characterRestriction={500}
@@ -294,46 +345,37 @@ class CatScreen extends Component {
 											this.setState({ explanation })
 										}}
 										sufffix="Let us know"
-										style={
-											{
-												// height: 150,
-												// justifyContent: "flex-start"
-											}
-										}
-										inputContainerStyle={
-											{
-												// height: 130,
-												// justifyContent: "flex-start"
-											}
-										}
 										value={explanation}
 									/>
-
 									<ButtonComponent
 										buttonStyle={styles.explanationBtn}
 										onPress={() => this.reportAbuse()}
-										text="Submit"
+										text="Report"
 									/>
 								</View>
 							</Overlay>
 						</ScrollView>
 					</View>
 				)}
+				{SlidePanel}
 			</Container>
 		)
 	}
 }
+
 CatScreen.navigationOptions = { header: null }
+
 CatScreen.propTypes = {
 	cat: PropTypes.shape({
 		description: PropTypes.string,
-		homeless: PropTypes.bool,
 		id: PropTypes.string,
-		img: PropTypes.string,
+		imgColor: PropTypes.string,
 		lastLocationTime: PropTypes.string,
 		lat: PropTypes.number,
 		likeCount: PropTypes.number,
 		likedByMe: PropTypes.bool,
+		livingSituation: PropTypes.number,
+		livingSituationLabel: PropTypes.string,
 		lon: PropTypes.number,
 		mealCount: PropTypes.number,
 		meals: PropTypes.array,
@@ -348,16 +390,11 @@ CatScreen.propTypes = {
 	likeCat: PropTypes.func,
 	loading: PropTypes.bool,
 	navigation: PropTypes.object,
-	region: PropTypes.shape({
-		latitude: PropTypes.number,
-		latitudeDelta: PropTypes.number,
-		longitude: PropTypes.number,
-		longitudeDelta: PropTypes.number
-	}),
 	resetCat: PropTypes.func,
 	toggleCatScreenEditing: PropTypes.func,
 	unlikeCat: PropTypes.func
 }
+
 CatScreen.defaultProps = {
 	cat: {
 		id: null,
@@ -367,22 +404,18 @@ CatScreen.defaultProps = {
 	getCat,
 	likeCat,
 	loading: true,
-	region: {
-		latitude: 40.7644,
-		latitudeDelta: 0.0922,
-		longitude: -73.9235,
-		longitudeDelta: 0.0421
-	},
 	resetCat,
 	toggleCatScreenEditing,
 	unlikeCat
 }
+
 const mapStateToProps = (state, ownProps) => {
 	return {
 		...state.app,
 		...ownProps
 	}
 }
+
 export default connect(
 	mapStateToProps,
 	{

@@ -2,13 +2,19 @@ import AppHeader from "../components/AppHeader"
 import ButtonComponent from "../components/ButtonComponent"
 import PropTypes from "prop-types"
 import RegisterPic from "../assets/images/register.svg"
+import store from "../store"
 import React, { Component } from "react"
+import { validateEmail } from "../tools/textFunctions"
 import { connect } from "react-redux"
 import { style } from "./styles/LoginScreen"
-import { getCurrentUser, login, register, resetPassword } from "@redux/actions/profile"
+import { login, register, updateUser } from "@redux/actions/app"
 import { Dimensions, StyleSheet, View } from "react-native"
 import { TextField } from "react-native-material-textfield"
 import { Container, Text, Toast } from "native-base"
+
+import Amplify, { Auth } from "aws-amplify"
+import config from "../aws-exports"
+Amplify.configure(config)
 
 const { width } = Dimensions.get("window")
 
@@ -27,80 +33,258 @@ class LoginScreen extends Component {
 			loginPassword: "",
 			loginForm: true,
 			name: "",
+			newPassword: "",
 			registerEmail: "",
 			registerPassword: "",
 			registrationForm: false,
 			resetEmail: "",
 			screenTitle: "Sign in",
-			showToast: false,
-			username: ""
+			showVerification: false,
+			username: "",
+			verificationCode: ""
 		}
+	}
+
+	async checkUsername(username) {
+		const response = await fetch(`http://localhost:8888/cats/api/users/checkUsername?username=${username}`, {
+			headers: {
+				"Content-Type": "application/json"
+			}
+		})
+		const json = await response.json()
+		return json
 	}
 
 	resetPassword(email) {
-		console.log("resetPassword")
-		console.log(email)
-		if (email !== "") {
-			this.props.resetPassword({ email, navigate: this.navigate })
+		if (email === "") {
+			return
 		}
+
+		Auth.forgotPassword(email)
+			.then(() => {
+				this.setState({
+					forgotPassword: false,
+					loginForm: false,
+					registrationForm: false,
+					screenTitle: "Sign in",
+					showVerification: true
+				})
+			})
+			.catch(err => {
+				Toast.show({
+					buttonText: null,
+					style: {
+						bottom: 64
+					},
+					text: err.message,
+					type: "danger"
+				})
+			})
 	}
 
-	submitLoginForm(email, password) {
-		if (email !== "" && password !== "") {
-			this.props.login({ email, navigate: this.navigate, password })
+	async submitLoginForm(email, password) {
+		if (email === "") {
+			return null
 		}
+
+		if (password === "") {
+			return null
+		}
+
+		return await Auth.signIn({
+				password,
+				username: email
+			})
+				.then(async user => {
+					const uuid = user.username
+					console.log("uuid")
+					console.log(uuid)
+
+					const login = await this.props.login({
+						email,
+						navigate: this.navigate,
+						password,
+						redirect: true,
+						verified: true
+					})
+
+					console.log("login")
+					console.log(login)
+					return login
+				})
+				.catch(err => {
+					console.log("login error with AWS")
+					console.log(err)
+
+					// The user has not verified their email
+					if (err.code === "UserNotConfirmedException") {
+						Auth.resendSignUp(email).then(json => {
+							console.log("resend sign up")
+							console.log(json)
+
+							 const login = this.props.login({
+								email,
+								navigate: this.navigate,
+								password,
+								redirect: false,
+								verified: false
+							})
+
+							this.navigate("VerificationCode")
+							return login
+						}).catch(err => {
+							Toast.show({
+								buttonText: null,
+								style: {
+									bottom: 64
+								},
+								text: err.message,
+								type: "danger"
+							})
+
+							return err
+						})
+					}
+
+					Toast.show({
+						buttonText: null,
+						style: {
+							bottom: 64
+						},
+						text: err.message,
+						type: "danger"
+					})
+
+					return err
+				})
 	}
 
 	submitRegistrationForm(email, name, password, username) {
 		if (name === "") {
 			Toast.show({
-				buttonText: "Okay",
-				duration: 3000,
+				style: {
+					bottom: 64
+				},
 				text: "Please enter your name",
 				type: "danger"
 			})
-			return false
+			return
 		}
 
-		if (username === "") {
-			Toast.show({
-				buttonText: "Okay",
-				duration: 3000,
-				text: "Please enter your username",
-				type: "danger"
-			})
-			return false
-		}
+		console.log("check username")
+		const check = this.checkUsername(username)
+		check.then(check => {
+			if (check.error) {
+				Toast.show({
+					style: {
+						bottom: 64
+					},
+					text: check.error,
+					type: "danger"
+				})
+				return check
+			}
+		})
 
-		if (email === "") {
+		console.log("after check username")
+
+		if (!validateEmail(email)) {
 			Toast.show({
-				buttonText: "Okay",
-				duration: 3000,
+				style: {
+					bottom: 64
+				},
 				text: "Please enter a valid email address",
 				type: "danger"
 			})
-			return false
+			return
 		}
 
 		if (password.length < 7) {
 			Toast.show({
-				buttonText: "Okay",
-				duration: 3000,
-				text: "Your password must contain at lest 7 characters",
+				style: {
+					bottom: 64
+				},
+				text: "Your password must contain at least 7 characters",
 				type: "danger"
 			})
-			return false
+			return
 		}
 
-		if (email !== "" && password.length > 6 && name.length > 1 && username.length > 1) {
-			this.props.register({
+		Auth.signUp({
+			username: email,
+			password,
+			attributes: {
 				email,
 				name,
-				navigate: this.navigate,
-				password,
-				username
+			},
+			validationData: []
+		})
+			.then(data => {
+				console.log("register data")
+				console.log(data)
+				this.props.register({
+					email,
+					name,
+					navigate: this.navigate,
+					password,
+					username,
+					uuid: data.userSub
+				})
+
+				return data
 			})
+			.catch(err => {
+				console.log("register data error")
+				console.log(err)
+				Toast.show({
+					style: {
+						bottom: 64
+					},
+					text: err.message,
+					type: "danger"
+				})
+
+
+				return err
+			})
+	}
+
+	submitVerificationCode(code, email, password) {
+		if (code.length !== 6) {
+			return
 		}
+
+		if (password.length < 7) {
+			Toast.show({
+				style: {
+					bottom: 64
+				},
+				text: "Your password must contain at least 7 characters",
+				type: "danger"
+			})
+			return
+		}
+
+		Auth.forgotPasswordSubmit(email, code, password)
+			.then(() => {
+				console.log("forgotPasswordSubmit")
+
+				const login = this.submitLoginForm(email, password)
+				login.then(data => {
+					const _state = store.getState()
+					const bearer = _state.app.token
+					console.log(data)
+
+					this.props.updateUser({
+						bearer,
+						data: {
+							password
+						},
+						id: data.id
+					})
+				})
+			})
+			.catch(err => console.log(err))
 	}
 
 	render() {
@@ -110,16 +294,26 @@ class LoginScreen extends Component {
 			loginForm,
 			loginPassword,
 			name,
+			newPassword,
 			registerEmail,
 			registerPassword,
 			registrationForm,
 			resetEmail,
 			screenTitle,
-			username
+			showVerification,
+			username,
+			verificationCode
 		} = this.state
 
-		console.log("profile screen")
-		console.log(this.props)
+		/*
+		const login = this.submitLoginForm("lnlance09@gmail.com", "password1")
+		console.log("login promise")
+		console.log(login)
+		login.then(data => {
+			console.log("promise complete")
+			console.log(data)
+		})
+		*/
 
 		const SubmitFormButton = ({ callback, text }) => {
 			return (
@@ -149,7 +343,8 @@ class LoginScreen extends Component {
 							forgotPassword: false,
 							loginForm: true,
 							registrationForm: false,
-							screenTitle: "Sign in"
+							screenTitle: "Sign in",
+							showVerification: false
 						})
 					}}
 					style={styles.formSubText}
@@ -189,7 +384,8 @@ class LoginScreen extends Component {
 							forgotPassword: true,
 							loginForm: false,
 							registrationForm: false,
-							screenTitle: "Reset"
+							screenTitle: "Reset",
+							showVerification: false
 						})
 					}}
 					style={styles.formSubText}
@@ -202,7 +398,8 @@ class LoginScreen extends Component {
 							forgotPassword: false,
 							loginForm: false,
 							registrationForm: true,
-							screenTitle: "Sign up"
+							screenTitle: "Sign up",
+							showVerification: false
 						})
 					}}
 					style={styles.formSubText}
@@ -265,7 +462,8 @@ class LoginScreen extends Component {
 							forgotPassword: false,
 							loginForm: true,
 							registrationForm: false,
-							screenTitle: "Sign in"
+							screenTitle: "Sign in",
+							showVerification: false
 						})
 					}}
 					style={styles.formSubText}
@@ -275,11 +473,52 @@ class LoginScreen extends Component {
 			</Container>
 		)
 
+		const VerificationCodeForm = (
+			<Container style={styles.formContainer}>
+				<TextField
+					autoCapitalize="none"
+					label="Enter your verification code"
+					onChangeText={verificationCode => {
+						this.setState({ verificationCode })
+					}}
+					value={verificationCode}
+				/>
+				<TextField
+					autoCapitalize="none"
+					label="New password"
+					onChangeText={newPassword => {
+						this.setState({ newPassword })
+					}}
+					secureTextEntry
+					value={newPassword}
+				/>
+				<SubmitFormButton
+					callback={() => this.submitVerificationCode(verificationCode, resetEmail, newPassword)}
+					text="Submit"
+				/>
+				<Text
+					onPress={() => {
+						this.setState({
+							forgotPassword: false,
+							loginForm: false,
+							registrationForm: false,
+							screenTitle: "Sign in",
+							showVerification: false
+						})
+					}}
+					style={styles.formSubText}
+				>
+					Cancel
+				</Text>
+			</Container>
+		)
+
 		return (
 			<Container>
 				<AppHeader left={() => null} right={() => null} title={screenTitle} />
 				<Container style={styles.container}>
 					<RegisterPic width={width} height={170} />
+					{showVerification && VerificationCodeForm}
 					{forgotPassword && ForgotPassword}
 					{loginForm && LoginForm}
 					{registrationForm && RegistrationForm}
@@ -294,33 +533,21 @@ LoginScreen.navigationOptions = {
 }
 
 LoginScreen.propTypes = {
-	authenticated: PropTypes.bool,
-	getCurrentUser: PropTypes.func,
-	login: PropTypes.func,
 	navigation: PropTypes.object,
+	login: PropTypes.func,
 	register: PropTypes.func,
-	resetPassword: PropTypes.func,
-	user: PropTypes.object
+	updateUser: PropTypes.func
 }
 
 LoginScreen.defaultProps = {
-	getCurrentUser,
 	login,
 	register,
-	resetPassword,
-	user: {
-		dateCreated: null,
-		id: null,
-		img: null,
-		name: null,
-		pushNotificationsEnabled: true,
-		verificationCode: null
-	}
+	updateUser
 }
 
 const mapStateToProps = (state, ownProps) => {
 	return {
-		...state.profile,
+		...state.app,
 		...ownProps
 	}
 }
@@ -328,9 +555,8 @@ const mapStateToProps = (state, ownProps) => {
 export default connect(
 	mapStateToProps,
 	{
-		getCurrentUser,
 		login,
 		register,
-		resetPassword
+		updateUser
 	}
 )(LoginScreen)

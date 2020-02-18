@@ -3,16 +3,17 @@ import { Platform, View } from "react-native"
 import { createBottomTabNavigator, createStackNavigator } from "react-navigation"
 import { fromLeft } from "react-navigation-transitions"
 import TabBarIcon from "../components/TabBarIcon"
+import AboutScreen from "../screens/AboutScreen"
 import CameraRollScreen from "../screens/CameraRollScreen"
 import CaptureScreen from "../screens/CaptureScreen"
 import CatScreen from "../screens/CatScreen"
+import CatTypeSelectionScreen from "../screens/CatTypeSelectionScreen"
 import ChangePasswordScreen from "../screens/ChangePasswordScreen"
 import EditPhotoScreen from "../screens/EditPhotoScreen"
 import HomeScreen from "../screens/HomeScreen"
 import LoginScreen from "../screens/LoginScreen"
 import MapScreen from "../screens/MapScreen"
 import ProfileScreen from "../screens/ProfileScreen"
-import SearchScreen from "../screens/SearchScreen"
 import VerificationCodeScreen from "../screens/VerificationCodeScreen"
 import Colors from "../constants/Colors"
 
@@ -35,6 +36,9 @@ const CaptureStack = createStackNavigator(
 		},
 		CameraRoll: {
 			screen: CameraRollScreen
+		},
+		CatTypeSelection: {
+			screen: CatTypeSelectionScreen
 		}
 	},
 	config
@@ -43,7 +47,7 @@ const CaptureStack = createStackNavigator(
 CaptureStack.navigationOptions = ({ navigation }) => {
 	let tabBarVisible = true
 	navigation.state.routes.map(route => {
-		tabBarVisible = route.routeName !== "Capture"
+		// tabBarVisible = route.routeName !== "Capture"
 	})
 
 	return {
@@ -110,6 +114,9 @@ const HomeStack = createStackNavigator(
 		},
 		Cat: {
 			screen: CatScreen
+		},
+		Capture: {
+			screen: CaptureScreen
 		}
 	},
 	config
@@ -201,16 +208,16 @@ ProfileStack.navigationOptions = {
 
 ProfileStack.path = ""
 
-// Search stack
-const SearchStack = createStackNavigator(
+// About stack
+const AboutStack = createStackNavigator(
 	{
-		Search: SearchScreen
+		About: AboutScreen
 	},
 	config
 )
 
-SearchStack.navigationOptions = {
-	tabBarLabel: "Search",
+AboutStack.navigationOptions = {
+	tabBarLabel: "About",
 	tabBarIcon: ({ focused }) => (
 		<TabBarIcon
 			color={focused ? Colors.tabIconSelected : Colors.tabIconDefault}
@@ -227,7 +234,7 @@ SearchStack.navigationOptions = {
 	)
 }
 
-SearchStack.path = ""
+AboutStack.path = ""
 
 // Tab navigator
 const tabNavigator = createBottomTabNavigator(
@@ -235,7 +242,7 @@ const tabNavigator = createBottomTabNavigator(
 		HomeStack,
 		MapStack,
 		CaptureStack,
-		SearchStack,
+		AboutStack,
 		ProfileStack
 	},
 	{

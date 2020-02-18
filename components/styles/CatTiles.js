@@ -9,20 +9,10 @@ export const style = {
 		width: "100%"
 	},
 	imgBackground: {
+		borderRadius: 4,
+		borderWidth: 8,
 		height: 200,
-		marginTop: 5,
+		marginTop: 30,
 		width: "100%"
-	},
-	imgBackgroundImage: {
-		borderRadius: 4
-	},
-	nameText: {
-		alignItems: "center",
-		bottom: 7,
-		color: Colors.white,
-		fontSize: 28,
-		justifyContent: "center",
-		marginLeft: 7,
-		position: "absolute"
 	}
 }

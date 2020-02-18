@@ -9,8 +9,6 @@ import { Platform, StatusBar } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import AppNavigator from "./navigation/AppNavigator"
 import MonoFont from "./assets/fonts/SpaceMono-Regular.ttf"
-import RobotDevImg from "./assets/images/robot-dev.png"
-import RobotProdImg from "./assets/images/robot-prod.png"
 import store from "./store"
 
 class App extends Component {

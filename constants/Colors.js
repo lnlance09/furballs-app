@@ -17,11 +17,23 @@ const grey = "#767676"
 const black = "#1B1C1D"
 const white = "#ffffff"
 
+const familyCat = "#1b2a49"
+const businessCat = "#484c7f"
+const strayCat = "#00909e"
+const abuseColor = "#216583"
+const highlightColor = "#fcd313"
+
 export default {
 	tabBar,
 	tabIconDefault,
 	tabIconSelected: tintColor,
 	tintColor,
+
+	familyCat,
+	businessCat,
+	strayCat,
+	abuseColor,
+	highlightColor,
 
 	black,
 	blue,

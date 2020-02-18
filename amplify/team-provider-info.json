@@ -1,0 +1,31 @@
+{
+    "local": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-felinus-local-174607-authRole",
+            "UnauthRoleArn": "arn:aws:iam::777522891125:role/amplify-felinus-local-174607-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::777522891125:role/amplify-felinus-local-174607-authRole",
+            "Region": "us-east-1",
+            "DeploymentBucketName": "amplify-felinus-local-174607-deployment",
+            "UnauthRoleName": "amplify-felinus-local-174607-unauthRole",
+            "StackName": "amplify-felinus-local-174607",
+            "StackId": "arn:aws:cloudformation:us-east-1:777522891125:stack/amplify-felinus-local-174607/60287510-0b1e-11ea-ae95-12e346dd5d0c"
+        },
+        "categories": {
+            "function": {
+                "cats": {},
+                "dynamo59913190": {},
+                "felinuseea0ba0cCustomMessage": {
+                    "REDIRECTURL": "http://catsofnyc.com/verify",
+                    "EMAILSUBJECT": "Verify your email",
+                    "EMAILMESSAGE": "Please confirm your email by clicking here"
+                },
+                "felinuseea0ba0cPreSignup": {
+                    "DOMAINBLACKLIST": ""
+                }
+            },
+            "auth": {
+                "felinuseea0ba0c": {}
+            }
+        }
+    }
+}

@@ -1,8 +1,9 @@
 import * as constants from "@redux/types"
+import Colors from "../constants/Colors"
 import PropTypes from "prop-types"
 import React, { Component } from "react"
 import { style } from "./styles/CatTiles"
-import { FlatList, ImageBackground, StyleSheet, Text, TouchableWithoutFeedback } from "react-native"
+import { FlatList, Image, StyleSheet, TouchableWithoutFeedback } from "react-native"
 
 const styles = StyleSheet.create(style)
 
@@ -89,25 +90,34 @@ class CatTiles extends Component {
 					onEndThreshold={0}
 					onRefresh={this.handleRefresh}
 					refreshing={isRefreshing}
-					renderItem={({ item, index }) => (
-						<TouchableWithoutFeedback
-							key={`catTile${index}`}
-							onPress={() => {
-								this.props.navigate("Cat", {
-									id: item.id
-								})
-							}}
-							style={{ height: 200, width: "100%" }}
-						>
-							<ImageBackground
-								imageStyle={styles.imgBackgroundImage}
-								source={{ uri: item.img }}
+					renderItem={({ item, index }) => {
+						console.log(parseInt(item.living_situation, 10))
+						let borderColor = Colors.strayCat
+						if (parseInt(item.living_situation, 10) === 1) {
+							borderColor = Colors.businessCat
+						}
+						if (parseInt(item.living_situation, 10) === 2) {
+							borderColor = Colors.familyCat
+						}
+						const imgStyle = { borderColor }
+
+						return (
+							<TouchableWithoutFeedback
+								key={`catTile${index}`}
+								onPress={() => {
+									this.props.navigate("Cat", {
+										id: item.id
+									})
+								}}
 								style={styles.imgBackground}
 							>
-								<Text style={styles.nameText}>{item.name}</Text>
-							</ImageBackground>
-						</TouchableWithoutFeedback>
-					)}
+								<Image
+									source={{ uri: item.path }}
+									style={[imgStyle, styles.imgBackground]}
+								/>
+							</TouchableWithoutFeedback>
+						)
+					}}
 				/>
 			)
 		)

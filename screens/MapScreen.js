@@ -1,14 +1,12 @@
 import CatList from "../components/CatList"
+import Colors from "../constants/Colors"
 import PropTypes from "prop-types"
 import mapStyle from "../mapStyle.json"
 import Animated, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
 import React, { Component } from "react"
 import { connect } from "react-redux"
 import { style } from "./styles/MapScreen"
-import {
-	searchCatsByLocation,
-	setRegion
-} from "@redux/actions/map"
+import { searchCatsByLocation, setRegion } from "@redux/actions/app"
 import { Tab, TabHeading, Tabs, Text } from "native-base"
 import { SafeAreaView, StyleSheet, View } from "react-native"
 
@@ -20,7 +18,10 @@ class MapScreen extends Component {
 
 		this.state = {
 			index: 0,
-			routes: [{ key: "list", title: "List" }, { key: "map", title: "Map" }]
+			routes: [
+				{ key: "map", title: "Map" },
+				{ key: "list", title: "List" }
+			]
 		}
 
 		this.onRegionChange = this.onRegionChange.bind(this)
@@ -44,10 +45,8 @@ class MapScreen extends Component {
 	render() {
 		const { initialRegion, mapCats } = this.props
 		const { navigate } = this.props.navigation
-		// console.log("map screen")
-		// console.log(this.props.region)
 
-		const MapView = ({ }) => (
+		const MapView = () => (
 			<View>
 				<Animated
 					customMapStyle={mapStyle}
@@ -57,6 +56,14 @@ class MapScreen extends Component {
 					style={styles.map}
 				>
 					{mapCats.map(c => {
+						let pinColor = Colors.strayCat
+						if (parseInt(c.living_situation, 10) === 1) {
+							pinColor = Colors.businessCat
+						}
+						if (parseInt(c.living_situation, 10) === 2) {
+							pinColor = Colors.familyCat
+						}
+
 						return (
 							<Marker
 								coordinate={{
@@ -70,6 +77,7 @@ class MapScreen extends Component {
 										id: c.id
 									})
 								}}
+								pinColor={pinColor}
 								title={c.name}
 							/>
 						)
@@ -78,7 +86,7 @@ class MapScreen extends Component {
 			</View>
 		)
 
-		const SearchView = ({ }) => <CatList navigate={navigate} />
+		const SearchView = () => <CatList navigate={navigate} />
 
 		return (
 			<SafeAreaView style={styles.container}>
@@ -89,20 +97,20 @@ class MapScreen extends Component {
 					<Tab
 						heading={
 							<TabHeading style={styles.tabHeading}>
-								<Text style={styles.tabText}>List</Text>
-							</TabHeading>
-						}
-					>
-						{SearchView(this.props)}
-					</Tab>
-					<Tab
-						heading={
-							<TabHeading style={styles.tabHeading}>
 								<Text style={styles.tabText}>Map</Text>
 							</TabHeading>
 						}
 					>
 						{MapView(this.props)}
+					</Tab>
+					<Tab
+						heading={
+							<TabHeading style={styles.tabHeading}>
+								<Text style={styles.tabText}>List</Text>
+							</TabHeading>
+						}
+					>
+						{SearchView(this.props)}
 					</Tab>
 				</Tabs>
 			</SafeAreaView>
@@ -147,7 +155,7 @@ MapScreen.defaultProps = {
 
 const mapStateToProps = (state, ownProps) => {
 	return {
-		...state.map,
+		...state.app,
 		...ownProps
 	}
 }

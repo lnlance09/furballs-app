@@ -12,21 +12,17 @@ export const style = {
 	},
 	gridImg: {
 		borderRadius: 0,
-		height: width / 3 - 12,
+		height: width / 3,
 		justifyContent: "flex-end",
-		marginTop: 7,
-		width: width / 3 - 12
+		width: width / 3
 	},
 	listContainer: {
 		flex: 1,
-		marginHorizontal: 0,
 		marginTop: 5,
-		paddingHorizontal: 0,
 		width: "100%"
 	},
 	pictureGrid: {
 		flex: 1,
-		marginHorizontal: 5,
-		width: "100%"
+		marginHorizontal: 7
 	}
 }

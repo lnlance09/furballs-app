@@ -25,7 +25,12 @@
     ],
     "ios": {
       "bundleIdentifier": "com.felinus.felinus",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "audio"
+        ]
+      }
     },
     "packagerOpts": {
       "config": "metro.config.js",

@@ -1,13 +1,20 @@
 import AppHeader from "../components/AppHeader"
 import ButtonComponent from "../components/ButtonComponent"
+import Colors from "../constants/Colors"
 import PropTypes from "prop-types"
+import store from "../store"
 import React, { Component } from "react"
+import { logout, verifyEmail } from "@redux/actions/app"
 import { connect } from "react-redux"
 import { style } from "./styles/VerificationCodeScreen"
-import { submitVerificationCode } from "@redux/actions/profile"
 import { AsyncStorage, StyleSheet } from "react-native"
+import { Icon } from "react-native-elements"
 import { TextField } from "react-native-material-textfield"
-import { Container, Text } from "native-base"
+import { Container, Text, Toast } from "native-base"
+
+import Amplify, { Auth } from "aws-amplify"
+import config from "../aws-exports"
+Amplify.configure(config)
 
 const styles = StyleSheet.create(style)
 
@@ -24,17 +31,38 @@ class VerificationCodeScreen extends Component {
 	}
 
 	async submitVerificationCode(code) {
-		const email = (await AsyncStorage.getItem("email")) || null
 		console.log("submitVerificationCode")
 		console.log(code)
-		console.log(email)
-		if (code !== "") {
-			this.props.submitVerificationCode({
-				code,
-				email,
-				navigate: this.navigate
-			})
+
+		const _state = store.getState()
+		const user = _state.app.user
+		const email = user.email
+
+		if (code.length !== 6) {
+			return
 		}
+
+		console.log("email")
+		console.log(email)
+
+		Auth.confirmSignUp(email, code, {
+			forceAliasCreation: true
+		})
+			.then(data => {
+				this.props.verifyEmail()
+				this.navigate("Profile")
+			})
+			.catch(err => {
+				console.log(err)
+				Toast.show({
+					buttonText: null,
+					style: {
+						bottom: 64
+					},
+					text: err.message,
+					type: "danger"
+				})
+			})
 	}
 
 	render() {
@@ -53,7 +81,19 @@ class VerificationCodeScreen extends Component {
 
 		return (
 			<Container>
-				<AppHeader left={() => null} right={() => null} title="Verify" />
+				<AppHeader
+					left={() => (
+						<Icon
+							color={Colors.black}
+							name="arrow-back"
+							onPress={() => {
+								this.props.navigation.goBack()
+							}}
+						/>
+					)}
+					right={() => null}
+					title="Verify"
+				/>
 				<Container style={styles.container}>
 					<TextField
 						autoCapitalize="none"
@@ -61,7 +101,6 @@ class VerificationCodeScreen extends Component {
 						onChangeText={code => {
 							this.setState({ code })
 						}}
-						// secureTextEntry
 						value={code}
 					/>
 					<SubmitFormButton
@@ -70,11 +109,12 @@ class VerificationCodeScreen extends Component {
 					/>
 					<Text
 						onPress={() => {
-							this.props.navigation.goBack()
+							this.props.logout()
+							this.navigate("Login")
 						}}
 						style={styles.formSubText}
 					>
-						Back
+						Sign out
 					</Text>
 				</Container>
 			</Container>
@@ -87,17 +127,19 @@ VerificationCodeScreen.navigationOptions = {
 }
 
 VerificationCodeScreen.propTypes = {
+	logout: PropTypes.func,
 	navigation: PropTypes.object,
-	submitVerificationCode: PropTypes.func
+	verifyEmail: PropTypes.func
 }
 
 VerificationCodeScreen.defaultProps = {
-	submitVerificationCode
+	logout,
+	verifyEmail
 }
 
 const mapStateToProps = (state, ownProps) => {
 	return {
-		...state.profile,
+		...state.app,
 		...ownProps
 	}
 }
@@ -105,6 +147,7 @@ const mapStateToProps = (state, ownProps) => {
 export default connect(
 	mapStateToProps,
 	{
-		submitVerificationCode
+		logout,
+		verifyEmail
 	}
 )(VerificationCodeScreen)

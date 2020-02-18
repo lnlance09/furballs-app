@@ -7,6 +7,7 @@ export const style = {
 	},
 	text: {
 		color: Colors.white,
+		fontSize: 16,
 		fontWeight: "bold"
 	}
 }

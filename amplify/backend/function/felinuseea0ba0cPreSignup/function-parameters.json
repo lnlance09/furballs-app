@@ -1,0 +1,14 @@
+{
+    "trigger": true,
+    "modules": [
+        "email-filter-blacklist"
+    ],
+    "parentResource": "felinuseea0ba0c",
+    "functionName": "felinuseea0ba0cPreSignup",
+    "parentStack": "auth",
+    "triggerEnvs": "[]",
+    "triggerTemplate": "PreSignup.json.ejs",
+    "roleName": "felinuseea0ba0cPreSignup",
+    "skipEdit": true,
+    "resourceName": "felinuseea0ba0cPreSignup"
+}

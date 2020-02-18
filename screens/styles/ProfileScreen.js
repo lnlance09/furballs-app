@@ -13,18 +13,7 @@ export const style = {
 	imageWrapper: {
 		alignItems: "center",
 		flex: 1,
-		justifyContent: "center",
-		paddingHorizontal: 5,
 		paddingVertical: 7
-	},
-	myCatContainer: {
-		marginLeft: 4,
-		marginRight: 7
-	},
-	myCatsHeader: {
-		fontSize: 24,
-		marginLeft: 7,
-		marginTop: 8
 	},
 	usernameText: {
 		fontSize: 13,

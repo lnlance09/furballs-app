@@ -4,6 +4,7 @@ export const style = {
 	header: {
 		alignSelf: "stretch",
 		backgroundColor: Colors.white,
+		borderWidth: 0,
 		textAlign: "left"
 	},
 	title: {

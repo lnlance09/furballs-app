@@ -1,7 +1,7 @@
 import * as constants from "@redux/types"
 import PropTypes from "prop-types"
-import React, { Component } from "react"
 import moment from "moment"
+import React, { Component } from "react"
 import { style } from "./styles/CatList"
 import { RenderMeal } from "../tools/textFunctions"
 import { FlatList, StyleSheet, View } from "react-native"
@@ -112,7 +112,7 @@ class CatList extends Component {
 								bottomDivider
 								chevron
 								key={`ListItem${index}`}
-								leftAvatar={{ source: { uri: item.img } }}
+								leftAvatar={{ source: { uri: item.path } }}
 								onPress={() => {
 									this.props.navigate("Cat", {
 										id: item.id

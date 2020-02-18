@@ -4,10 +4,10 @@ import PropTypes from "prop-types"
 import React, { Component } from "react"
 import { connect } from "react-redux"
 import { style } from "./styles/ChangePasswordScreen"
-import { changePassword } from "@redux/actions/profile"
+import { changePassword } from "@redux/actions/app"
 import { StyleSheet } from "react-native"
 import { TextField } from "react-native-material-textfield"
-import { Container, Text, Toast } from "native-base"
+import { Container, Toast } from "native-base"
 
 const styles = StyleSheet.create(style)
 
@@ -25,8 +25,6 @@ class ChangePasswordScreen extends Component {
 	}
 
 	changePassword(newPassword, confirmPassword) {
-		console.log("change password")
-
 		if (newPassword.length < 7) {
 			Toast.show({
 				buttonText: null,
@@ -112,7 +110,7 @@ ChangePasswordScreen.defaultProps = {
 
 const mapStateToProps = (state, ownProps) => {
 	return {
-		...state.profile,
+		...state.app,
 		...ownProps
 	}
 }

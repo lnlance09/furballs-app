@@ -1,12 +1,12 @@
 import * as Permissions from "expo-permissions"
 import AppHeader from "../components/AppHeader"
+import CameraRollComponent from "../components/CameraRollComponent"
 import Colors from "../constants/Colors"
 import PropTypes from "prop-types"
 import React, { Component } from "react"
 import { style } from "./styles/CameraRollScreen"
 import { connect } from "react-redux"
-import { addCatPic } from "@redux/actions/capture"
-import { CameraRoll, Dimensions, Image, StyleSheet, Text, TouchableHighlight, View } from "react-native"
+import { CameraRoll, Dimensions, Image, StyleSheet, TouchableHighlight, View } from "react-native"
 import { Icon } from "react-native-elements"
 import { FlatGrid } from "react-native-super-grid"
 
@@ -90,7 +90,7 @@ class CameraRollScreen extends Component {
 							color={Colors.black}
 							name="arrow-back"
 							onPress={() => {
-								navigate("Home")
+								this.props.navigation.goBack()
 							}}
 						/>
 					)}
@@ -98,28 +98,7 @@ class CameraRollScreen extends Component {
 					title="Pick a photo"
 				/>
 				<View style={styles.listContainer}>
-					{photos.length > 0 && (
-						<FlatGrid
-							itemDimension={width / 3 - 20}
-							items={photos}
-							onEndReached={this.handleLoadMore}
-							onEndThreshold={0}
-							onRefresh={this.handleRefresh}
-							refreshing={isRefreshing}
-							renderItem={({ item, index }) => (
-								<TouchableHighlight
-									key={`${item.id}_${index}`}
-									onPress={() => {
-										return null
-									}}
-								>
-									<Image source={{ uri: item.url }} style={styles.gridImg} />
-								</TouchableHighlight>
-							)}
-							spacing={1}
-							style={styles.pictureGrid}
-						/>
-					)}
+					<CameraRollComponent navigate={navigate} />
 				</View>
 			</View>
 		)

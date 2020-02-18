@@ -17,7 +17,8 @@ export const style = {
 		top: 0
 	},
 	tabBarUnderlineStyle: {
-		backgroundColor: Colors.black
+		backgroundColor: Colors.black,
+		height: 1
 	},
 	tabBarContainerStyle: {
 		borderBottomWidth: 0

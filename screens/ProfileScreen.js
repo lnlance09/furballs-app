@@ -4,14 +4,11 @@ import CatGrid from "../components/CatGrid"
 import Colors from "../constants/Colors"
 import PropTypes from "prop-types"
 import store from "../store/"
-import ToggleSwitch from "toggle-switch-react-native"
 import React, { Component } from "react"
 import { connect } from "react-redux"
 import { style } from "./styles/ProfileScreen"
-import { fetchUser, getCurrentUser, logout } from "@redux/actions/profile"
+import { fetchUser, logout } from "@redux/actions/app"
 import {
-	ActivityIndicator,
-	Image,
 	ScrollView,
 	StyleSheet,
 	View
@@ -25,35 +22,52 @@ class ProfileScreen extends Component {
 	constructor(props) {
 		super(props)
 
+		const { navigate } = this.props.navigation
+		this.navigate = navigate
+
 		this.state = {
 			auth: false,
 			bearer: null,
 			hasCameraPermission: false,
-			hasCameraRollPermission: false,
-			hasLocationPermission: false,
-			hasMicrophonePermission: false,
-			hasPushNotifications: false,
-			photos: [],
-			settingsVisible: false
+			settingsVisible: false,
+			verified: false
 		}
 	}
 
 	async componentDidMount() {
-		const _state = store.getState()
-		const user = _state.profile.user
-		const auth = user === null ? false : true
-		const bearer = auth ? user.token : null
-		this.setState({ auth, bearer, user })
+		this.checkUser()
 
-		if (auth) {
-			this.props.fetchUser({ id: user.id })
-			this.toggleCameraPermission(true)
-			this.toggleCameraRollPermission(true)
-			this.toggleLocationPermission(true)
-			this.toggleMicrophonePermission(true)
-		} else {
-			const { navigate } = this.props.navigation
-			navigate("Login")
+		this.willFocusProfileScreen = this.props.navigation.addListener(
+			"willFocus",
+			() => {
+				this.checkUser()
+			}
+		)
+	}
+
+	componentWillUnmount() {
+		this.willFocusProfileScreen.remove()
+	}
+
+	checkUser() {
+		const _state = store.getState()
+		const user = _state.app.user
+		const bearer = _state.app.token
+		const verified = user.email_verified
+		const auth = bearer === null ? false : true
+		this.setState({ auth, bearer, verified })
+
+		console.log("componentDidMount profile screen")
+		console.log(_state)
+
+		if (!auth) {
+			this.navigate("Login")
+			return
+		}
+
+		if (!verified) {
+			this.navigate("VerificationCode")
+			return
 		}
 	}
 
@@ -68,142 +82,27 @@ class ProfileScreen extends Component {
 		}
 	}
 
-	async toggleCameraRollPermission(on) {
-		if (on) {
-			const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL)
-			this.setState({
-				hasCameraRollPermission: status === "granted"
-			})
-		} else {
-			this.setState({ hasCameraRollPermission: false })
-		}
-	}
-
-	async toggleLocationPermission(on) {
-		if (on) {
-			const { status } = await Permissions.askAsync(Permissions.LOCATION)
-			this.setState({
-				hasLocationPermission: status === "granted"
-			})
-		} else {
-			this.setState({ hasLocationPermission: false })
-		}
-	}
-
-	async toggleMicrophonePermission(on) {
-		if (on) {
-			const { status } = await Permissions.askAsync(Permissions.AUDIO_RECORDING)
-			this.setState({
-				hasMicrophonePermission: status === "granted"
-			})
-		} else {
-			this.setState({ hasMicrophonePermission: false })
-		}
-	}
-
-	async togglePushNotifications(on) {
-		console.log("togglePushNotifications")
-		console.log(on)
-		if (on) {
-			const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS)
-			console.log("status")
-			console.log(status)
-			this.setState({
-				hasPushNotifications: status === "granted"
-			})
-		} else {
-			this.setState({ hasPushNotifications: false })
-		}
-	}
-
 	toggleSettingsVisibility() {
 		this.setState({ settingsVisible: !this.state.settingsVisible })
 	}
 
 	render() {
+		console.log("profile screen props")
+		console.log(this.props)
+		console.log("profile screen state")
+		console.log(this.state)
+
 		const {
 			auth,
 			hasCameraPermission,
-			hasCameraRollPermission,
-			hasLocationPermission,
-			hasMicrophonePermission,
-			hasPushNotifications,
-			photos,
-			settingsVisible
+			settingsVisible,
+			verified
 		} = this.state
-		const { user } = this.props
-		const { navigate } = this.props.navigation
-
-		console.log("photos")
-		console.log(photos)
+		const { navigation, user } = this.props
+		const { navigate } = navigation
 
 		const SettingsSection = (
 			<View>
-				<ListItem
-					bottomDivider
-					key="pushNotificationsListItem"
-					rightTitle={
-						<ToggleSwitch
-							isOn={hasPushNotifications}
-							onColor={Colors.green}
-							onToggle={isOn => this.togglePushNotifications(isOn)}
-						/>
-					}
-					subtitle={null}
-					title="Push notifications"
-				/>
-				<ListItem
-					bottomDivider
-					key="locationListItem"
-					rightTitle={
-						<ToggleSwitch
-							isOn={hasLocationPermission}
-							onColor={Colors.green}
-							onToggle={isOn => this.toggleLocationPermission(isOn)}
-						/>
-					}
-					subtitle={null}
-					title="Location"
-				/>
-				<ListItem
-					bottomDivider
-					key="cameraListItem"
-					rightTitle={
-						<ToggleSwitch
-							isOn={hasCameraPermission}
-							onColor={Colors.green}
-							onToggle={isOn => this.toggleCameraPermission(isOn)}
-						/>
-					}
-					subtitle={null}
-					title="Camera"
-				/>
-				<ListItem
-					bottomDivider
-					key="cameraRollListItem"
-					rightTitle={
-						<ToggleSwitch
-							isOn={hasCameraRollPermission}
-							onColor={Colors.green}
-							onToggle={isOn => this.toggleCameraRollPermission(isOn)}
-						/>
-					}
-					subtitle={null}
-					title="Camera roll"
-				/>
-				<ListItem
-					bottomDivider
-					key="microphoneListItem"
-					rightTitle={
-						<ToggleSwitch
-							isOn={hasMicrophonePermission}
-							onColor={Colors.green}
-							onToggle={isOn => this.toggleMicrophonePermission(isOn)}
-						/>
-					}
-					subtitle={null}
-					title="Microphone"
-				/>
 				{auth !== null && (
 					<ListItem
 						bottomDivider
@@ -221,48 +120,46 @@ class ProfileScreen extends Component {
 
 		return (
 			<Container>
-				<AppHeader
-					left={() => null}
-					right={() => (
-						<Icon
-							color={Colors.black}
-							name="cog"
-							onPress={() => this.toggleSettingsVisibility()}
-							type="font-awesome"
-						/>
-					)}
-					title="Profile"
-				/>
-				<ScrollView>
-					{settingsVisible ? (
-						SettingsSection
-					) : auth ? (
-						<View>
-							<View style={styles.imageWrapper}>
-								<Avatar
-									icon={{ name: "home" }}
-									onEditPress={() => {
-										navigate("CameraRoll")
-									}}
-									rounded
-									showEditButton
-									size="large"
+				{auth && verified ? (
+					<View>
+						<AppHeader
+							left={() => null}
+							right={() => (
+								<Icon
+									color={Colors.black}
+									name="cog"
+									onPress={() => this.toggleSettingsVisibility()}
+									type="font-awesome"
 								/>
-							</View>
-							<Text style={styles.h1}>{user.name}</Text>
-							<Text style={styles.usernameText}>@{user.username}</Text>
+							)}
+							title="Profile"
+						/>
 
-							<Container style={styles.myCatContainer}>
-								<Text style={styles.myCatsHeader}>
-									My cats
-								</Text>
-								<CatGrid navigate={navigate} user={user} />
-							</Container>
-						</View>
-					) : (
-						<ActivityIndicator />
-					)}
-				</ScrollView>
+						{settingsVisible ? (
+							SettingsSection
+						) : (
+							<ScrollView>
+								<View style={styles.imageWrapper}>
+									<Avatar
+										icon={{ name: "home" }}
+										onEditPress={() => {
+											navigate("CameraRoll")
+										}}
+										rounded
+										showEditButton
+										size="large"
+									/>
+								</View>
+								<Text style={styles.h1}>{user.name}</Text>
+								<Text style={styles.usernameText}>@{user.username}</Text>
+
+								<View style={{ marginTop: 12 }}>
+									<CatGrid navigation={navigation} user={user} />
+								</View>
+							</ScrollView>
+						)}
+					</View>
+				) : null}
 			</Container>
 		)
 	}
@@ -273,42 +170,37 @@ ProfileScreen.navigationOptions = {
 }
 
 ProfileScreen.propTypes = {
-	authenticated: PropTypes.bool,
-	catCount: PropTypes.number,
-	catImages: PropTypes.array,
-	cats: PropTypes.array,
 	fetchUser: PropTypes.func,
-	getCurrentUser: PropTypes.func,
 	logout: PropTypes.func,
 	navigation: PropTypes.object,
 	user: PropTypes.shape({
-		dateCreated: PropTypes.string,
+		email: PropTypes.string,
+		email_verified: PropTypes.bool,
 		id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 		img: PropTypes.string,
 		name: PropTypes.string,
-		pushNotificationsEnabled: PropTypes.bool,
 		username: PropTypes.string,
-		verificationCode: PropTypes.string,
+		uuid: PropTypes.string
 	})
 }
 
 ProfileScreen.defaultProps = {
 	fetchUser,
-	getCurrentUser,
 	logout,
 	user: {
-		dateCreated: null,
+		email: null,
+		email_verified: true,
 		id: null,
 		img: null,
 		name: null,
-		pushNotificationsEnabled: true,
-		verificationCode: null
+		username: null,
+		uuid: null
 	}
 }
 
 const mapStateToProps = (state, ownProps) => {
 	return {
-		...state.profile,
+		...state.app,
 		...ownProps
 	}
 }
@@ -317,7 +209,6 @@ export default connect(
 	mapStateToProps,
 	{
 		fetchUser,
-		getCurrentUser,
 		logout
 	}
 )(ProfileScreen)

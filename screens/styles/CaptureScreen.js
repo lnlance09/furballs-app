@@ -15,10 +15,36 @@ export const style = {
 	cameraTouchableOpacity: {
 		alignItems: "center",
 		alignSelf: "flex-end",
-		height: "70%"
+		height: "80%"
 		// flex: 0.1
 	},
 	cameraView: {
 		flex: 1
 	},
+	permissionBtn: {
+		backgroundColor: Colors.white,
+		borderColor: Colors.blue,
+		marginHorizontal: 7,
+		marginTop: 24
+	},
+	permissionBtnText: {
+		color: Colors.blue,
+	},
+	permissionView: {
+		alignItems: "center",
+		flex: 1,
+		justifyContent: "center",
+	},
+	tabBarUnderlineStyle: {
+		height: 0
+	},
+	tabBarContainerStyle: {
+		borderBottomWidth: 0
+	},
+	tabHeading: {
+		backgroundColor: Colors.white
+	},
+	tabText: {
+		color: Colors.black
+	}
 }

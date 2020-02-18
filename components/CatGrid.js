@@ -34,19 +34,35 @@ class CatGrid extends Component {
 	}
 
 	componentDidMount() {
+		console.log("cat grid componentDidMount")
 		this.getCats()
+		this.willFocusCatGrid = this.props.navigation.addListener(
+			"willFocus",
+			() => {
+				this.getCats()
+			}
+		)
+	}
+
+	componentWillUnmount() {
+		this.willFocusCatGrid.remove()
 	}
 
 	getCats() {
 		const { cats, page } = this.state
 		this.setState({ isLoading: true })
 
+		console.log("get cats")
 		fetch(`${constants.BASE_URL}api/users/getLikedCats?id=${this.props.user.id}&page=${page}`, {
 			headers: {
 				"Content-Type": "application/json"
 			}
 		})
-			.then(response => response.json())
+			.then(response => {
+				console.log("get cats response")
+				console.log(response)
+				return response.json()
+			})
 			.then(json => {
 				this.setState({
 					cats: page === 0 ? json.cats : [...cats, ...json.cats],
@@ -87,12 +103,12 @@ class CatGrid extends Component {
 
 	render() {
 		const { cats, isRefreshing } = this.state
-		const { navigate, user } = this.props
+		const { user } = this.props
+		const { navigate } = this.props.navigation
 
 		return cats.length > 0 ? (
 			<View style={styles.listContainer}>
 				<FlatGrid
-					itemDimension={width / 3 - 20}
 					items={cats}
 					onEndReached={this.handleLoadMore}
 					onEndThreshold={0}
@@ -107,10 +123,10 @@ class CatGrid extends Component {
 								})
 							}}
 						>
-							<Image source={{ uri: item.url }} style={styles.gridImg} />
+							<Image source={{ uri: item.path }} style={styles.gridImg} />
 						</TouchableHighlight>
 					)}
-					spacing={1}
+					spacing={0}
 					style={styles.pictureGrid}
 				/>
 			</View>
@@ -121,7 +137,7 @@ class CatGrid extends Component {
 }
 
 CatGrid.propTypes = {
-	navigate: PropTypes.func,
+	navigation: PropTypes.object,
 	user: PropTypes.shape({
 		id: PropTypes.string,
 		name: PropTypes.string
