@@ -1,21 +1,19 @@
-import AppHeader from "../components/AppHeader"
-import ButtonComponent from "../components/ButtonComponent"
-import Colors from "../constants/Colors"
+import AppHeader from "@components/primary/AppHeader"
+import ButtonComponent from "@components/primary/ButtonComponent"
+import Colors from "@constants/Colors"
 import PropTypes from "prop-types"
-import store from "../store"
+import RegisterPic from "@assets/images/register.svg"
+import store from "@store"
 import React, { Component } from "react"
-import { logout, verifyEmail } from "@redux/actions/app"
+import { logout, verifyEmail } from "@redux/actions/user"
 import { connect } from "react-redux"
 import { style } from "./styles/VerificationCodeScreen"
-import { AsyncStorage, StyleSheet } from "react-native"
+import { AsyncStorage, Dimensions, StyleSheet } from "react-native"
 import { Icon } from "react-native-elements"
 import { TextField } from "react-native-material-textfield"
 import { Container, Text, Toast } from "native-base"
 
-import Amplify, { Auth } from "aws-amplify"
-import config from "../aws-exports"
-Amplify.configure(config)
-
+const { width } = Dimensions.get("window")
 const styles = StyleSheet.create(style)
 
 class VerificationCodeScreen extends Component {
@@ -25,8 +23,15 @@ class VerificationCodeScreen extends Component {
 		const { navigate } = this.props.navigation
 		this.navigate = navigate
 
+		const _state = store.getState()
+		const user = _state.app.user
+
+		console.log("user")
+		console.log(user)
+
 		this.state = {
-			code: ""
+			code: "",
+			user
 		}
 	}
 
@@ -65,8 +70,28 @@ class VerificationCodeScreen extends Component {
 			})
 	}
 
+	async checkEmailVerification(id) {
+		/*
+		const response = await fetch(`http://localhost:8888/cats/api/users/getUser?id=${id}`, {
+			headers: {
+				"Content-Type": "application/json"
+			}
+		})
+		const json = await response.json()
+		console.log("checkEmailVerification")
+		console.log(json)
+		return json
+		*/
+
+		Auth.currentAuthenticatedUser({
+			bypassCache: true
+		})
+			.then(user => console.log(user))
+			.catch(err => console.log(err))
+	}
+
 	render() {
-		const { code } = this.state
+		const { code, user } = this.state
 
 		const SubmitFormButton = ({ callback, text }) => {
 			return (
@@ -95,17 +120,19 @@ class VerificationCodeScreen extends Component {
 					title="Verify"
 				/>
 				<Container style={styles.container}>
-					<TextField
-						autoCapitalize="none"
-						label="Verification code"
-						onChangeText={code => {
-							this.setState({ code })
+					<Text
+						onPress={() => {
+							this.props.logout()
+							this.navigate("Login")
 						}}
-						value={code}
-					/>
+						style={styles.verifyText}
+					>
+						Please verify your email
+					</Text>
+					<RegisterPic width={width} height={170} />
 					<SubmitFormButton
-						callback={() => this.submitVerificationCode(code)}
-						text="Verify"
+						callback={() => this.checkEmailVerification(user.id)}
+						text="I've verified my email"
 					/>
 					<Text
 						onPress={() => {

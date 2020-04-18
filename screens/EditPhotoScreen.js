@@ -1,14 +1,14 @@
 import * as Location from "expo-location"
-import AppHeader from "../components/AppHeader"
-import Colors from "../constants/Colors"
+import AppHeader from "@components/primary/AppHeader"
+import Colors from "@constants/Colors"
 import PropTypes from "prop-types"
 import Confetti from "react-native-confetti"
-import store from "../store"
+import store from "@store"
 import Video from "expo-av"
 import React, { Component } from "react"
 import { style } from "./styles/EditPhotoScreen"
 import { connect } from "react-redux"
-import { addCatPic } from "@redux/actions/app"
+import { addCatPic } from "@redux/actions/cat"
 import { ImageBackground, ScrollView, StyleSheet, Text, View } from "react-native"
 import { Dropdown } from "react-native-material-dropdown"
 import { TextField } from "react-native-material-textfield"
@@ -45,7 +45,7 @@ class EditPhotoScreen extends Component {
 		const img = this.state.img
 
 		const _state = store.getState()
-		const bearer = _state.app.token
+		const bearer = _state.user.token
 
 		console.log("submitCat")
 		console.log(location)

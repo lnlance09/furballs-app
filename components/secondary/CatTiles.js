@@ -1,5 +1,5 @@
 import * as constants from "@redux/types"
-import Colors from "../constants/Colors"
+import Colors from "@constants/Colors"
 import PropTypes from "prop-types"
 import React, { Component } from "react"
 import { style } from "./styles/CatTiles"
@@ -64,7 +64,10 @@ class CatTiles extends Component {
 				"Content-Type": "application/json"
 			}
 		})
-			.then(response => response.json())
+			.then(response => {
+				console.log(response)
+				return response.json()
+			})
 			.then(json => {
 				this.setState({
 					cats: page === 0 ? json.cats : [...cats, ...json.cats],

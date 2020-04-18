@@ -1,6 +1,8 @@
 import { combineReducers } from "redux"
-import app from "./app"
+import cat from "./cat"
+import user from "./user"
 
 export default combineReducers({
-	app
+	cat,
+	user
 })

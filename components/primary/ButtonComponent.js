@@ -1,8 +1,8 @@
-import { style } from "./styles/Button"
 import PropTypes from "prop-types"
 import React, { Component } from "react"
 import { Button } from "native-base"
 import { StyleSheet, Text } from "react-native"
+import { style } from "./styles/Button"
 
 const styles = StyleSheet.create(style)
 

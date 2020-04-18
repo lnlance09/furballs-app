@@ -1,5 +1,5 @@
 import * as Permissions from "expo-permissions"
-import Colors from "../constants/Colors"
+import Colors from "@constants/Colors"
 import PropTypes from "prop-types"
 import React, { Component } from "react"
 import { style } from "./styles/CameraRoll"

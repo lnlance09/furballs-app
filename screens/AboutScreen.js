@@ -1,5 +1,5 @@
-import AppHeader from "../components/AppHeader"
-import Colors from "../constants/Colors"
+import AppHeader from "@components/primary/AppHeader"
+import Colors from "@constants/Colors"
 import PropTypes from "prop-types"
 import parser from "parse-address"
 import React, { Component } from "react"
@@ -18,7 +18,7 @@ class AboutScreen extends Component {
 	}
 
 	componentDidMount() {
-		
+
 	}
 
 	render() {
@@ -28,7 +28,7 @@ class AboutScreen extends Component {
 			<View style={styles.container}>
 				<AppHeader title="About" />
 				<ScrollView style={styles.scrollView}>
-					
+
 				</ScrollView>
 			</View>
 		)
@@ -40,11 +40,11 @@ AboutScreen.navigationOptions = {
 }
 
 AboutScreen.propTypes = {
-	
+
 }
 
 AboutScreen.defaultProps = {
-	
+
 }
 
 const mapStateToProps = (state, ownProps) => {

@@ -1,8 +1,8 @@
-import { style } from "./styles/AppHeader"
 import PropTypes from "prop-types"
 import React, { Component } from "react"
 import { Body, Header, Left, Right, Title } from "native-base"
 import { StyleSheet } from "react-native"
+import { style } from "./styles/AppHeader"
 
 const styles = StyleSheet.create(style)
 

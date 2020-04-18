@@ -1,5 +1,5 @@
-import AppHeader from "../components/AppHeader"
-import CatTiles from "../components/CatTiles"
+import AppHeader from "@components/primary/AppHeader"
+import CatTiles from "@components/secondary/CatTiles"
 import PropTypes from "prop-types"
 import React, { Component } from "react"
 import { style } from "./styles/HomeScreen"

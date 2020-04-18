@@ -1,13 +1,13 @@
 import * as Permissions from "expo-permissions"
-import AppHeader from "../components/AppHeader"
-import CatGrid from "../components/CatGrid"
-import Colors from "../constants/Colors"
+import AppHeader from "@components/primary/AppHeader"
+import CatGrid from "@components/secondary/CatGrid"
+import Colors from "@constants/Colors"
 import PropTypes from "prop-types"
-import store from "../store/"
+import store from "@store"
 import React, { Component } from "react"
 import { connect } from "react-redux"
 import { style } from "./styles/ProfileScreen"
-import { fetchUser, logout } from "@redux/actions/app"
+import { fetchUser, logout } from "@redux/actions/user"
 import {
 	ScrollView,
 	StyleSheet,
@@ -51,8 +51,8 @@ class ProfileScreen extends Component {
 
 	checkUser() {
 		const _state = store.getState()
-		const user = _state.app.user
-		const bearer = _state.app.token
+		const user = _state.user.user
+		const bearer = _state.user.token
 		const verified = user.email_verified
 		const auth = bearer === null ? false : true
 		this.setState({ auth, bearer, verified })
@@ -83,12 +83,13 @@ class ProfileScreen extends Component {
 	}
 
 	toggleSettingsVisibility() {
+		console.log("toggleSettingsVisibility")
 		this.setState({ settingsVisible: !this.state.settingsVisible })
 	}
 
 	render() {
 		console.log("profile screen props")
-		console.log(this.props)
+		console.log(this.props.user)
 		console.log("profile screen state")
 		console.log(this.state)
 
@@ -200,7 +201,7 @@ ProfileScreen.defaultProps = {
 
 const mapStateToProps = (state, ownProps) => {
 	return {
-		...state.app,
+		...state.user,
 		...ownProps
 	}
 }

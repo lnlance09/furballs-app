@@ -1,22 +1,22 @@
 import * as constants from "@redux/types"
 import Animated, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
-import CatPic from "../assets/images/family-cat-illustration-band.png"
+import CatPic from "@assets/images/family-cat-illustration-band.png"
 import mapStyle from "../mapStyle.json"
-import AppHeader from "../components/AppHeader"
-import ButtonComponent from "../components/ButtonComponent"
-import Carousel from "../components/Carousel"
-import Colors from "../constants/Colors"
+import AppHeader from "@components/primary/AppHeader"
+import ButtonComponent from "@components/primary/ButtonComponent"
+import Carousel from "@components/primary/Carousel"
+import Colors from "@constants/Colors"
 import PropTypes from "prop-types"
 import moment from "moment"
-import store from "../store"
+import store from "@store"
 import SlidingUpPanel from "rn-sliding-up-panel"
 import React, { Component } from "react"
-import { playSound } from "../tools/soundFunctions"
+import { playSound } from "@tools/soundFunctions"
+import { RenderMeal } from "@tools/textFunctions"
 import { style } from "./styles/CatScreen"
 import { connect } from "react-redux"
-import { RenderMeal } from "../tools/textFunctions"
 import { TextField } from "react-native-material-textfield"
-import { getCat, likeCat, resetCat, toggleCatScreenEditing, unlikeCat } from "@redux/actions/app"
+import { getCat, likeCat, resetCat, toggleCatScreenEditing, unlikeCat } from "@redux/actions/cat"
 import { Container, Spinner, Text, Toast } from "native-base"
 import { Clipboard, Dimensions, Image, ScrollView, StyleSheet, View } from "react-native"
 import { Icon, ListItem, Overlay } from "react-native-elements"
@@ -51,9 +51,11 @@ class CatScreen extends Component {
 			"willFocus",
 			() => {
 				const _state = store.getState()
-				const user = _state.app.user
-				const auth = user === null ? false : true
-				const bearer = auth ? _state.app.token : null
+				console.log("did mount sss")
+				console.log(_state)
+				const user = _state.user
+				const auth = user.token === null ? false : true
+				const bearer = auth ? user.token : null
 				this.setState({ auth, bearer, user })
 				console.log(user)
 

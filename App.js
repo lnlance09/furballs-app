@@ -8,8 +8,8 @@ import { Provider } from "react-redux"
 import { Platform, StatusBar } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import AppNavigator from "./navigation/AppNavigator"
-import MonoFont from "./assets/fonts/SpaceMono-Regular.ttf"
-import store from "./store"
+import MonoFont from "@assets/fonts/SpaceMono-Regular.ttf"
+import store from "@store"
 
 class App extends Component {
 	constructor(props) {
@@ -30,10 +30,6 @@ class App extends Component {
 
 	async loadResourcesAsync() {
 		await Promise.all([
-			Asset.loadAsync([
-				RobotDevImg,
-				RobotProdImg
-			]),
 			Font.loadAsync({
 				...Ionicons.font,
 				"space-mono": MonoFont

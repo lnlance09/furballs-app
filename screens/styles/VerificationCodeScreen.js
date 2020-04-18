@@ -1,4 +1,4 @@
-import Colors from "../../constants/Colors"
+import Colors from "@constants/Colors"
 import { Dimensions } from "react-native"
 
 const { width } = Dimensions.get("window")
@@ -21,5 +21,9 @@ export const style = {
 		fontSize: 14,
 		marginTop: 8,
 		textAlign: "left"
+	},
+	verifyText: {
+		fontSize: 24,
+		textAlign: "center"
 	}
 }

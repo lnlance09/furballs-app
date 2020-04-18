@@ -3,7 +3,7 @@ import PropTypes from "prop-types"
 import moment from "moment"
 import React, { Component } from "react"
 import { style } from "./styles/CatList"
-import { RenderMeal } from "../tools/textFunctions"
+import { RenderMeal } from "@tools/textFunctions"
 import { FlatList, StyleSheet, View } from "react-native"
 import { ListItem, SearchBar } from "react-native-elements"
 

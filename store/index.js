@@ -1,7 +1,7 @@
 import * as constants from "@redux/types"
 import { applyMiddleware, createStore } from "redux"
 import { composeWithDevTools } from "redux-devtools-extension"
-import { setUserData } from "@redux/actions/app"
+import { setUserData } from "@redux/actions/user"
 import { AsyncStorage } from "react-native"
 import Amplify, { Auth } from "aws-amplify"
 import thunk from "redux-thunk"

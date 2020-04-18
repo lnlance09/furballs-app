@@ -4,95 +4,24 @@ import {
 	deleteItemFromStorage,
 	getItemFromStorage,
 	saveItemToStorage
-} from "../../tools/storageFunctions"
-import { addToS3 } from "../../tools/awsFunctions"
-import { randomString } from "../../tools/textFunctions"
-
-import Amplify, { Auth } from "aws-amplify"
-import config from "../../aws-exports"
-Amplify.configure(config)
-
-export const addCatPic = ({ bearer, img, lat, lon }) => dispatch => {
-	const fileName = `${randomString(32)}.jpg`
-	dispatch(addToS3({ contentType: "image/jpeg", fileName, img }))
-}
+} from "@tools/storageFunctions"
+import { addToS3 } from "@tools/awsFunctions"
 
 export const fetchUser = ({ id }) => dispatch => {
-	fetch(`${constants.BASE_URL}api/users/getUser?id=${id}`, {
+	fetch(`${constants.BASE_URL}api/users/get?id=${id}`, {
 		headers: {
 			"Content-Type": "application/json"
 		}
 	})
 		.then(response => {
-			// console.log(response)
+			console.log("response fetch user")
+			console.log(response)
 			return response.json()
 		})
 		.then(json => {
 			dispatch({
 				payload: json,
 				type: constants.FETCH_USER
-			})
-		})
-		.catch(error => {
-			console.error(error)
-		})
-}
-
-export const getCat = ({ bearer, id }) => dispatch => {
-	let headers = {
-		"Content-Type": "application/json"
-	}
-
-	if (bearer) {
-		headers.Authorization = bearer
-	}
-
-	console.log(bearer)
-
-	fetch(`${constants.BASE_URL}api/cats/getCat?id=${id}`, {
-		headers
-	})
-		.then(response => {
-			console.log(response)
-			return response.json()
-		})
-		.then(json => {
-			dispatch({
-				type: constants.GET_CAT,
-				payload: json
-			})
-		})
-		.catch(error => {
-			console.error(error)
-		})
-}
-
-export const likeCat = ({ bearer, id }) => dispatch => {
-	let headers = {
-		Accept: "application/json",
-		"Content-Type": "application/json"
-	}
-
-	if (bearer) {
-		headers.Authorization = bearer
-	}
-
-	fetch(`${constants.BASE_URL}api/cats/likeCat`, {
-		body: JSON.stringify({
-			cat_id: id
-		}),
-		headers,
-		method: "POST"
-	})
-		.then(response => {
-			console.log("like cat response")
-			console.log(response)
-			return response.json()
-		})
-		.then(json => {
-			dispatch({
-				type: constants.LIKE_CAT,
-				payload: json
 			})
 		})
 		.catch(error => {
@@ -157,17 +86,11 @@ export const login = ({
 }
 
 export const logout = () => dispatch => {
-	Auth.signOut()
-		.then(data => {
-			deleteItemFromStorage("user")
-			deleteItemFromStorage("token")
-			dispatch({
-				type: constants.LOGOUT
-			})
-		})
-		.catch(err => {
-			console.log(err)
-		})
+	deleteItemFromStorage("user")
+	deleteItemFromStorage("token")
+	dispatch({
+		type: constants.LOGOUT
+	})
 }
 
 export const register = ({ email, name, navigate, password, username, uuid }) => dispatch => {
@@ -208,30 +131,6 @@ export const register = ({ email, name, navigate, password, username, uuid }) =>
 		})
 }
 
-export const resetCat = () => dispatch => {
-	dispatch({
-		type: constants.RESET_CAT
-	})
-}
-
-export const searchCatsByLocation = ({ lat, lon }) => dispatch => {
-	fetch(`${constants.BASE_URL}api/cats/browseCatsByLocation?lat=${lat}&lon=${lon}`, {
-		headers: {
-			"Content-Type": "application/json"
-		}
-	})
-		.then(response => response.json())
-		.then(json => {
-			dispatch({
-				payload: json,
-				type: constants.SEARCH_CATS_BY_LOCATION
-			})
-		})
-		.catch(error => {
-			console.error(error)
-		})
-}
-
 export const setRegion = region => dispatch => {
 	dispatch({
 		payload: region,
@@ -260,49 +159,14 @@ export const setUserData = ({ token, user }) => {
 	}
 }
 
-export const toggleCatPageEditing = () => dispatch => {
-	dispatch({
-		type: constants.TOGGLE_CAT_EDITING_PAGE
-	})
-}
-
-export const unlikeCat = ({ bearer, id }) => dispatch => {
-	let headers = {
-		Accept: "application/json",
-		"Content-Type": "application/json"
-	}
-
-	if (bearer) {
-		headers.Authorization = bearer
-	}
-
-	fetch(`${constants.BASE_URL}api/cats/unlikeCat`, {
-		body: JSON.stringify({
-			cat_id: id
-		}),
-		headers,
-		method: "POST"
-	})
-		.then(response => response.json())
-		.then(json => {
-			dispatch({
-				payload: json,
-				type: constants.UNLIKE_CAT
-			})
-		})
-		.catch(error => {
-			console.error(error)
-		})
-}
-
 export const updateUser = ({ bearer, data, id }) => dispatch => {
 	let headers = {
 		Accept: "application/json",
-		"Authorization": bearer,
+		Authorization: bearer,
 		"Content-Type": "application/json"
 	}
 
-	fetch(`${constants.BASE_URL}api/users/updateUser`, {
+	fetch(`${constants.BASE_URL}api/users/update`, {
 		body: JSON.stringify({
 			data,
 			id: id
