@@ -11,18 +11,18 @@ class CarouselComponent extends Component {
 		super(props)
 
 		this.state = {
-			loaded: false,
+			loaded: false
 		}
 	}
 
 	componentDidMount() {
-		this.willFocusCatPage = this.props.navigation.addListener(
-			"willFocus",
-			() => {
-				this.setState({ imgColor: this.props.imgColor, loaded: !this.state.loaded })
-				// this._carousel.current.currentIndex = 0
-			}
-		)
+		this.willFocusCatPage = this.props.navigation.addListener("willFocus", () => {
+			this.setState({
+				imgColor: this.props.imgColor,
+				loaded: !this.state.loaded
+			})
+			// this._carousel.current.currentIndex = 0
+		})
 	}
 
 	componentWillUnmount() {
@@ -50,7 +50,9 @@ class CarouselComponent extends Component {
 			<Carousel
 				data={photos}
 				itemWidth={width}
-				ref={c => { this._carousel = c }}
+				ref={c => {
+					this._carousel = c
+				}}
 				renderItem={item => this.renderItem(item)}
 				sliderWidth={width}
 			/>
@@ -67,8 +69,6 @@ CarouselComponent.propTypes = {
 	width: PropTypes.number
 }
 
-CarouselComponent.defaultProps = {
-	
-}
+CarouselComponent.defaultProps = {}
 
 export default CarouselComponent

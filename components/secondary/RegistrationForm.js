@@ -29,11 +29,14 @@ class RegistrationForm extends Component {
 	}
 
 	async checkUsername(username) {
-		const response = await fetch(`http://localhost:8888/cats/api/users/checkUsername?username=${username}`, {
-			headers: {
-				"Content-Type": "application/json"
+		const response = await fetch(
+			`http://localhost:8888/cats/api/users/checkUsername?username=${username}`,
+			{
+				headers: {
+					"Content-Type": "application/json"
+				}
 			}
-		})
+		)
 		const json = await response.json()
 		return json
 	}
@@ -153,9 +156,7 @@ class RegistrationForm extends Component {
 					value={password}
 				/>
 				<SubmitFormButton
-					callback={() =>
-						this.submitRegistrationForm(email, name, password, username)
-					}
+					callback={() => this.submitRegistrationForm(email, name, password, username)}
 					text="Sign Up"
 				/>
 				<Text
@@ -169,11 +170,7 @@ class RegistrationForm extends Component {
 			</Container>
 		)
 
-		return (
-			<Container>
-				{MainForm}
-			</Container>
-		)
+		return <Container>{MainForm}</Container>
 	}
 }
 

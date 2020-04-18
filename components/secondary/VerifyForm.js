@@ -88,22 +88,13 @@ class VerifyForm extends Component {
 					callback={() => this.submitVerificationCode(code, email, password)}
 					text="Submit"
 				/>
-				<Text
-					onPress={() => {
-
-					}}
-					style={styles.formSubText}
-				>
+				<Text onPress={() => {}} style={styles.formSubText}>
 					Cancel
 				</Text>
 			</Container>
 		)
 
-		return (
-			<Container>
-				{MainForm}
-			</Container>
-		)
+		return <Container>{MainForm}</Container>
 	}
 }
 
@@ -113,9 +104,7 @@ VerifyForm.propTypes = {
 	toggleSignUp: PropTypes.func
 }
 
-VerifyForm.defaultProps = {
-
-}
+VerifyForm.defaultProps = {}
 
 const mapStateToProps = (state, ownProps) => {
 	return {
@@ -126,7 +115,5 @@ const mapStateToProps = (state, ownProps) => {
 
 export default connect(
 	mapStateToProps,
-	{
-
-	}
+	{}
 )(VerifyForm)

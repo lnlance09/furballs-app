@@ -27,10 +27,7 @@ class CaptureScreen extends Component {
 			img: null,
 			index: 0,
 			recording: false,
-			routes: [
-				{ key: "camera", title: "Camera" },
-				{ key: "library", title: "Library" }
-			],
+			routes: [{ key: "camera", title: "Camera" }, { key: "library", title: "Library" }],
 			showHeader: false,
 			type: Camera.Constants.Type.back
 		}
@@ -141,9 +138,7 @@ class CaptureScreen extends Component {
 					type={type}
 				>
 					<View style={styles.cameraTouchableOpacity}>
-						<TouchableOpacity
-							style={styles.cameraTouchableOpacity}
-						/>
+						<TouchableOpacity style={styles.cameraTouchableOpacity} />
 					</View>
 					<View style={styles.cameraOptions}>
 						<Icon
@@ -169,9 +164,7 @@ class CaptureScreen extends Component {
 					type={type}
 				>
 					<View style={styles.cameraTouchableOpacity}>
-						<TouchableOpacity
-							style={styles.cameraTouchableOpacity}
-						/>
+						<TouchableOpacity style={styles.cameraTouchableOpacity} />
 					</View>
 					<View style={styles.cameraOptions}>
 						{recording ? (
@@ -194,7 +187,9 @@ class CaptureScreen extends Component {
 					</View>
 					{recording && (
 						<View style={{ backgroundColor: Colors.white }}>
-							<Text style={{ fontStyle: "italic", textAlign: "center" }}>Recording...</Text>
+							<Text style={{ fontStyle: "italic", textAlign: "center" }}>
+								Recording...
+							</Text>
 						</View>
 					)}
 				</Camera>
@@ -242,16 +237,14 @@ class CaptureScreen extends Component {
 						title={headerTitle}
 					/>
 					<Tabs
-						onChangeTab={data => this.setState({ index: data.i }) }
+						onChangeTab={data => this.setState({ index: data.i })}
 						tabBarPosition="bottom"
 						tabBarUnderlineStyle={styles.tabBarUnderlineStyle}
 						tabContainerStyle={styles.tabBarContainerStyle}
 					>
 						<Tab
 							heading={
-								<TabHeading
-									style={styles.tabHeading}
-								>
+								<TabHeading style={styles.tabHeading}>
 									<Text style={styles.tabText}>Photo</Text>
 								</TabHeading>
 							}
@@ -260,9 +253,7 @@ class CaptureScreen extends Component {
 						</Tab>
 						<Tab
 							heading={
-								<TabHeading
-									style={styles.tabHeading}
-								>
+								<TabHeading style={styles.tabHeading}>
 									<Text style={styles.tabText}>Library</Text>
 								</TabHeading>
 							}

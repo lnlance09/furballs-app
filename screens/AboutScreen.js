@@ -17,9 +17,7 @@ class AboutScreen extends Component {
 		this.state = {}
 	}
 
-	componentDidMount() {
-
-	}
+	componentDidMount() {}
 
 	render() {
 		const { resources } = this.props
@@ -27,9 +25,7 @@ class AboutScreen extends Component {
 		return (
 			<View style={styles.container}>
 				<AppHeader title="About" />
-				<ScrollView style={styles.scrollView}>
-
-				</ScrollView>
+				<ScrollView style={styles.scrollView}></ScrollView>
 			</View>
 		)
 	}
@@ -39,13 +35,9 @@ AboutScreen.navigationOptions = {
 	header: null
 }
 
-AboutScreen.propTypes = {
+AboutScreen.propTypes = {}
 
-}
-
-AboutScreen.defaultProps = {
-
-}
+AboutScreen.defaultProps = {}
 
 const mapStateToProps = (state, ownProps) => {
 	return {
@@ -56,7 +48,5 @@ const mapStateToProps = (state, ownProps) => {
 
 export default connect(
 	mapStateToProps,
-	{
-
-	}
+	{}
 )(AboutScreen)

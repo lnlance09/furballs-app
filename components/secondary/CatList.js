@@ -122,8 +122,8 @@ class CatList extends Component {
 									item.food_type === null
 										? ""
 										: `${RenderMeal([item.food_type])} fed ${moment(
-											item.food_date
-										).fromNow()}`
+												item.food_date
+										  ).fromNow()}`
 								}
 								title={item.name}
 							/>

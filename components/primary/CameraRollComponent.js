@@ -4,7 +4,6 @@ import PropTypes from "prop-types"
 import React, { Component } from "react"
 import { style } from "./styles/CameraRoll"
 import { CameraRoll, Dimensions, Image, StyleSheet, TouchableHighlight, View } from "react-native"
-import { Icon } from "react-native-elements"
 import { FlatGrid } from "react-native-super-grid"
 
 const { width } = Dimensions.get("window")
@@ -100,7 +99,10 @@ class CameraRollComponent extends Component {
 									this.props.onSelectCallback(item.node.image)
 								}}
 							>
-								<Image source={{ uri: item.node.image.uri }} style={styles.gridImg} />
+								<Image
+									source={{ uri: item.node.image.uri }}
+									style={styles.gridImg}
+								/>
 							</TouchableHighlight>
 						)}
 						spacing={0}

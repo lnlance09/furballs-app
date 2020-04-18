@@ -8,11 +8,7 @@ import React, { Component } from "react"
 import { connect } from "react-redux"
 import { style } from "./styles/ProfileScreen"
 import { fetchUser, logout } from "@redux/actions/user"
-import {
-	ScrollView,
-	StyleSheet,
-	View
-} from "react-native"
+import { ScrollView, StyleSheet, View } from "react-native"
 import { Container, Text } from "native-base"
 import { Avatar, Icon, ListItem } from "react-native-elements"
 
@@ -37,12 +33,9 @@ class ProfileScreen extends Component {
 	async componentDidMount() {
 		this.checkUser()
 
-		this.willFocusProfileScreen = this.props.navigation.addListener(
-			"willFocus",
-			() => {
-				this.checkUser()
-			}
-		)
+		this.willFocusProfileScreen = this.props.navigation.addListener("willFocus", () => {
+			this.checkUser()
+		})
 	}
 
 	componentWillUnmount() {
@@ -93,12 +86,7 @@ class ProfileScreen extends Component {
 		console.log("profile screen state")
 		console.log(this.state)
 
-		const {
-			auth,
-			hasCameraPermission,
-			settingsVisible,
-			verified
-		} = this.state
+		const { auth, hasCameraPermission, settingsVisible, verified } = this.state
 		const { navigation, user } = this.props
 		const { navigate } = navigation
 

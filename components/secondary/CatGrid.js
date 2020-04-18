@@ -2,14 +2,7 @@ import * as constants from "@redux/types"
 import PropTypes from "prop-types"
 import React, { Component } from "react"
 import { style } from "./styles/CatGrid"
-import {
-	Dimensions,
-	Image,
-	StyleSheet,
-	Text,
-	TouchableHighlight,
-	View
-} from "react-native"
+import { Dimensions, Image, StyleSheet, Text, TouchableHighlight, View } from "react-native"
 import { FlatGrid } from "react-native-super-grid"
 
 const { width } = Dimensions.get("window")
@@ -36,12 +29,9 @@ class CatGrid extends Component {
 	componentDidMount() {
 		console.log("cat grid componentDidMount")
 		this.getCats()
-		this.willFocusCatGrid = this.props.navigation.addListener(
-			"willFocus",
-			() => {
-				this.getCats()
-			}
-		)
+		this.willFocusCatGrid = this.props.navigation.addListener("willFocus", () => {
+			this.getCats()
+		})
 	}
 
 	componentWillUnmount() {

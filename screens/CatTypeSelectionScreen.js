@@ -20,9 +20,7 @@ class CatTypeSelectionScreen extends Component {
 		this.state = {}
 	}
 
-	componentDidMount() {
-
-	}
+	componentDidMount() {}
 
 	render() {
 		const { resources } = this.props
@@ -40,7 +38,7 @@ class CatTypeSelectionScreen extends Component {
 					</ImageBackground>
 
 					<ImageBackground source={FamilyCatPic} style={{ height: 200, width: "100%" }}>
-						<Text>This is a family v   cat</Text>
+						<Text>This is a family v cat</Text>
 					</ImageBackground>
 				</ScrollView>
 			</View>
@@ -52,13 +50,9 @@ CatTypeSelectionScreen.navigationOptions = {
 	header: null
 }
 
-CatTypeSelectionScreen.propTypes = {
+CatTypeSelectionScreen.propTypes = {}
 
-}
-
-CatTypeSelectionScreen.defaultProps = {
-
-}
+CatTypeSelectionScreen.defaultProps = {}
 
 const mapStateToProps = (state, ownProps) => {
 	return {
@@ -69,7 +63,5 @@ const mapStateToProps = (state, ownProps) => {
 
 export default connect(
 	mapStateToProps,
-	{
-
-	}
+	{}
 )(CatTypeSelectionScreen)

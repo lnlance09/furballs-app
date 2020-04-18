@@ -105,11 +105,7 @@ class LoginForm extends Component {
 			</View>
 		)
 
-		return (
-			<Container>
-				{MainForm}
-			</Container>
-		)
+		return <Container>{MainForm}</Container>
 	}
 }
 

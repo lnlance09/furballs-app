@@ -90,11 +90,7 @@ class ResetPassForm extends Component {
 			</Container>
 		)
 
-		return (
-			<Container>
-				{MainForm}
-			</Container>
-		)
+		return <Container>{MainForm}</Container>
 	}
 }
 
@@ -103,9 +99,7 @@ ResetPassForm.propTypes = {
 	toggleResetForm: PropTypes.func
 }
 
-ResetPassForm.defaultProps = {
-
-}
+ResetPassForm.defaultProps = {}
 
 const mapStateToProps = (state, ownProps) => {
 	return {
@@ -116,7 +110,5 @@ const mapStateToProps = (state, ownProps) => {
 
 export default connect(
 	mapStateToProps,
-	{
-
-	}
+	{}
 )(ResetPassForm)

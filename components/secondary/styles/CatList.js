@@ -15,5 +15,5 @@ export const style = {
 	},
 	searchBarInputContainer: {
 		backgroundColor: "#efefef"
-	},
+	}
 }

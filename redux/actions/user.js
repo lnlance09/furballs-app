@@ -29,13 +29,7 @@ export const fetchUser = ({ id }) => dispatch => {
 		})
 }
 
-export const login = ({
-	email,
-	navigate,
-	password,
-	redirect,
-	verified
-}) => async dispatch => {
+export const login = ({ email, navigate, password, redirect, verified }) => async dispatch => {
 	return await fetch(`${constants.BASE_URL}api/users/login`, {
 		body: JSON.stringify({
 			email,

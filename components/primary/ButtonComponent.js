@@ -11,11 +11,7 @@ class ButtonComponent extends Component {
 		const { buttonStyle, onPress, text, textStyle } = this.props
 
 		return (
-			<Button
-				block
-				onPress={() => onPress()}
-				style={[styles.button, buttonStyle]}
-			>
+			<Button block onPress={() => onPress()} style={[styles.button, buttonStyle]}>
 				<Text style={[styles.text, textStyle]}>{text}</Text>
 			</Button>
 		)

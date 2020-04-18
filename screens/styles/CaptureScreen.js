@@ -28,12 +28,12 @@ export const style = {
 		marginTop: 24
 	},
 	permissionBtnText: {
-		color: Colors.blue,
+		color: Colors.blue
 	},
 	permissionView: {
 		alignItems: "center",
 		flex: 1,
-		justifyContent: "center",
+		justifyContent: "center"
 	},
 	tabBarUnderlineStyle: {
 		height: 0

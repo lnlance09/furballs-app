@@ -47,23 +47,20 @@ class CatScreen extends Component {
 	async componentDidMount() {
 		console.log("componentDidMount")
 
-		this.willFocusCatPage = this.props.navigation.addListener(
-			"willFocus",
-			() => {
-				const _state = store.getState()
-				console.log("did mount sss")
-				console.log(_state)
-				const user = _state.user
-				const auth = user.token === null ? false : true
-				const bearer = auth ? user.token : null
-				this.setState({ auth, bearer, user })
-				console.log(user)
+		this.willFocusCatPage = this.props.navigation.addListener("willFocus", () => {
+			const _state = store.getState()
+			console.log("did mount sss")
+			console.log(_state)
+			const user = _state.user
+			const auth = user.token === null ? false : true
+			const bearer = auth ? user.token : null
+			this.setState({ auth, bearer, user })
+			console.log(user)
 
-				const id = this.props.navigation.getParam("id", null)
-				this.props.getCat({ bearer, id })
-				this._panel.hide()
-			}
-		)
+			const id = this.props.navigation.getParam("id", null)
+			this.props.getCat({ bearer, id })
+			this._panel.hide()
+		})
 	}
 
 	componentWillUnmount() {
@@ -190,7 +187,6 @@ class CatScreen extends Component {
 				</Text>
 			</View>
 		)
-
 		const RenderMeals = () => {
 			return meals.map((m, i) => (
 				<ListItem
@@ -204,12 +200,8 @@ class CatScreen extends Component {
 				/>
 			))
 		}
-
 		const SlidePanel = (
-			<SlidingUpPanel
-				height={height}
-				ref={c => this._panel = c}
-			>
+			<SlidingUpPanel height={height} ref={c => (this._panel = c)}>
 				<View style={styles.slideUpPanel}>
 					<Image resizeMode="cover" source={CatPic} style={{ width, height: 400 }} />
 					<ListItem
@@ -217,9 +209,11 @@ class CatScreen extends Component {
 						containerStyle={{ width }}
 						key="camera-action"
 						leftIcon={{ color: Colors.yellow, name: "camera", type: "font-awesome" }}
-						onPress={() => navigate("Capture", {
-							showHeader: true
-						})}
+						onPress={() =>
+							navigate("Capture", {
+								showHeader: true
+							})
+						}
 						title="Capture"
 					/>
 					<ListItem
@@ -233,7 +227,6 @@ class CatScreen extends Component {
 							} else {
 								this.likeCat(bearer, id)
 							}
-
 							this._panel.hide()
 						}}
 						title={likedByMe ? "Loved!" : "Love"}
@@ -267,7 +260,6 @@ class CatScreen extends Component {
 				</View>
 			</SlidingUpPanel>
 		)
-
 		return (
 			<Container style={styles.cardPageContainer}>
 				{loading ? null : (
@@ -306,25 +298,19 @@ class CatScreen extends Component {
 						/>
 
 						<ScrollView style={{ marginHorizontal: 7, marginVertical: 7 }}>
-							<Text style={styles.nameText}>
-								{name}
-							</Text>
-							<Text style={styles.homelessText}>
-								{livingSituationLabel}
-							</Text>
-							<Text style={styles.cardPageDescriptionText}>
-								{description}
-							</Text>
+							<Text style={styles.nameText}>{name}</Text>
+							<Text style={styles.homelessText}>{livingSituationLabel}</Text>
+							<Text style={styles.cardPageDescriptionText}>{description}</Text>
 
 							{MapSection()}
 
-							<Text style={{ fontSize: 24, marginBottom: 5, marginTop: 18 }}>Cativity</Text>
+							<Text style={{ fontSize: 24, marginBottom: 5, marginTop: 18 }}>
+								Cativity
+							</Text>
 							{mealCount > 0 ? (
 								RenderMeals()
 							) : (
-								<Text style={styles.emptyMsg}>
-									This cat has not been fed yet
-								</Text>
+								<Text style={styles.emptyMsg}>This cat has not been fed yet</Text>
 							)}
 
 							<Overlay
@@ -335,9 +321,7 @@ class CatScreen extends Component {
 								}
 							>
 								<View>
-									<Text style={styles.modalHeader}>
-										Report animal abuse
-									</Text>
+									<Text style={styles.modalHeader}>Report animal abuse</Text>
 									<TextField
 										characterRestriction={500}
 										label="Suspect abuse or neglect?"
@@ -364,9 +348,7 @@ class CatScreen extends Component {
 		)
 	}
 }
-
 CatScreen.navigationOptions = { header: null }
-
 CatScreen.propTypes = {
 	cat: PropTypes.shape({
 		description: PropTypes.string,
@@ -396,7 +378,6 @@ CatScreen.propTypes = {
 	toggleCatScreenEditing: PropTypes.func,
 	unlikeCat: PropTypes.func
 }
-
 CatScreen.defaultProps = {
 	cat: {
 		id: null,
@@ -410,14 +391,12 @@ CatScreen.defaultProps = {
 	toggleCatScreenEditing,
 	unlikeCat
 }
-
 const mapStateToProps = (state, ownProps) => {
 	return {
 		...state.app,
 		...ownProps
 	}
 }
-
 export default connect(
 	mapStateToProps,
 	{

@@ -24,5 +24,5 @@ export const style = {
 	},
 	textInput: {
 		// paddingTop: 2
-	},
+	}
 }

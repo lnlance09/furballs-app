@@ -12,10 +12,10 @@ export const addToS3 = async ({ contentType, fileName, img }) => {
 			contentType,
 			level: "public",
 			progressCallback(progress) {
-				console.log(`Uploaded: ${progress.loaded}/${progress.total}`);
+				console.log(`Uploaded: ${progress.loaded}/${progress.total}`)
 			}
 		})
 	} catch (err) {
-		console.log('error: ', err)
+		console.log("error: ", err)
 	}
 }

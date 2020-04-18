@@ -14,7 +14,7 @@ const getAsyncStorage = () => {
 			AsyncStorage.getItem("token").then(token => {
 				console.log("store")
 				console.log(token)
-				dispatch( setUserData({ token, user }) )
+				dispatch(setUserData({ token, user }))
 			})
 		})
 	}

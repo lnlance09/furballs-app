@@ -27,7 +27,7 @@ export const style = {
 	},
 	homelessText: {
 		color: Colors.black,
-		fontSize: 15,
+		fontSize: 15
 	},
 	map: {
 		borderColor: Colors.tabIconDefault,

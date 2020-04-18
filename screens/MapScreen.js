@@ -18,10 +18,7 @@ class MapScreen extends Component {
 
 		this.state = {
 			index: 0,
-			routes: [
-				{ key: "map", title: "Map" },
-				{ key: "list", title: "List" }
-			]
+			routes: [{ key: "map", title: "Map" }, { key: "list", title: "List" }]
 		}
 
 		this.onRegionChange = this.onRegionChange.bind(this)

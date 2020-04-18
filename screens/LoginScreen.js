@@ -37,10 +37,17 @@ class LoginScreen extends Component {
 
 	toggleLoginForm = () => this.setState({ showLoginForm: !this.state.showLoginForm })
 
-	toggleRegistrationForm = () => this.setState({ showLoginForm: !this.state.showLoginForm, showRegistrationForm: !this.state.showRegistrationForm })
+	toggleRegistrationForm = () =>
+		this.setState({
+			showLoginForm: !this.state.showLoginForm,
+			showRegistrationForm: !this.state.showRegistrationForm
+		})
 
 	toggleResetForm = () => {
-		this.setState({ showResetForm: !this.state.showResetForm, showLoginForm: !this.state.showLoginForm })
+		this.setState({
+			showResetForm: !this.state.showResetForm,
+			showLoginForm: !this.state.showLoginForm
+		})
 	}
 
 	render() {
@@ -80,12 +87,7 @@ class LoginScreen extends Component {
 						/>
 					)}
 
-					{showVerificationForm && (
-						<VerifyForm
-							navigation={this.props.navigation}
-
-						/>
-					)}
+					{showVerificationForm && <VerifyForm navigation={this.props.navigation} />}
 				</Container>
 			</Container>
 		)
