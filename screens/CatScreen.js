@@ -45,17 +45,12 @@ class CatScreen extends Component {
 	}
 
 	async componentDidMount() {
-		console.log("componentDidMount")
-
 		this.willFocusCatPage = this.props.navigation.addListener("willFocus", () => {
 			const _state = store.getState()
-			console.log("did mount sss")
-			console.log(_state)
 			const user = _state.user
 			const auth = user.token === null ? false : true
 			const bearer = auth ? user.token : null
 			this.setState({ auth, bearer, user })
-			console.log(user)
 
 			const id = this.props.navigation.getParam("id", null)
 			this.props.getCat({ bearer, id })
@@ -160,7 +155,6 @@ class CatScreen extends Component {
 		} = cat
 		const { navigate } = this.props.navigation
 		const canEdit = auth && userId === user.id
-		console.log("props cat screen")
 
 		const MapSection = () => (
 			<View>

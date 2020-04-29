@@ -27,7 +27,6 @@ class CatGrid extends Component {
 	}
 
 	componentDidMount() {
-		console.log("cat grid componentDidMount")
 		this.getCats()
 		this.willFocusCatGrid = this.props.navigation.addListener("willFocus", () => {
 			this.getCats()
@@ -42,15 +41,12 @@ class CatGrid extends Component {
 		const { cats, page } = this.state
 		this.setState({ isLoading: true })
 
-		console.log("get cats")
 		fetch(`${constants.BASE_URL}api/users/getLikedCats?id=${this.props.user.id}&page=${page}`, {
 			headers: {
 				"Content-Type": "application/json"
 			}
 		})
 			.then(response => {
-				console.log("get cats response")
-				console.log(response)
 				return response.json()
 			})
 			.then(json => {

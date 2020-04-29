@@ -1,16 +1,13 @@
 import ButtonComponent from "@components/primary/ButtonComponent"
 import PropTypes from "prop-types"
-import store from "@store"
 import React, { Component } from "react"
-import { validateEmail } from "@tools/textFunctions"
 import { connect } from "react-redux"
 import { style } from "./styles/LoginForm"
 import { login } from "@redux/actions/user"
-import { Dimensions, StyleSheet, View } from "react-native"
+import { StyleSheet, View } from "react-native"
 import { TextField } from "react-native-material-textfield"
-import { Container, Text, Toast } from "native-base"
+import { Container, Text } from "native-base"
 
-const { width } = Dimensions.get("window")
 const styles = StyleSheet.create(style)
 
 class LoginForm extends Component {
@@ -35,17 +32,12 @@ class LoginForm extends Component {
 			return null
 		}
 
-		const login = await this.props.login({
+		await this.props.login({
 			email,
 			navigate: this.navigate,
 			password,
-			redirect: true,
-			verified: true
+			redirect: true
 		})
-
-		console.log("login")
-		console.log(login)
-		return login
 	}
 
 	render() {

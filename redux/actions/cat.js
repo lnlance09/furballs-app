@@ -1,4 +1,6 @@
 import * as constants from "@redux/types"
+import axios from "axios"
+import queryString from "query-string"
 import { Toast } from "native-base"
 import { addToS3 } from "@tools/awsFunctions"
 import { randomString } from "@tools/textFunctions"
@@ -8,65 +10,48 @@ export const addCatPic = ({ bearer, img, lat, lon }) => dispatch => {
 	dispatch(addToS3({ contentType: "image/jpeg", fileName, img }))
 }
 
-export const getCat = ({ bearer, id }) => dispatch => {
-	let headers = {
-		"Content-Type": "application/json"
-	}
-
-	if (bearer) {
-		headers.Authorization = bearer
-	}
-
-	console.log(bearer)
-
-	fetch(`${constants.BASE_URL}api/cats/get?id=${id}`, {
-		headers
-	})
+export const getCat = ({ bearer, id }) => async dispatch => {
+	return await axios
+		.get(`${constants.BASE_URL}api/cats/get?id=${id}`)
 		.then(response => {
-			console.log(response)
-			return response.json()
-		})
-		.then(json => {
+			const { data } = response
+			if (data.error) {
+				return
+			}
+
 			dispatch({
-				type: constants.GET_CAT,
-				payload: json
+				payload: data,
+				type: constants.GET_CAT
 			})
 		})
 		.catch(error => {
 			console.error(error)
+			return error
 		})
 }
 
-export const likeCat = ({ bearer, id }) => dispatch => {
-	let headers = {
-		Accept: "application/json",
-		"Content-Type": "application/json"
-	}
-
-	if (bearer) {
-		headers.Authorization = bearer
-	}
-
-	fetch(`${constants.BASE_URL}api/cats/like`, {
-		body: JSON.stringify({
-			cat_id: id
-		}),
-		headers,
-		method: "POST"
-	})
+export const likeCat = ({ bearer, id }) => async dispatch => {
+	return await axios
+		.post(
+			`${constants.BASE_URL}api/cats/like`,
+			queryString.stringify({
+				id
+			})
+		)
 		.then(response => {
-			console.log("like cat response")
-			console.log(response)
-			return response.json()
-		})
-		.then(json => {
+			const { data } = response
+			if (data.error) {
+				return
+			}
+
 			dispatch({
-				type: constants.LIKE_CAT,
-				payload: json
+				payload: data,
+				type: constants.LIKE_CAT
 			})
 		})
 		.catch(error => {
 			console.error(error)
+			return error
 		})
 }
 
@@ -76,21 +61,23 @@ export const resetCat = () => dispatch => {
 	})
 }
 
-export const searchCatsByLocation = ({ lat, lon }) => dispatch => {
-	fetch(`${constants.BASE_URL}api/cats/browseCatsByLocation?lat=${lat}&lon=${lon}`, {
-		headers: {
-			"Content-Type": "application/json"
-		}
-	})
-		.then(response => response.json())
-		.then(json => {
+export const searchCatsByLocation = ({ lat, lon }) => async dispatch => {
+	return await axios
+		.get(`${constants.BASE_URL}api/cats/browseCatsByLocation?lat=${lat}&lon=${lon}`)
+		.then(response => {
+			const { data } = response
+			if (data.error) {
+				return
+			}
+
 			dispatch({
-				payload: json,
+				payload: data,
 				type: constants.SEARCH_CATS_BY_LOCATION
 			})
 		})
 		.catch(error => {
 			console.error(error)
+			return error
 		})
 }
 
@@ -107,31 +94,27 @@ export const toggleCatPageEditing = () => dispatch => {
 	})
 }
 
-export const unlikeCat = ({ bearer, id }) => dispatch => {
-	let headers = {
-		Accept: "application/json",
-		"Content-Type": "application/json"
-	}
+export const unlikeCat = ({ bearer, id }) => async dispatch => {
+	return await axios
+		.post(
+			`${constants.BASE_URL}api/cats/unlike`,
+			queryString.stringify({
+				id
+			})
+		)
+		.then(response => {
+			const { data } = response
+			if (data.error) {
+				return
+			}
 
-	if (bearer) {
-		headers.Authorization = bearer
-	}
-
-	fetch(`${constants.BASE_URL}api/cats/unlike`, {
-		body: JSON.stringify({
-			cat_id: id
-		}),
-		headers,
-		method: "POST"
-	})
-		.then(response => response.json())
-		.then(json => {
 			dispatch({
-				payload: json,
+				payload: data,
 				type: constants.UNLIKE_CAT
 			})
 		})
 		.catch(error => {
 			console.error(error)
+			return error
 		})
 }

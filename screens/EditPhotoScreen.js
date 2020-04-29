@@ -34,7 +34,6 @@ class EditPhotoScreen extends Component {
 
 	async componentDidMount() {
 		const img = this.props.navigation.getParam("img", {})
-		console.log("EditPhotoScreen componentDidMount")
 		this.setState({ img })
 	}
 
@@ -47,8 +46,6 @@ class EditPhotoScreen extends Component {
 		const _state = store.getState()
 		const bearer = _state.user.token
 
-		console.log("submitCat")
-		console.log(location)
 		this.props.addCatPic({ bearer, img, lat, lon })
 	}
 

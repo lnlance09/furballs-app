@@ -1,4 +1,6 @@
 import * as constants from "@redux/types"
+import axios from "axios"
+import queryString from "query-string"
 import { Toast } from "native-base"
 import {
 	deleteItemFromStorage,
@@ -6,122 +8,116 @@ import {
 	saveItemToStorage
 } from "@tools/storageFunctions"
 import { addToS3 } from "@tools/awsFunctions"
+import { AsyncStorage } from "react-native"
 
-export const fetchUser = ({ id }) => dispatch => {
-	fetch(`${constants.BASE_URL}api/users/get?id=${id}`, {
-		headers: {
-			"Content-Type": "application/json"
-		}
-	})
+export const fetchUser = ({ id }) => async dispatch => {
+	return await axios
+		.get(`${constants.BASE_URL}api/users/get?id=${id}`)
 		.then(response => {
-			console.log("response fetch user")
-			console.log(response)
-			return response.json()
-		})
-		.then(json => {
+			const { data } = response
+			if (data.error) {
+				return
+			}
+
 			dispatch({
-				payload: json,
+				payload: data,
 				type: constants.FETCH_USER
 			})
 		})
 		.catch(error => {
 			console.error(error)
+			return error
 		})
 }
 
-export const login = ({ email, navigate, password, redirect, verified }) => async dispatch => {
-	return await fetch(`${constants.BASE_URL}api/users/login`, {
-		body: JSON.stringify({
-			email,
-			password
-		}),
-		headers: {
-			Accept: "application/json",
-			"Content-Type": "application/json"
-		},
-		method: "POST"
-	})
-		.then(response => {
-			console.log("response login")
-			console.log(response)
-			return response.json()
+export const getAsyncStorage = () => async dispatch => {
+	AsyncStorage.getItem("user").then(result => {
+		const user = JSON.parse(result)
+		AsyncStorage.getItem("token").then(token => {
+			dispatch(setUserData({ token, user }))
 		})
-		.then(json => {
-			console.log("login action")
-			console.log(json)
-			console.log(email)
-			console.log(password)
+	})
+}
 
-			if (json.error) {
+export const login = ({ email, navigate, password, redirect }) => async dispatch => {
+	return await axios
+		.post(
+			`${constants.BASE_URL}api/users/login`,
+			queryString.stringify({
+				email,
+				password
+			})
+		)
+		.then(async response => {
+			const { data } = response
+			if (data.error) {
 				Toast.show({
 					buttonText: null,
 					style: {
 						bottom: 64
 					},
-					text: "There was an error",
+					text: data.error,
 					type: "danger"
 				})
-				return json
+				return
 			}
 
-			json.user.email_verified = verified
-			dispatch(setUserData({ token: json.token, user: json.user }))
+			const { token, user } = data
+			await dispatch( await setUserData({ token, user }))
 
-			if (redirect) {
-				navigate("Profile")
+			if (user.email_verified === "0") {
+				navigate("VerificationCode")
+				return
 			}
 
-			return json
+			navigate("Profile")
 		})
 		.catch(error => {
-			return error
 			console.error(error)
+			return error
 		})
 }
 
-export const logout = () => dispatch => {
-	deleteItemFromStorage("user")
-	deleteItemFromStorage("token")
+export const logout = () => async dispatch => {
+	await deleteItemFromStorage("user")
+	await deleteItemFromStorage("token")
 	dispatch({
 		type: constants.LOGOUT
 	})
 }
 
-export const register = ({ email, name, navigate, password, username, uuid }) => dispatch => {
-	fetch(`${constants.BASE_URL}api/users/register`, {
-		body: JSON.stringify({
-			email,
-			name,
-			password,
-			username,
-			uuid
-		}),
-		headers: {
-			Accept: "application/json",
-			"Content-Type": "application/json"
-		},
-		method: "POST"
-	})
-		.then(response => {
-			return response.json()
-		})
-		.then(json => {
-			if (json.error) {
+export const register = ({ email, name, navigate, password, username }) => async dispatch => {
+	return await axios
+		.post(
+			`${constants.BASE_URL}api/users/register`,
+			queryString.stringify({
+				email,
+				name,
+				password,
+				username
+			})
+		)
+		.then(async response => {
+			const { data } = response
+			if (data.error) {
 				Toast.show({
 					buttonText: null,
 					style: {
 						bottom: 64
 					},
-					text: "There was an error",
+					text: data.error,
 					type: "danger"
 				})
-			} else {
-				dispatch(setUserData({ token: json.token, user: json.user }))
-				navigate("VerificationCode")
+				return
 			}
+
+			const { token, user } = data
+			await dispatch(await setUserData({ token, user }))
+			navigate("VerificationCode")
 		})
 		.catch(error => {
 			console.error(error)
+			return error
 		})
 }
 
@@ -132,68 +128,81 @@ export const setRegion = region => dispatch => {
 	})
 }
 
-export const setUserData = ({ token, user }) => {
-	console.log("setUserData action")
-	console.log(user)
-	console.log(JSON.stringify(user))
-	console.log(token)
-
+export const setUserData = ({ token, user }) => async dispatch => {
 	if (token) {
-		saveItemToStorage("token", token)
+		await saveItemToStorage("token", token)
 	}
 
-	saveItemToStorage("user", JSON.stringify(user))
+	await saveItemToStorage("user", JSON.stringify(user))
 
-	return {
+	await dispatch({
 		payload: {
 			token,
 			user
 		},
 		type: constants.SET_USER_DATA
-	}
+	})
 }
 
-export const updateUser = ({ bearer, data, id }) => dispatch => {
-	let headers = {
-		Accept: "application/json",
-		Authorization: bearer,
-		"Content-Type": "application/json"
+export const updateUser = ({ bearer, data, id }) => async dispatch => {
+	const postData = JSON.stringify({
+		data,
+		id
+	})
+	const headers = {
+		Authorization: bearer
 	}
 
-	fetch(`${constants.BASE_URL}api/users/update`, {
-		body: JSON.stringify({
-			data,
-			id: id
-		}),
-		headers,
-		method: "POST"
-	})
+	return await fetch(`${constants.BASE_URL}api/users/update`, {
+			body: postData,
+			headers,
+			method: "POST"
+		})
 		.then(response => {
-			console.log("updateUser response")
-			console.log(response)
 			return response.json()
 		})
 		.then(json => {
-			console.log(json)
-			if (!json.error) {
-				dispatch({
-					payload: json,
-					type: constants.UPDATE_USER
-				})
+			if (json.error) {
+				return
 			}
+
+			dispatch({
+				payload: json,
+				type: constants.SET_USER_DATA
+			})
 		})
 		.catch(error => {
 			console.error(error)
 		})
 }
 
-export const verifyEmail = () => dispatch => {
-	let user = getItemFromStorage()
-	user.email_verified = true
+export const verifyEmail = ({ bearer, code, correctCode, id, navigate }) => async dispatch => {
+	if (code === correctCode) {
+		let user = await getItemFromStorage()
+		user = JSON.parse(user)
+		user.email_verified = "1"
+		await saveItemToStorage("user", JSON.stringify(user))
 
-	saveItemToStorage("user", JSON.stringify(user))
+		await dispatch(
+			await updateUser({
+				bearer,
+				data: {
+					email_verified: 1
+				},
+				id
+			})
+		)
 
-	dispatch({
-		type: constants.VERIFY_EMAIL
+		navigate("Profile")
+		return
+	}
+
+	Toast.show({
+		buttonText: null,
+		style: {
+			bottom: 64
+		},
+		text: "That code is incorrect",
+		type: "danger"
 	})
 }

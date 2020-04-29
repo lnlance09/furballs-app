@@ -44,14 +44,10 @@ class ProfileScreen extends Component {
 
 	checkUser() {
 		const _state = store.getState()
-		const user = _state.user.user
-		const bearer = _state.user.token
-		const verified = user.email_verified
-		const auth = bearer === null ? false : true
-		this.setState({ auth, bearer, verified })
-
-		console.log("componentDidMount profile screen")
-		console.log(_state)
+		const { token, user } = _state.user
+		const verified = user.email_verified === true
+		const auth = token === null ? false : true
+		this.setState({ auth, bearer: token, verified })
 
 		if (!auth) {
 			this.navigate("Login")
@@ -62,6 +58,11 @@ class ProfileScreen extends Component {
 			this.navigate("VerificationCode")
 			return
 		}
+	}
+
+	onPressLogout = async () => {
+		await this.props.logout()
+		this.navigate("Login")
 	}
 
 	async toggleCameraPermission(on) {
@@ -81,11 +82,6 @@ class ProfileScreen extends Component {
 	}
 
 	render() {
-		console.log("profile screen props")
-		console.log(this.props.user)
-		console.log("profile screen state")
-		console.log(this.state)
-
 		const { auth, hasCameraPermission, settingsVisible, verified } = this.state
 		const { navigation, user } = this.props
 		const { navigate } = navigation
@@ -96,10 +92,7 @@ class ProfileScreen extends Component {
 					<ListItem
 						bottomDivider
 						key="logoutListItem"
-						onPress={() => {
-							this.props.logout()
-							navigate("Login")
-						}}
+						onPress={() => this.onPressLogout()}
 						subtitle={null}
 						title="Logout"
 					/>
@@ -109,46 +102,44 @@ class ProfileScreen extends Component {
 
 		return (
 			<Container>
-				{auth && verified ? (
-					<View>
-						<AppHeader
-							left={() => null}
-							right={() => (
-								<Icon
-									color={Colors.black}
-									name="cog"
-									onPress={() => this.toggleSettingsVisibility()}
-									type="font-awesome"
-								/>
-							)}
-							title="Profile"
-						/>
-
-						{settingsVisible ? (
-							SettingsSection
-						) : (
-							<ScrollView>
-								<View style={styles.imageWrapper}>
-									<Avatar
-										icon={{ name: "home" }}
-										onEditPress={() => {
-											navigate("CameraRoll")
-										}}
-										rounded
-										showEditButton
-										size="large"
-									/>
-								</View>
-								<Text style={styles.h1}>{user.name}</Text>
-								<Text style={styles.usernameText}>@{user.username}</Text>
-
-								<View style={{ marginTop: 12 }}>
-									<CatGrid navigation={navigation} user={user} />
-								</View>
-							</ScrollView>
+				<View>
+					<AppHeader
+						left={() => null}
+						right={() => (
+							<Icon
+								color={Colors.black}
+								name="cog"
+								onPress={() => this.toggleSettingsVisibility()}
+								type="font-awesome"
+							/>
 						)}
-					</View>
-				) : null}
+						title="Profile"
+					/>
+
+					{settingsVisible ? (
+						SettingsSection
+					) : (
+						<ScrollView>
+							<View style={styles.imageWrapper}>
+								<Avatar
+									icon={{ name: "home" }}
+									onEditPress={() => {
+										navigate("CameraRoll")
+									}}
+									rounded
+									showEditButton
+									size="large"
+								/>
+							</View>
+							<Text style={styles.h1}>{user.name}</Text>
+							<Text style={styles.usernameText}>@{user.username}</Text>
+
+							<View style={{ marginTop: 12 }}>
+								<CatGrid navigation={navigation} user={user} />
+							</View>
+						</ScrollView>
+					)}
+				</View>
 			</Container>
 		)
 	}

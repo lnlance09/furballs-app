@@ -30,8 +30,6 @@ class CarouselComponent extends Component {
 	}
 
 	renderItem(data) {
-		console.log("renderItem")
-		console.log(data)
 		return (
 			<View style={{ padding: 7 }}>
 				<Image

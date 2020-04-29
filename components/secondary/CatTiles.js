@@ -65,7 +65,6 @@ class CatTiles extends Component {
 			}
 		})
 			.then(response => {
-				console.log(response)
 				return response.json()
 			})
 			.then(json => {
@@ -94,7 +93,6 @@ class CatTiles extends Component {
 					onRefresh={this.handleRefresh}
 					refreshing={isRefreshing}
 					renderItem={({ item, index }) => {
-						console.log(parseInt(item.living_situation, 10))
 						let borderColor = Colors.strayCat
 						if (parseInt(item.living_situation, 10) === 1) {
 							borderColor = Colors.businessCat

@@ -65,7 +65,6 @@ class CaptureScreen extends Component {
 
 	async startRecording() {
 		if (this.video) {
-			console.log("start recording")
 			this.setState({ recording: true }, async () => {
 				const video = await this.video.recordAsync()
 				this.setState({ video })
@@ -103,8 +102,6 @@ class CaptureScreen extends Component {
 				}
 
 				this.setState({ img: data.uri }, () => {
-					console.log("cat pic")
-					console.log(data)
 					this.navigate("EditPhoto", {
 						img: data
 					})
@@ -124,9 +121,6 @@ class CaptureScreen extends Component {
 		const { navigate } = this.props.navigation
 		const displayHeader = showHeader || index === 1
 		const headerTitle = index === 0 ? "Take a picture" : "Pick a photo"
-		console.log("hasCameraPermission")
-		console.log(hasCameraPermission)
-		console.log(index)
 
 		const CameraView = (
 			<View style={styles.cameraView}>

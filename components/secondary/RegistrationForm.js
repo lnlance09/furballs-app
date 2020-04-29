@@ -42,55 +42,6 @@ class RegistrationForm extends Component {
 	}
 
 	submitRegistrationForm(email, name, password, username) {
-		if (name === "") {
-			Toast.show({
-				style: {
-					bottom: 64
-				},
-				text: "Please enter your name",
-				type: "danger"
-			})
-			return
-		}
-
-		console.log("check username")
-		const check = this.checkUsername(username)
-		check.then(check => {
-			if (check.error) {
-				Toast.show({
-					style: {
-						bottom: 64
-					},
-					text: check.error,
-					type: "danger"
-				})
-				return check
-			}
-		})
-
-		console.log("after check username")
-		if (!validateEmail(email)) {
-			Toast.show({
-				style: {
-					bottom: 64
-				},
-				text: "Please enter a valid email address",
-				type: "danger"
-			})
-			return
-		}
-
-		if (password.length < 7) {
-			Toast.show({
-				style: {
-					bottom: 64
-				},
-				text: "Your password must contain at least 7 characters",
-				type: "danger"
-			})
-			return
-		}
-
 		this.props.register({
 			email,
 			name,
@@ -117,7 +68,7 @@ class RegistrationForm extends Component {
 		const MainForm = (
 			<Container style={styles.formContainer}>
 				<TextField
-					autoCompleteType="name"
+					autoCapitalize="words"
 					label="Name"
 					onChangeText={name => {
 						this.setState({ name })
@@ -126,7 +77,7 @@ class RegistrationForm extends Component {
 					value={name}
 				/>
 				<TextField
-					autoCompleteType="username"
+					autoCapitalize="none"
 					label="Username"
 					onChangeText={username => {
 						this.setState({ username })
@@ -146,7 +97,6 @@ class RegistrationForm extends Component {
 					value={email}
 				/>
 				<TextField
-					autoCompleteType="password"
 					label="Password"
 					onChangeText={password => {
 						this.setState({ password })

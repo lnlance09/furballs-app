@@ -24,50 +24,35 @@ class VerificationCodeScreen extends Component {
 		this.navigate = navigate
 
 		const _state = store.getState()
-		const user = _state.app.user
+		const { token, user } = _state.user
 
-		console.log("user")
-		console.log(user)
-
+		console.log("VerificationCodeScreen")
+		console.log(_state)
 		this.state = {
 			code: "",
+			token,
 			user
 		}
 	}
 
 	async submitVerificationCode(code) {
+		const _state = store.getState()
+		const { token, user } = _state.user
 		console.log("submitVerificationCode")
 		console.log(code)
+		console.log(user)
+		console.log(token)
 
-		const _state = store.getState()
-		const user = _state.app.user
-		const email = user.email
-
-		if (code.length !== 6) {
+		if (code.length !== 8) {
 			return
 		}
 
-		console.log("email")
-		console.log(email)
-
-		Auth.confirmSignUp(email, code, {
-			forceAliasCreation: true
+		this.props.verifyEmail({
+			bearer: token,
+			code,
+			correctCode: user.code,
+			navigate: this.navigate
 		})
-			.then(data => {
-				this.props.verifyEmail()
-				this.navigate("Profile")
-			})
-			.catch(err => {
-				console.log(err)
-				Toast.show({
-					buttonText: null,
-					style: {
-						bottom: 64
-					},
-					text: err.message,
-					type: "danger"
-				})
-			})
 	}
 
 	async checkEmailVerification(id) {
@@ -82,12 +67,6 @@ class VerificationCodeScreen extends Component {
 		console.log(json)
 		return json
 		*/
-
-		Auth.currentAuthenticatedUser({
-			bypassCache: true
-		})
-			.then(user => console.log(user))
-			.catch(err => console.log(err))
 	}
 
 	render() {
@@ -120,19 +99,20 @@ class VerificationCodeScreen extends Component {
 					title="Verify"
 				/>
 				<Container style={styles.container}>
-					<Text
-						onPress={() => {
-							this.props.logout()
-							this.navigate("Login")
-						}}
-						style={styles.verifyText}
-					>
-						Please verify your email
-					</Text>
+					<Text style={styles.verifyText}>Please verify your email</Text>
 					<RegisterPic width={width} height={170} />
+					<TextField
+						autoCapitalize="none"
+						label="Verification code"
+						onChangeText={code => {
+							this.setState({ code })
+						}}
+						style={styles.textInput}
+						value={code}
+					/>
 					<SubmitFormButton
-						callback={() => this.checkEmailVerification(user.id)}
-						text="I've verified my email"
+						callback={() => this.submitVerificationCode(code)}
+						text="Enter code"
 					/>
 					<Text
 						onPress={() => {

@@ -10,7 +10,7 @@ export const deleteItemFromStorage = async item => {
 
 export const getItemFromStorage = async () => {
 	try {
-		await AsyncStorage.getItem("user")
+		return await AsyncStorage.getItem("user")
 	} catch (error) {
 		console.error(error.message)
 	}

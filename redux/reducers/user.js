@@ -45,13 +45,13 @@ const user = (state = initial(), action) => {
 			if (payload.user !== null) {
 				user = {
 					...state.user,
+					code: payload.user.verification_code,
 					email: payload.user.email,
-					email_verified: payload.user.email_verified,
+					email_verified: payload.user.email_verified === "1",
 					id: payload.user.id,
 					img: payload.user.img,
 					name: payload.user.name,
-					username: payload.user.username,
-					uuid: payload.user.sub
+					username: payload.user.username
 				}
 			}
 
@@ -64,24 +64,7 @@ const user = (state = initial(), action) => {
 		case constants.UPDATE_USER:
 			return {
 				...state,
-				user: {
-					...state.user,
-					email: payload.user.email,
-					id: payload.user.id,
-					img: payload.user.img,
-					name: payload.user.name,
-					username: payload.user.username,
-					uuid: payload.user.uuid
-				}
-			}
-
-		case constants.VERIFY_EMAIL:
-			return {
-				...state,
-				user: {
-					...state.user,
-					email_verified: true
-				}
+				user: payload.user
 			}
 
 		default:

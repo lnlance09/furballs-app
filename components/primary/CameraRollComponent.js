@@ -79,8 +79,6 @@ class CameraRollComponent extends Component {
 
 	render() {
 		const { hasCameraRollPermission, isRefreshing, photos } = this.state
-		console.log("CameraRollComponent")
-		console.log(this.state)
 
 		return (
 			<View style={styles.listContainer}>

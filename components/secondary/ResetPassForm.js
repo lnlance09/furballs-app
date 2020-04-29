@@ -55,8 +55,6 @@ class ResetPassForm extends Component {
 	render() {
 		const { email } = this.state
 
-		console.log("reset pass form")
-
 		const SubmitFormButton = ({ callback, text }) => {
 			return (
 				<ButtonComponent
