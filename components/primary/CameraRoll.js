@@ -1,10 +1,10 @@
 import * as Permissions from "expo-permissions"
-import Colors from "@constants/Colors"
-import PropTypes from "prop-types"
-import React, { Component } from "react"
 import { style } from "./styles/CameraRoll"
 import { CameraRoll, Dimensions, Image, StyleSheet, TouchableHighlight, View } from "react-native"
 import { FlatGrid } from "react-native-super-grid"
+import Colors from "@constants/Colors"
+import PropTypes from "prop-types"
+import React, { Component } from "react"
 
 const { width } = Dimensions.get("window")
 

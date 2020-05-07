@@ -1,12 +1,13 @@
-import ButtonComponent from "@components/primary/ButtonComponent"
-import PropTypes from "prop-types"
-import React, { Component } from "react"
-import { connect } from "react-redux"
 import { style } from "./styles/LoginForm"
+import { connect } from "react-redux"
 import { login } from "@redux/actions/user"
 import { StyleSheet, View } from "react-native"
+import { Container } from "native-base"
 import { TextField } from "react-native-material-textfield"
-import { Container, Text } from "native-base"
+import Button from "@components/primary/Button"
+import PropTypes from "prop-types"
+import React, { Component } from "react"
+import StyledText from "@components/primary/StyledText"
 
 const styles = StyleSheet.create(style)
 
@@ -23,13 +24,13 @@ class LoginForm extends Component {
 		}
 	}
 
-	async submitLoginForm(email, password) {
+	submitLoginForm = async (email, password) => {
 		if (email === "") {
-			return null
+			return
 		}
 
 		if (password === "") {
-			return null
+			return
 		}
 
 		await this.props.login({
@@ -45,7 +46,7 @@ class LoginForm extends Component {
 
 		const SubmitFormButton = ({ callback, text }) => {
 			return (
-				<ButtonComponent
+				<Button
 					buttonStyle={styles.formSubmitBtn}
 					onPress={() => callback()}
 					text={text}
@@ -78,22 +79,20 @@ class LoginForm extends Component {
 					callback={() => this.submitLoginForm(email, password)}
 					text="Sign In"
 				/>
-				<Text
+				<StyledText
 					onPress={() => {
 						this.props.toggleResetForm()
 					}}
 					style={styles.formSubText}
-				>
-					Forgot password?
-				</Text>
-				<Text
+					text="Forgot password?"
+				/>
+				<StyledText
 					onPress={() => {
 						this.props.toggleRegistrationForm()
 					}}
 					style={styles.formSubText}
-				>
-					Sign Up
-				</Text>
+					text="Sign Up"
+				/>
 			</View>
 		)
 

@@ -1,13 +1,13 @@
-import AppHeader from "@components/primary/AppHeader"
-import ButtonComponent from "@components/primary/ButtonComponent"
-import PropTypes from "prop-types"
-import React, { Component } from "react"
+import { style } from "./styles/ChangePassword"
 import { connect } from "react-redux"
-import { style } from "./styles/ChangePasswordScreen"
 import { changePassword } from "@redux/actions/user"
 import { StyleSheet } from "react-native"
 import { TextField } from "react-native-material-textfield"
 import { Container, Toast } from "native-base"
+import AppHeader from "@components/primary/AppHeader"
+import Button from "@components/primary/Button"
+import PropTypes from "prop-types"
+import React, { Component } from "react"
 
 const styles = StyleSheet.create(style)
 
@@ -54,7 +54,7 @@ class ChangePasswordScreen extends Component {
 
 		const SubmitFormButton = ({ callback, text }) => {
 			return (
-				<ButtonComponent
+				<Button
 					buttonStyle={styles.formSubmitBtn}
 					onPress={() => callback()}
 					text={text}

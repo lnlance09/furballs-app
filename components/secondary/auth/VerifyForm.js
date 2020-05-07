@@ -1,14 +1,15 @@
-import ButtonComponent from "@components/primary/ButtonComponent"
-import PropTypes from "prop-types"
-import store from "@store"
-import React, { Component } from "react"
-import { validateEmail } from "@tools/textFunctions"
-import { connect } from "react-redux"
 import { style } from "./styles/LoginForm"
+import { connect } from "react-redux"
+import { validateEmail } from "@tools/textFunctions"
 import { register } from "@redux/actions/user"
 import { Dimensions, StyleSheet, View } from "react-native"
 import { TextField } from "react-native-material-textfield"
-import { Container, Text, Toast } from "native-base"
+import { Container, Toast } from "native-base"
+import Button from "@components/primary/Button"
+import PropTypes from "prop-types"
+import React, { Component } from "react"
+import store from "@store"
+import StyledText from "@components/primary/StyledText"
 
 const { width } = Dimensions.get("window")
 const styles = StyleSheet.create(style)
@@ -56,7 +57,7 @@ class VerifyForm extends Component {
 
 		const SubmitFormButton = ({ callback, text }) => {
 			return (
-				<ButtonComponent
+				<Button
 					buttonStyle={styles.formSubmitBtn}
 					onPress={() => callback()}
 					text={text}
@@ -88,9 +89,11 @@ class VerifyForm extends Component {
 					callback={() => this.submitVerificationCode(code, email, password)}
 					text="Submit"
 				/>
-				<Text onPress={() => {}} style={styles.formSubText}>
-					Cancel
-				</Text>
+				<StyledText
+					onPress={() => {}}
+					style={styles.formSubText}
+					text="Cancel"
+				/>
 			</Container>
 		)
 

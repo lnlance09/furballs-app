@@ -1,8 +1,9 @@
+import { style } from "./styles/Button"
+import { StyleSheet } from "react-native"
+import { Button } from "native-base"
 import PropTypes from "prop-types"
 import React, { Component } from "react"
-import { Button } from "native-base"
-import { StyleSheet, Text } from "react-native"
-import { style } from "./styles/Button"
+import StyledText from "@components/primary/StyledText"
 
 const styles = StyleSheet.create(style)
 
@@ -11,8 +12,15 @@ class ButtonComponent extends Component {
 		const { buttonStyle, onPress, text, textStyle } = this.props
 
 		return (
-			<Button block onPress={() => onPress()} style={[styles.button, buttonStyle]}>
-				<Text style={[styles.text, textStyle]}>{text}</Text>
+			<Button
+				block
+				onPress={() => onPress()}
+				style={[styles.button, buttonStyle]}
+			>
+				<StyledText
+					style={[styles.text, textStyle]}
+					text={text}
+				/>
 			</Button>
 		)
 	}

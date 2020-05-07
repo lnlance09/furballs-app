@@ -1,14 +1,14 @@
 import * as Permissions from "expo-permissions"
-import AppHeader from "@components/primary/AppHeader"
-import CameraRollComponent from "@components/primary/CameraRollComponent"
-import Colors from "@constants/Colors"
-import PropTypes from "prop-types"
-import React, { Component } from "react"
-import { style } from "./styles/CameraRollScreen"
+import { style } from "./styles/CameraRoll"
 import { connect } from "react-redux"
 import { CameraRoll, Dimensions, Image, StyleSheet, TouchableHighlight, View } from "react-native"
 import { Icon } from "react-native-elements"
 import { FlatGrid } from "react-native-super-grid"
+import AppHeader from "@components/primary/AppHeader"
+import CameraRollComponent from "@components/primary/CameraRoll"
+import Colors from "@constants/Colors"
+import PropTypes from "prop-types"
+import React, { Component } from "react"
 
 const { width } = Dimensions.get("window")
 

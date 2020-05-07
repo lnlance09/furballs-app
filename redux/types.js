@@ -1,5 +1,5 @@
 // export const BASE_URL = "http://ec2-54-188-60-94.us-west-2.compute.amazonaws.com/"
-export const BASE_URL = "http://localhost:8888/cats/"
+export const BASE_URL = "http://192.168.1.229:8888/cats/"
 
 export const ADD_CAT_PIC = "ADD_CAT_PIC"
 export const CHECK_USERNAME = "CHECK_USERNAME"

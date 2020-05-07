@@ -1,8 +1,8 @@
+import { style } from "./styles/Carousel"
+import { ActivityIndicator, Image, StyleSheet, View } from "react-native"
 import Carousel from "react-native-snap-carousel"
 import PropTypes from "prop-types"
 import React, { Component } from "react"
-import { ActivityIndicator, Image, StyleSheet, View } from "react-native"
-import { style } from "./styles/Carousel"
 
 const styles = StyleSheet.create(style)
 

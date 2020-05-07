@@ -1,21 +1,21 @@
-import React from "react"
 import { Platform, View } from "react-native"
 import { createBottomTabNavigator, createStackNavigator } from "react-navigation"
 import { fromLeft } from "react-navigation-transitions"
-import TabBarIcon from "@components/primary/TabBarIcon"
-import AboutScreen from "@screens/AboutScreen"
-import CameraRollScreen from "@screens/CameraRollScreen"
-import CaptureScreen from "@screens/CaptureScreen"
-import CatScreen from "@screens/CatScreen"
-import CatTypeSelectionScreen from "@screens/CatTypeSelectionScreen"
-import ChangePasswordScreen from "@screens/ChangePasswordScreen"
-import EditPhotoScreen from "@screens/EditPhotoScreen"
-import HomeScreen from "@screens/HomeScreen"
-import LoginScreen from "@screens/LoginScreen"
-import MapScreen from "@screens/MapScreen"
-import ProfileScreen from "@screens/ProfileScreen"
-import VerificationCodeScreen from "@screens/VerificationCodeScreen"
 import Colors from "@constants/Colors"
+import TabBarIcon from "@components/primary/TabBarIcon"
+import AboutScreen from "@screens/About"
+import CameraRollScreen from "@screens/CameraRoll"
+import CaptureScreen from "@screens/Capture"
+import CatScreen from "@screens/Cat"
+import CatTypeScreen from "@screens/CatType"
+import ChangePasswordScreen from "@screens/ChangePassword"
+import EditPhotoScreen from "@screens/EditPhoto"
+import HomeScreen from "@screens/Home"
+import LoginScreen from "@screens/Login"
+import MapScreen from "@screens/Map"
+import ProfileScreen from "@screens/Profile"
+import React from "react"
+import VerificationScreen from "@screens/Verification"
 
 const config = Platform.select({
 	default: {},
@@ -25,7 +25,6 @@ const config = Platform.select({
 	}
 })
 
-// Capture stack
 const CaptureStack = createStackNavigator(
 	{
 		Capture: {
@@ -37,8 +36,8 @@ const CaptureStack = createStackNavigator(
 		CameraRoll: {
 			screen: CameraRollScreen
 		},
-		CatTypeSelection: {
-			screen: CatTypeSelectionScreen
+		CatType: {
+			screen: CatTypeScreen
 		}
 	},
 	config
@@ -73,7 +72,6 @@ CaptureStack.navigationOptions = ({ navigation }) => {
 
 CaptureStack.path = ""
 
-// Cat stack
 const CatStack = createStackNavigator(
 	{
 		Cat: {
@@ -106,7 +104,6 @@ CatStack.navigationOptions = {
 
 CatStack.path = "cat/:id"
 
-// Home stack
 const HomeStack = createStackNavigator(
 	{
 		Home: {
@@ -138,7 +135,6 @@ HomeStack.navigationOptions = {
 
 HomeStack.path = "home"
 
-// Map stack
 const MapStack = createStackNavigator(
 	{
 		Map: {
@@ -167,7 +163,6 @@ MapStack.navigationOptions = {
 
 MapStack.path = ""
 
-// Profile stack
 const ProfileStack = createStackNavigator(
 	{
 		Profile: {
@@ -177,7 +172,7 @@ const ProfileStack = createStackNavigator(
 			screen: LoginScreen
 		},
 		VerificationCode: {
-			screen: VerificationCodeScreen
+			screen: VerificationScreen
 		},
 		ChangePassword: {
 			screen: ChangePasswordScreen
@@ -208,7 +203,6 @@ ProfileStack.navigationOptions = {
 
 ProfileStack.path = ""
 
-// About stack
 const AboutStack = createStackNavigator(
 	{
 		About: AboutScreen
@@ -236,7 +230,6 @@ AboutStack.navigationOptions = {
 
 AboutStack.path = ""
 
-// Tab navigator
 const tabNavigator = createBottomTabNavigator(
 	{
 		HomeStack,
@@ -247,10 +240,12 @@ const tabNavigator = createBottomTabNavigator(
 	},
 	{
 		navigationOptions: () => ({
-			tabBarVisible: false
+			tabBarVisible: true
 		}),
 		tabBarOptions: {
 			style: {
+				backgroundColor: "transparent",
+				// opacity: 0.2
 				// borderTopColor: "transparent"
 			},
 			showLabel: false

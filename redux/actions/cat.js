@@ -10,11 +10,12 @@ export const addCatPic = ({ bearer, img, lat, lon }) => dispatch => {
 	dispatch(addToS3({ contentType: "image/jpeg", fileName, img }))
 }
 
-export const getCat = ({ bearer, id }) => async dispatch => {
+export const getCat = ({ id }) => async dispatch => {
 	return await axios
 		.get(`${constants.BASE_URL}api/cats/get?id=${id}`)
 		.then(response => {
 			const { data } = response
+			console.log(data)
 			if (data.error) {
 				return
 			}

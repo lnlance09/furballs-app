@@ -1,14 +1,15 @@
-import ButtonComponent from "@components/primary/ButtonComponent"
-import PropTypes from "prop-types"
-import store from "@store"
-import React, { Component } from "react"
-import { validateEmail } from "@tools/textFunctions"
-import { connect } from "react-redux"
 import { style } from "./styles/LoginForm"
+import { connect } from "react-redux"
+import { validateEmail } from "@tools/textFunctions"
 import { register } from "@redux/actions/user"
 import { Dimensions, StyleSheet, View } from "react-native"
 import { TextField } from "react-native-material-textfield"
-import { Container, Text, Toast } from "native-base"
+import { Container, Toast } from "native-base"
+import Button from "@components/primary/Button"
+import PropTypes from "prop-types"
+import React, { Component } from "react"
+import store from "@store"
+import StyledText from "@components/primary/StyledText"
 
 const { width } = Dimensions.get("window")
 const styles = StyleSheet.create(style)
@@ -56,7 +57,7 @@ class RegistrationForm extends Component {
 
 		const SubmitFormButton = ({ callback, text }) => {
 			return (
-				<ButtonComponent
+				<Button
 					buttonStyle={styles.formSubmitBtn}
 					onPress={() => callback()}
 					text={text}
@@ -109,14 +110,13 @@ class RegistrationForm extends Component {
 					callback={() => this.submitRegistrationForm(email, name, password, username)}
 					text="Sign Up"
 				/>
-				<Text
+				<StyledText
 					onPress={() => {
 						this.props.toggleRegistrationForm()
 					}}
 					style={styles.formSubText}
-				>
-					Sign In
-				</Text>
+					text="Sign In"
+				/>
 			</Container>
 		)
 

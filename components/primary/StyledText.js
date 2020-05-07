@@ -1,17 +1,30 @@
+import { Text } from "react-native"
 import PropTypes from "prop-types"
 import React, { Component } from "react"
-import { Text } from "react-native"
 
-class MonoText extends Component {
+class StyledText extends Component {
 	render() {
-		return <Text style={[this.props.style, { fontFamily: "space-mono" }]} {...this.props} />
+		const { onPress, style, text } = this.props
+
+		return (
+			<Text
+				onPress={() => onPress()}
+				style={[style, { fontFamily: "century-gothic" }]}
+			>
+				{text}
+			</Text>
+		)
 	}
 }
 
-MonoText.propTypes = {
-	style: PropTypes.object
+StyledText.propTypes = {
+	onPress: PropTypes.func,
+	style: PropTypes.object,
+	text: PropTypes.string
 }
 
-MonoText.defaultProps = {}
+StyledText.defaultProps = {
+	onPress: () => null
+}
 
-export default MonoText
+export default StyledText

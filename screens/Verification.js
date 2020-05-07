@@ -1,22 +1,22 @@
-import AppHeader from "@components/primary/AppHeader"
-import ButtonComponent from "@components/primary/ButtonComponent"
-import Colors from "@constants/Colors"
-import PropTypes from "prop-types"
-import RegisterPic from "@assets/images/register.svg"
-import store from "@store"
-import React, { Component } from "react"
-import { logout, verifyEmail } from "@redux/actions/user"
+import { style } from "./styles/Verification"
 import { connect } from "react-redux"
-import { style } from "./styles/VerificationCodeScreen"
+import { logout, verifyEmail } from "@redux/actions/user"
 import { AsyncStorage, Dimensions, StyleSheet } from "react-native"
 import { Icon } from "react-native-elements"
 import { TextField } from "react-native-material-textfield"
 import { Container, Text, Toast } from "native-base"
+import AppHeader from "@components/primary/AppHeader"
+import Button from "@components/primary/Button"
+import Colors from "@constants/Colors"
+import PropTypes from "prop-types"
+import React, { Component } from "react"
+import RegisterPic from "@assets/images/register.svg"
+import store from "@store"
 
 const { width } = Dimensions.get("window")
 const styles = StyleSheet.create(style)
 
-class VerificationCodeScreen extends Component {
+class VerificationScreen extends Component {
 	constructor(props) {
 		super(props)
 
@@ -129,17 +129,17 @@ class VerificationCodeScreen extends Component {
 	}
 }
 
-VerificationCodeScreen.navigationOptions = {
+VerificationScreen.navigationOptions = {
 	header: null
 }
 
-VerificationCodeScreen.propTypes = {
+VerificationScreen.propTypes = {
 	logout: PropTypes.func,
 	navigation: PropTypes.object,
 	verifyEmail: PropTypes.func
 }
 
-VerificationCodeScreen.defaultProps = {
+VerificationScreen.defaultProps = {
 	logout,
 	verifyEmail
 }
@@ -157,4 +157,4 @@ export default connect(
 		logout,
 		verifyEmail
 	}
-)(VerificationCodeScreen)
+)(VerificationScreen)

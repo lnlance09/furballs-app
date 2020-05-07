@@ -1,9 +1,10 @@
 import * as constants from "@redux/types"
+import { style } from "./styles/CatTiles"
+import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import Colors from "@constants/Colors"
 import PropTypes from "prop-types"
+import StyledText from "@components/primary/StyledText"
 import React, { Component } from "react"
-import { style } from "./styles/CatTiles"
-import { FlatList, Image, StyleSheet, TouchableWithoutFeedback } from "react-native"
 
 const styles = StyleSheet.create(style)
 
@@ -19,21 +20,20 @@ class CatTiles extends Component {
 			page: 0,
 			seed: 0
 		}
-
-		this.getActivity = this.getActivity.bind(this)
-		this.handleLoadMore = this.handleLoadMore.bind(this)
-		this.handleRefresh = this.handleRefresh.bind(this)
 	}
 
 	componentDidMount() {
 		this.getActivity()
 	}
 
-	handleLoadMore() {
-		if (this.state.hasMore) {
+	handleLoadMore = () => {
+		console.log("handleLoadMore")
+		// console.log(this.state)
+		const { hasMore, page } = this.state
+		if (hasMore) {
 			this.setState(
 				{
-					page: this.state.page + 1
+					page: page + 1
 				},
 				() => {
 					this.getActivity()
@@ -42,7 +42,7 @@ class CatTiles extends Component {
 		}
 	}
 
-	handleRefresh() {
+	handleRefresh = () => {
 		this.setState(
 			{
 				isRefreshing: true,
@@ -55,28 +55,34 @@ class CatTiles extends Component {
 		)
 	}
 
-	getActivity() {
+	getActivity = () => {
 		const { cats, page } = this.state
-		this.setState({ isLoading: true })
-
-		fetch(`${constants.BASE_URL}api/cats/browse?page=${page}`, {
-			headers: {
-				"Content-Type": "application/json"
-			}
-		})
-			.then(response => {
-				return response.json()
+		this.setState({ isLoading: true }, () => {
+			fetch(`${constants.BASE_URL}api/cats/browse?page=${page}`, {
+				headers: {
+					"Content-Type": "application/json"
+				}
 			})
-			.then(json => {
-				this.setState({
-					cats: page === 0 ? json.cats : [...cats, ...json.cats],
-					hasMore: json.hasMore,
-					isRefreshing: false
+				.then(response => {
+					// console.log("cats response")
+					// console.log(response.json())
+					return response.json()
 				})
-			})
-			.catch(error => {
-				console.error(error)
-			})
+				.then(json => {
+					console.log("json")
+					console.log(json)
+					/*
+					this.setState({
+						cats: page === 0 ? json.cats : [...cats, ...json.cats],
+						hasMore: json.hasMore,
+						isRefreshing: false
+					})
+					*/
+				})
+				.catch(error => {
+					console.error(error)
+				})
+		})
 	}
 
 	render() {
@@ -94,29 +100,44 @@ class CatTiles extends Component {
 					refreshing={isRefreshing}
 					renderItem={({ item, index }) => {
 						let borderColor = Colors.strayCat
+						let marginTop = 25
+
+						if (index > 0) {
+							marginTop = 25
+						}
+
 						if (parseInt(item.living_situation, 10) === 1) {
 							borderColor = Colors.businessCat
 						}
+
 						if (parseInt(item.living_situation, 10) === 2) {
 							borderColor = Colors.familyCat
 						}
-						const imgStyle = { borderColor }
+
+						const imgStyle = { borderColor, marginTop }
 
 						return (
-							<TouchableWithoutFeedback
+							<View
 								key={`catTile${index}`}
-								onPress={() => {
-									this.props.navigate("Cat", {
-										id: item.id
-									})
-								}}
-								style={styles.imgBackground}
 							>
-								<Image
-									source={{ uri: item.path }}
-									style={[imgStyle, styles.imgBackground]}
-								/>
-							</TouchableWithoutFeedback>
+								<TouchableOpacity
+									onPress={() => {
+										this.props.navigate("Cat", {
+											id: item.id
+										})
+									}}
+								>
+									<Image
+										source={{ uri: item.path }}
+										style={[imgStyle, styles.imgBackground]}
+									/>
+								</TouchableOpacity>
+								<Text
+									style={styles.catTileHeader}
+								>
+									{item.name}
+								</Text>
+							</View>
 						)
 					}}
 				/>

@@ -1,16 +1,16 @@
 import * as Permissions from "expo-permissions"
-import AppHeader from "@components/primary/AppHeader"
-import CatGrid from "@components/secondary/CatGrid"
-import Colors from "@constants/Colors"
-import PropTypes from "prop-types"
-import store from "@store"
-import React, { Component } from "react"
+import { style } from "./styles/Profile"
 import { connect } from "react-redux"
-import { style } from "./styles/ProfileScreen"
 import { fetchUser, logout } from "@redux/actions/user"
 import { ScrollView, StyleSheet, View } from "react-native"
 import { Container, Text } from "native-base"
 import { Avatar, Icon, ListItem } from "react-native-elements"
+import AppHeader from "@components/primary/AppHeader"
+import CatGrid from "@components/secondary/lists/CatGrid"
+import Colors from "@constants/Colors"
+import PropTypes from "prop-types"
+import React, { Component } from "react"
+import store from "@store"
 
 const styles = StyleSheet.create(style)
 

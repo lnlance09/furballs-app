@@ -1,19 +1,19 @@
+import { style } from "./styles/Cat"
+import { connect } from "react-redux"
+import { Card, CardItem, Spinner, Text } from "native-base"
+import { ImageBackground, ScrollView, StyleSheet, View } from "react-native"
 import AppHeader from "@components/primary/AppHeader"
 import BusinessCatPic from "@assets/images/business-cat-illustration.png"
-import FamilyCatPic from "@assets/images/family-cat-illustration-band.png"
-import StrayCatPic from "@assets/images/street-cat-illustration.png"
 import Colors from "@constants/Colors"
+import FamilyCatPic from "@assets/images/family-cat-illustration-band.png"
 import PropTypes from "prop-types"
 import parser from "parse-address"
 import React, { Component } from "react"
-import { connect } from "react-redux"
-import { style } from "./styles/SearchScreen"
-import { Card, CardItem, Spinner, Text } from "native-base"
-import { ImageBackground, ScrollView, StyleSheet, View } from "react-native"
+import StrayCatPic from "@assets/images/street-cat-illustration.png"
 
 const styles = StyleSheet.create(style)
 
-class CatTypeSelectionScreen extends Component {
+class CatTypeScreen extends Component {
 	constructor(props) {
 		super(props)
 
@@ -46,13 +46,13 @@ class CatTypeSelectionScreen extends Component {
 	}
 }
 
-CatTypeSelectionScreen.navigationOptions = {
+CatTypeScreen.navigationOptions = {
 	header: null
 }
 
-CatTypeSelectionScreen.propTypes = {}
+CatTypeScreen.propTypes = {}
 
-CatTypeSelectionScreen.defaultProps = {}
+CatTypeScreen.defaultProps = {}
 
 const mapStateToProps = (state, ownProps) => {
 	return {
@@ -64,4 +64,4 @@ const mapStateToProps = (state, ownProps) => {
 export default connect(
 	mapStateToProps,
 	{}
-)(CatTypeSelectionScreen)
+)(CatTypeScreen)

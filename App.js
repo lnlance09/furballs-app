@@ -8,6 +8,7 @@ import { Provider } from "react-redux"
 import { Platform, StatusBar } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import AppNavigator from "./navigation/AppNavigator"
+import GothicFont from "@assets/fonts/Century-Gothic.ttf"
 import MonoFont from "@assets/fonts/SpaceMono-Regular.ttf"
 import store from "@store"
 
@@ -32,6 +33,7 @@ class App extends Component {
 		await Promise.all([
 			Font.loadAsync({
 				...Ionicons.font,
+				"century-gothic": GothicFont,
 				"space-mono": MonoFont
 			})
 		])

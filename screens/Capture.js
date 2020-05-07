@@ -1,17 +1,17 @@
 import * as Permissions from "expo-permissions"
-import AppHeader from "@components/primary/AppHeader"
-import ButtonComponent from "@components/primary/ButtonComponent"
-import CameraRollComponent from "@components/primary/CameraRollComponent"
-import Colors from "@constants/Colors"
-import PropTypes from "prop-types"
-import React, { Component } from "react"
-import { style } from "./styles/CaptureScreen"
+import { style } from "./styles/Capture"
 import { connect } from "react-redux"
 import { addCatPic } from "@redux/actions/cat"
+import { Camera } from "expo-camera"
 import { Container, Tab, TabHeading, Tabs, Text } from "native-base"
 import { StyleSheet, TouchableOpacity, View } from "react-native"
 import { Icon } from "react-native-elements"
-import { Camera } from "expo-camera"
+import AppHeader from "@components/primary/AppHeader"
+import Button from "@components/primary/Button"
+import CameraRoll from "@components/primary/CameraRoll"
+import Colors from "@constants/Colors"
+import PropTypes from "prop-types"
+import React, { Component } from "react"
 
 const styles = StyleSheet.create(style)
 
@@ -193,7 +193,7 @@ class CaptureScreen extends Component {
 		if (hasCameraPermission === null) {
 			return (
 				<View style={styles.permissionView}>
-					<ButtonComponent
+					<Button
 						buttonStyle={styles.permissionBtn}
 						onPress={() => navigate("Capture")}
 						text="Add cat photos"
@@ -204,7 +204,7 @@ class CaptureScreen extends Component {
 		} else if (hasCameraPermission === false) {
 			return (
 				<View style={styles.permissionView}>
-					<ButtonComponent
+					<Button
 						buttonStyle={styles.permissionBtn}
 						onPress={() => this.toggleCameraPermission()}
 						text="Add cat photos"
@@ -252,7 +252,7 @@ class CaptureScreen extends Component {
 								</TabHeading>
 							}
 						>
-							<CameraRollComponent
+							<CameraRoll
 								onSelectCallback={img => {
 									this.navigate("EditPhoto", {
 										img

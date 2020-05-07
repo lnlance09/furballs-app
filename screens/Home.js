@@ -1,11 +1,11 @@
-import AppHeader from "@components/primary/AppHeader"
-import CatTiles from "@components/secondary/CatTiles"
-import PropTypes from "prop-types"
-import React, { Component } from "react"
-import { style } from "./styles/HomeScreen"
+import { style } from "./styles/Home"
 import { connect } from "react-redux"
 import { Container } from "native-base"
 import { StyleSheet } from "react-native"
+import AppHeader from "@components/primary/AppHeader"
+import CatTiles from "@components/secondary/lists/CatTiles"
+import PropTypes from "prop-types"
+import React, { Component } from "react"
 
 const styles = StyleSheet.create(style)
 
@@ -23,7 +23,7 @@ class HomeScreen extends Component {
 
 		return (
 			<Container style={styles.container}>
-				<AppHeader title="Activity" />
+				<AppHeader title="Cativity" />
 				<CatTiles navigate={navigate} />
 			</Container>
 		)

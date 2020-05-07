@@ -1,12 +1,12 @@
+import { style } from "./styles/About"
+import { connect } from "react-redux"
+import { Card, CardItem, Spinner, Text } from "native-base"
+import { Image, ScrollView, StyleSheet, View } from "react-native"
 import AppHeader from "@components/primary/AppHeader"
 import Colors from "@constants/Colors"
 import PropTypes from "prop-types"
 import parser from "parse-address"
 import React, { Component } from "react"
-import { connect } from "react-redux"
-import { style } from "./styles/SearchScreen"
-import { Card, CardItem, Spinner, Text } from "native-base"
-import { Image, ScrollView, StyleSheet, View } from "react-native"
 
 const styles = StyleSheet.create(style)
 

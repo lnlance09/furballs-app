@@ -1,6 +1,6 @@
+import { Ionicons } from "@expo/vector-icons"
 import PropTypes from "prop-types"
 import React, { Component } from "react"
-import { Ionicons } from "@expo/vector-icons"
 
 class TabBarIcon extends Component {
 	render() {

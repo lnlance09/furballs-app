@@ -1,14 +1,14 @@
-import CatList from "@components/secondary/CatList"
-import Colors from "@constants/Colors"
-import PropTypes from "prop-types"
-import mapStyle from "../mapStyle.json"
-import Animated, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
-import React, { Component } from "react"
+import { style } from "./styles/Map"
 import { connect } from "react-redux"
-import { style } from "./styles/MapScreen"
 import { searchCatsByLocation, setRegion } from "@redux/actions/cat"
 import { Tab, TabHeading, Tabs, Text } from "native-base"
 import { SafeAreaView, StyleSheet, View } from "react-native"
+import Animated, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
+import CatList from "@components/secondary/lists/CatList"
+import Colors from "@constants/Colors"
+import PropTypes from "prop-types"
+import mapStyle from "../mapStyle.json"
+import React, { Component } from "react"
 
 const styles = StyleSheet.create(style)
 
@@ -20,8 +20,6 @@ class MapScreen extends Component {
 			index: 0,
 			routes: [{ key: "map", title: "Map" }, { key: "list", title: "List" }]
 		}
-
-		this.onRegionChange = this.onRegionChange.bind(this)
 	}
 
 	componentDidMount() {
@@ -31,7 +29,7 @@ class MapScreen extends Component {
 		})
 	}
 
-	onRegionChange(region) {
+	onRegionChange = region => {
 		this.props.setRegion(region)
 		this.props.searchCatsByLocation({
 			lat: region.latitude,

@@ -1,9 +1,9 @@
 import * as constants from "@redux/types"
-import PropTypes from "prop-types"
-import React, { Component } from "react"
 import { style } from "./styles/CatGrid"
 import { Dimensions, Image, StyleSheet, Text, TouchableHighlight, View } from "react-native"
 import { FlatGrid } from "react-native-super-grid"
+import PropTypes from "prop-types"
+import React, { Component } from "react"
 
 const { width } = Dimensions.get("window")
 
@@ -21,9 +21,6 @@ class CatGrid extends Component {
 			page: 0,
 			seed: 0
 		}
-
-		this.handleLoadMore = this.handleLoadMore.bind(this)
-		this.handleRefresh = this.handleRefresh.bind(this)
 	}
 
 	componentDidMount() {
@@ -37,7 +34,7 @@ class CatGrid extends Component {
 		this.willFocusCatGrid.remove()
 	}
 
-	getCats() {
+	getCats = () => {
 		const { cats, page } = this.state
 		this.setState({ isLoading: true })
 
@@ -61,7 +58,7 @@ class CatGrid extends Component {
 			})
 	}
 
-	handleLoadMore() {
+	handleLoadMore = () => {
 		if (this.state.hasMore) {
 			this.setState(
 				{

@@ -1,11 +1,11 @@
 import * as constants from "@redux/types"
-import PropTypes from "prop-types"
-import moment from "moment"
-import React, { Component } from "react"
 import { style } from "./styles/CatList"
 import { RenderMeal } from "@tools/textFunctions"
 import { FlatList, StyleSheet, View } from "react-native"
 import { ListItem, SearchBar } from "react-native-elements"
+import moment from "moment"
+import PropTypes from "prop-types"
+import React, { Component } from "react"
 
 const styles = StyleSheet.create(style)
 
@@ -22,17 +22,13 @@ class CatList extends Component {
 			q: "",
 			seed: 0
 		}
-
-		this.handleLoadMore = this.handleLoadMore.bind(this)
-		this.handleRefresh = this.handleRefresh.bind(this)
-		this.updateSearch = this.updateSearch.bind(this)
 	}
 
 	componentDidMount() {
 		this.searchCats()
 	}
 
-	handleLoadMore() {
+	handleLoadMore = () => {
 		if (this.state.hasMore) {
 			this.setState(
 				{
@@ -45,7 +41,7 @@ class CatList extends Component {
 		}
 	}
 
-	handleRefresh() {
+	handleRefresh = () => {
 		this.setState(
 			{
 				isRefreshing: true,
@@ -58,7 +54,7 @@ class CatList extends Component {
 		)
 	}
 
-	searchCats() {
+	searchCats = () => {
 		const { cats, page, q } = this.state
 		this.setState({ isLoading: true })
 

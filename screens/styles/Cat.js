@@ -10,6 +10,11 @@ export const style = {
 		marginBottom: 10,
 		marginTop: 8
 	},
+	cativityText: {
+		fontSize: 24,
+		marginBottom: 5,
+		marginTop: 18
+	},
 	emptyMsg: {
 		alignItems: "center",
 		flex: 1,

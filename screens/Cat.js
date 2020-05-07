@@ -1,26 +1,27 @@
 import * as constants from "@redux/types"
-import Animated, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
-import CatPic from "@assets/images/family-cat-illustration-band.png"
-import mapStyle from "../mapStyle.json"
-import AppHeader from "@components/primary/AppHeader"
-import ButtonComponent from "@components/primary/ButtonComponent"
-import Carousel from "@components/primary/Carousel"
-import Colors from "@constants/Colors"
-import PropTypes from "prop-types"
-import moment from "moment"
-import store from "@store"
-import SlidingUpPanel from "rn-sliding-up-panel"
-import React, { Component } from "react"
+import { style } from "./styles/Cat"
+import { connect } from "react-redux"
+import { getCat, likeCat, resetCat, toggleCatScreenEditing, unlikeCat } from "@redux/actions/cat"
 import { playSound } from "@tools/soundFunctions"
 import { RenderMeal } from "@tools/textFunctions"
-import { style } from "./styles/CatScreen"
-import { connect } from "react-redux"
 import { TextField } from "react-native-material-textfield"
-import { getCat, likeCat, resetCat, toggleCatScreenEditing, unlikeCat } from "@redux/actions/cat"
-import { Container, Spinner, Text, Toast } from "native-base"
+import { Container, Spinner, Toast } from "native-base"
 import { Clipboard, Dimensions, Image, ScrollView, StyleSheet, View } from "react-native"
 import { Icon, ListItem, Overlay } from "react-native-elements"
+import Animated, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
 import CatMeow from "../assets/sounds/cat-meow.mp3"
+import CatPic from "@assets/images/family-cat-illustration-band.png"
+import AppHeader from "@components/primary/AppHeader"
+import Button from "@components/primary/Button"
+import Carousel from "@components/primary/Carousel"
+import Colors from "@constants/Colors"
+import mapStyle from "../mapStyle.json"
+import moment from "moment"
+import PropTypes from "prop-types"
+import React, { Component } from "react"
+import SlidingUpPanel from "rn-sliding-up-panel"
+import store from "@store"
+import StyledText from "@components/primary/StyledText"
 
 const styles = StyleSheet.create(style)
 
@@ -38,14 +39,10 @@ class CatScreen extends Component {
 			reportLayoutVisible: false,
 			user: {}
 		}
-
-		this.likeCat = this.likeCat.bind(this)
-		this.reportAbuse = this.reportAbuse.bind(this)
-		this.unlikeCat = this.unlikeCat.bind(this)
 	}
 
 	async componentDidMount() {
-		this.willFocusCatPage = this.props.navigation.addListener("willFocus", () => {
+		this.willFocusCatPage = this.props.navigation.addListener("willFocus", async () => {
 			const _state = store.getState()
 			const user = _state.user
 			const auth = user.token === null ? false : true
@@ -53,7 +50,9 @@ class CatScreen extends Component {
 			this.setState({ auth, bearer, user })
 
 			const id = this.props.navigation.getParam("id", null)
-			this.props.getCat({ bearer, id })
+			console.log("getCat")
+			console.log(id)
+			await this.props.getCat({ id })
 			this._panel.hide()
 		})
 	}
@@ -62,12 +61,12 @@ class CatScreen extends Component {
 		this.willFocusCatPage.remove()
 	}
 
-	async likeCat(bearer, id) {
+	likeCat = async (bearer, id) => {
 		playSound(CatMeow)
 		this.props.likeCat({ bearer, id })
 	}
 
-	reportAbuse() {
+	reportAbuse = () => {
 		const id = this.props.cat.id
 		const { bearer, explanation } = this.state
 
@@ -114,7 +113,7 @@ class CatScreen extends Component {
 		}
 	}
 
-	setContent(id) {
+	setContent = id => {
 		Clipboard.setString(`https://felinus.io/cats/${id}`)
 		Toast.show({
 			buttonText: null,
@@ -131,7 +130,7 @@ class CatScreen extends Component {
 		})
 	}
 
-	unlikeCat(bearer, id) {
+	unlikeCat = (bearer, id) => {
 		this.props.unlikeCat({ bearer, id })
 	}
 
@@ -156,6 +155,9 @@ class CatScreen extends Component {
 		const { navigate } = this.props.navigation
 		const canEdit = auth && userId === user.id
 
+		console.log("cat screen")
+		console.log(this.props)
+
 		const MapSection = () => (
 			<View>
 				<Animated
@@ -176,11 +178,13 @@ class CatScreen extends Component {
 						}}
 					/>
 				</Animated>
-				<Text style={styles.spottedAtText}>
-					🐾 Spotted {moment(lastLocationTime).fromNow()}
-				</Text>
+				<StyledText
+					style={styles.spottedAtText}
+					text={`🐾 Spotted ${moment(lastLocationTime).fromNow()}`}
+				/>
 			</View>
 		)
+
 		const RenderMeals = () => {
 			return meals.map((m, i) => (
 				<ListItem
@@ -194,6 +198,7 @@ class CatScreen extends Component {
 				/>
 			))
 		}
+
 		const SlidePanel = (
 			<SlidingUpPanel height={height} ref={c => (this._panel = c)}>
 				<View style={styles.slideUpPanel}>
@@ -254,6 +259,7 @@ class CatScreen extends Component {
 				</View>
 			</SlidingUpPanel>
 		)
+
 		return (
 			<Container style={styles.cardPageContainer}>
 				{loading ? null : (
@@ -284,27 +290,41 @@ class CatScreen extends Component {
 
 						<Carousel
 							imgColor={{
-								borderColor: imgColor
+								// borderColor: imgColor
 							}}
 							navigation={this.props.navigation}
 							photos={this.props.cat.pics}
 							width={width}
 						/>
 
-						<ScrollView style={{ marginHorizontal: 7, marginVertical: 7 }}>
-							<Text style={styles.nameText}>{name}</Text>
-							<Text style={styles.homelessText}>{livingSituationLabel}</Text>
-							<Text style={styles.cardPageDescriptionText}>{description}</Text>
+						<ScrollView style={{ marginHorizontal: 7, marginVertical: 0 }}>
+							<StyledText
+								style={styles.nameText}
+								text={name}
+							/>
+							<StyledText
+								style={styles.homelessText}
+								text={livingSituationLabel}
+							/>
+							<StyledText
+								style={styles.cardPageDescriptionText}
+								text={description}
+							/>
 
 							{MapSection()}
 
-							<Text style={{ fontSize: 24, marginBottom: 5, marginTop: 18 }}>
-								Cativity
-							</Text>
+							<StyledText
+								style={styles.cardPageDescriptionText}
+								text="Cativity"
+							/>
+
 							{mealCount > 0 ? (
 								RenderMeals()
 							) : (
-								<Text style={styles.emptyMsg}>This cat has not been fed yet</Text>
+								<StyledText
+									style={styles.emptyMsg}
+									text="This cat has not been fed yet"
+								/>
 							)}
 
 							<Overlay
@@ -315,7 +335,10 @@ class CatScreen extends Component {
 								}
 							>
 								<View>
-									<Text style={styles.modalHeader}>Report animal abuse</Text>
+									<StyledText
+										style={styles.modalHeader}
+										text="Report animal abuse"
+									/>
 									<TextField
 										characterRestriction={500}
 										label="Suspect abuse or neglect?"
@@ -327,7 +350,7 @@ class CatScreen extends Component {
 										sufffix="Let us know"
 										value={explanation}
 									/>
-									<ButtonComponent
+									<Button
 										buttonStyle={styles.explanationBtn}
 										onPress={() => this.reportAbuse()}
 										text="Report"
@@ -342,7 +365,9 @@ class CatScreen extends Component {
 		)
 	}
 }
+
 CatScreen.navigationOptions = { header: null }
+
 CatScreen.propTypes = {
 	cat: PropTypes.shape({
 		description: PropTypes.string,
@@ -372,6 +397,7 @@ CatScreen.propTypes = {
 	toggleCatScreenEditing: PropTypes.func,
 	unlikeCat: PropTypes.func
 }
+
 CatScreen.defaultProps = {
 	cat: {
 		id: null,
@@ -385,12 +411,14 @@ CatScreen.defaultProps = {
 	toggleCatScreenEditing,
 	unlikeCat
 }
+
 const mapStateToProps = (state, ownProps) => {
 	return {
-		...state.app,
+		...state.cat,
 		...ownProps
 	}
 }
+
 export default connect(
 	mapStateToProps,
 	{

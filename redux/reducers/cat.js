@@ -20,6 +20,8 @@ const cat = (state = initial(), action) => {
 			}
 
 		case constants.GET_CAT:
+			console.log("get cat reducer")
+			console.log(payload)
 			if (payload.error) {
 				return {
 					...state,
